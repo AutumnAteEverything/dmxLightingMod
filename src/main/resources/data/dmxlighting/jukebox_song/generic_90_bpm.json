@@ -1,0 +1,8 @@
+{
+  "comparator_output": 4,
+  "description": {
+    "translate": "jukebox_song.dmxlighting.generic_90_bpm"
+  },
+  "length_in_seconds": 3600.0,
+  "sound_event": "dmxlighting:music_disc.generic_90_bpm"
+}
