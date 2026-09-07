@@ -83,6 +83,10 @@ import java.util.Locale;
  *     Saves name, group, universe, RGBD patch data, and color fade
  *     settings for a DMX Nautilus.
  *
+ * UpdateDmxBlockDisplayPayload
+ *     Saves patch, skin, and color fade settings for a DMX Block
+ *     Display entity.
+ *
  * RequestFixtureBrowserPayload
  *     Requests a current browser snapshot for the player's dimension.
  *
@@ -199,6 +203,11 @@ public final class DmxNetworking {
         PayloadTypeRegistry.serverboundPlay().register(
                 UpdateDmxNautilusPayload.TYPE,
                 UpdateDmxNautilusPayload.STREAM_CODEC
+        );
+
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateDmxBlockDisplayPayload.TYPE,
+                UpdateDmxBlockDisplayPayload.STREAM_CODEC
         );
 
         PayloadTypeRegistry.serverboundPlay().register(
@@ -409,6 +418,17 @@ public final class DmxNetworking {
                 (payload, context) ->
                         context.server().execute(
                                 () -> handleDmxNautilusUpdate(
+                                        context.player(),
+                                        payload
+                                )
+                        )
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(
+                UpdateDmxBlockDisplayPayload.TYPE,
+                (payload, context) ->
+                        context.server().execute(
+                                () -> handleDmxBlockDisplayUpdate(
                                         context.player(),
                                         payload
                                 )
@@ -1539,6 +1559,87 @@ public final class DmxNetworking {
                         "Updated "
                                 + nautilus.getConsoleName()
                                 + "."
+                )
+        );
+    }
+
+    private static void handleDmxBlockDisplayUpdate(
+            ServerPlayer player,
+            UpdateDmxBlockDisplayPayload payload
+    ) {
+        if (player == null || payload == null) {
+            return;
+        }
+
+        ServerLevel level = (ServerLevel) player.level();
+        DmxBlockDisplayEntity display =
+                DmxBlockDisplayRegistry.getByEntityId(
+                        level.dimension(),
+                        payload.entityId()
+                );
+
+        if (display == null) {
+            Entity entity = level.getEntity(payload.entityId());
+            if (entity instanceof DmxBlockDisplayEntity foundDisplay) {
+                display = foundDisplay;
+                DmxBlockDisplayRegistry.register(foundDisplay);
+            }
+        }
+
+        if (display == null || display.isRemoved()) {
+            player.sendSystemMessage(
+                    Component.literal(
+                            "That DMX Block Display is not currently loaded."
+                    )
+            );
+            return;
+        }
+
+        if (!isValidParameterChannel(payload.redChannel())
+                || !isValidParameterChannel(payload.greenChannel())
+                || !isValidParameterChannel(payload.blueChannel())
+                || !isValidParameterChannel(payload.dimmerChannel())
+                || !isValidParameterChannel(payload.strobeChannel())
+                || !isValidParameterChannel(payload.skinDmxChannel())) {
+            player.sendSystemMessage(
+                    Component.literal(
+                            "DMX Block Display channels must be blank or 1-512."
+                    )
+            );
+            return;
+        }
+
+        display.setFixtureName(payload.fixtureName());
+        display.setFixtureGroup(
+                FixtureGroupName.of(payload.groupName())
+        );
+        display.setUniverse(
+                clamp(
+                        payload.universe(),
+                        DmxFixtureBlockEntity.MIN_UNIVERSE,
+                        DmxFixtureBlockEntity.MAX_UNIVERSE
+                )
+        );
+        display.setParameterMap(
+                payload.redChannel(),
+                payload.greenChannel(),
+                payload.blueChannel(),
+                payload.dimmerChannel(),
+                payload.strobeChannel()
+        );
+        display.setSkinConfiguration(
+                payload.skin(),
+                payload.skinDmxChannel()
+        );
+        display.setColorInterpolation(
+                payload.colorInterpolationEnabled(),
+                payload.colorInterpolationTimeSeconds()
+        );
+        display.refreshFromDmx();
+
+        player.sendSystemMessage(
+                Component.literal(
+                        "Updated " + display.getConsoleName() + "."
                 )
         );
     }

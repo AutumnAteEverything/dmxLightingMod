@@ -75,3 +75,25 @@ Then send:
 ```
 
 The block displays a bright blue-cyan color using Skin 5.
+
+## DMX Block Displays
+
+`dmxlighting:dmx_block_display` is a summonable visual version of the DMX Block. It appears in the Lighting Console and supports RGB, dimmer, strobe, skins, an optional skin channel, groups, and color fades. It is DMX-only and emits no Minecraft world light.
+
+The entity also retains Minecraft's normal display controls, including translation, scale, left and right rotation, billboard mode, interpolation, view range, shadows, width, and height. Those properties can be supplied in the summon command or changed later with `/data merge entity`.
+
+Basic summon using channels 101-105 for red, green, blue, dimmer, and strobe:
+
+```mcfunction
+/summon dmxlighting:dmx_block_display ~ ~ ~ {dmx_fixture_name:"Display 1",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104,dmx_parameter_strobe:105}
+```
+
+This example makes a large inside-out cube centered on its summon point. The negative scale is useful for surrounding-room and optical-illusion effects:
+
+```mcfunction
+/summon dmxlighting:dmx_block_display ~ ~ ~ {dmx_fixture_name:"Inside Out",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104,transformation:{translation:[4.0f,4.0f,4.0f],scale:[-8.0f,-8.0f,-8.0f],left_rotation:[0.0f,0.0f,0.0f,1.0f],right_rotation:[0.0f,0.0f,0.0f,1.0f]},width:8.0f,height:8.0f,view_range:4.0f}
+```
+
+The DMX editor is opened from the display's row in the Lighting Console. Transform settings remain command-driven so the entity stays compatible with vanilla display-building tools and command generators.
+
+DMX Block Displays have no spawn egg. Remove one with `/kill` or target it with normal entity selectors, for example `@e[type=dmxlighting:dmx_block_display,limit=1,sort=nearest]`.

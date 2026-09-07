@@ -57,6 +57,9 @@ public record FixtureBrowserEntry(
         int greenChannel,
         int blueChannel,
         int dimmerChannel,
+        int strobeChannel,
+        int skin,
+        int skinDmxChannel,
 
         boolean colorInterpolationEnabled,
         float colorInterpolationTimeSeconds
@@ -236,6 +239,23 @@ public record FixtureBrowserEntry(
                         dimmerChannel
                 );
 
+        strobeChannel =
+                cleanDmxChannel(
+                        strobeChannel
+                );
+
+        skin =
+                clamp(
+                        skin,
+                        DmxPixelBlockEntity.MIN_SKIN,
+                        DmxPixelBlockEntity.MAX_SKIN
+                );
+
+        skinDmxChannel =
+                cleanDmxChannel(
+                        skinDmxChannel
+                );
+
         colorInterpolationTimeSeconds =
                 ColorInterpolationSettings.clampTimeSeconds(
                         colorInterpolationTimeSeconds
@@ -340,6 +360,13 @@ public record FixtureBrowserEntry(
                 map.getGreenChannel(),
                 map.getBlueChannel(),
                 map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                fixture instanceof DmxPixelBlockEntity pixelBlock
+                        ? pixelBlock.getSkin()
+                        : DmxPixelBlockEntity.MIN_SKIN,
+                fixture instanceof DmxPixelBlockEntity pixelBlock
+                        ? pixelBlock.getSkinDmxChannel()
+                        : FixtureParameterMap.UNASSIGNED,
 
                 fixture.isColorInterpolationEnabled(),
                 fixture.getColorInterpolationTimeSeconds()
@@ -412,6 +439,9 @@ public record FixtureBrowserEntry(
                 map.getGreenChannel(),
                 map.getBlueChannel(),
                 map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                DmxPixelBlockEntity.MIN_SKIN,
+                FixtureParameterMap.UNASSIGNED,
 
                 parrot.isColorInterpolationEnabled(),
                 parrot.getColorInterpolationTimeSeconds()
@@ -484,6 +514,9 @@ public record FixtureBrowserEntry(
                 map.getGreenChannel(),
                 map.getBlueChannel(),
                 map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                DmxPixelBlockEntity.MIN_SKIN,
+                FixtureParameterMap.UNASSIGNED,
 
                 enderman.isColorInterpolationEnabled(),
                 enderman.getColorInterpolationTimeSeconds()
@@ -556,6 +589,9 @@ public record FixtureBrowserEntry(
                 map.getGreenChannel(),
                 map.getBlueChannel(),
                 map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                DmxPixelBlockEntity.MIN_SKIN,
+                FixtureParameterMap.UNASSIGNED,
 
                 warden.isColorInterpolationEnabled(),
                 warden.getColorInterpolationTimeSeconds()
@@ -628,9 +664,68 @@ public record FixtureBrowserEntry(
                 map.getGreenChannel(),
                 map.getBlueChannel(),
                 map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                DmxPixelBlockEntity.MIN_SKIN,
+                FixtureParameterMap.UNASSIGNED,
 
                 nautilus.isColorInterpolationEnabled(),
                 nautilus.getColorInterpolationTimeSeconds()
+        );
+    }
+
+    /** Creates a browser entry from one loaded DMX Block Display. */
+    public static FixtureBrowserEntry fromDmxBlockDisplay(
+            DmxBlockDisplayEntity display
+    ) {
+        Objects.requireNonNull(display, "display");
+
+        FixtureParameterMap map = display.getParameterMap();
+        int[] assignedChannels = new int[] {
+                map.getRedChannel(),
+                map.getGreenChannel(),
+                map.getBlueChannel(),
+                map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                display.getSkinDmxChannel()
+        };
+        FixtureOutput output = display.getCurrentOutput();
+
+        return new FixtureBrowserEntry(
+                display.blockPosition(),
+                display.getConsoleName(),
+                display.getGroupDisplayName(),
+                DmxBlockDisplayProfile.ID,
+                display.getUniverse(),
+                assignedChannels,
+                display.getControlMode().getSerializedName(),
+                display.getOutputPackedRgb(),
+                display.getMinecraftLightLevel(),
+
+                output.getRed(),
+                output.getGreen(),
+                output.getBlue(),
+                output.getWhite(),
+                output.getAmber(),
+                output.getDimmer(),
+                output.getPan(),
+                output.getTilt(),
+                output.getBeamWidth(),
+                output.getBeamLength(),
+                output.getStrobe(),
+
+                TARGET_MOB,
+                display.getId(),
+
+                map.getRedChannel(),
+                map.getGreenChannel(),
+                map.getBlueChannel(),
+                map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                display.getSkin(),
+                display.getSkinDmxChannel(),
+
+                display.isColorInterpolationEnabled(),
+                display.getColorInterpolationTimeSeconds()
         );
     }
 

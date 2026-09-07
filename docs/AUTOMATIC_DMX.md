@@ -4,12 +4,12 @@ Automatic DMX turns a playing jukebox into a simple synchronized light show. It 
 
 ## What it controls
 
-While a record is playing, every loaded DMX fixture, DMX Block, DMX Parrot, DMX Enderman, DMX Warden, and DMX Nautilus in the same dimension follows the record's beat.
+While a record is playing, every loaded DMX fixture, DMX Block, DMX Block Display, DMX Parrot, DMX Enderman, DMX Warden, and DMX Nautilus in the same dimension follows the record's beat.
 
 - All DMX fixtures and mobs receive saturated color changes every two beats.
 - Brightness pulses on every beat, with a stronger pulse at the start of each four-beat show phrase.
 - Fixture blocks receive smooth pan and tilt sweeps.
-- DMX Blocks and DMX mobs keep their normal physical behavior and use only the color and brightness part of the show.
+- DMX Blocks, DMX Block Displays, and DMX mobs keep their normal physical behavior and use only the color and brightness part of the show.
 
 If more than one jukebox is playing, each fixture or mob follows the nearest active jukebox in its dimension.
 
@@ -31,7 +31,7 @@ Automatic DMX is a temporary output layer. It does not write into the in-game DM
 
 ## Testing
 
-1. Place at least one DMX fixture, DMX Block, or DMX mob.
+1. Place or summon at least one DMX fixture, DMX Block, DMX Block Display, or DMX mob.
 2. Put any music disc in a jukebox in the same dimension.
 3. Run `/automaticdmx status` to see the detected disc and tempo.
 4. Eject the disc and confirm that the fixtures return to their previous output.

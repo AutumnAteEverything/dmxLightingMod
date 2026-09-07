@@ -135,6 +135,18 @@ public final class ConsoleFixtureOutputHandler {
             return;
         }
 
+        DmxBlockDisplayEntity targetedDisplay =
+                DmxBlockDisplayRegistry.getByEntityId(
+                        level.dimension(),
+                        payload.targetEntityId()
+                );
+
+        if (targetedDisplay != null
+                && !targetedDisplay.isRemoved()) {
+            applyPayloadToBlockDisplay(targetedDisplay, payload);
+            return;
+        }
+
         DmxParrotEntity targetedParrot =
                 DmxMobFixtureRegistry.getParrotByEntityId(
                         level.dimension(),
@@ -260,6 +272,14 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToNautilus(
                 nautilus,
+                payload
+        );
+
+        applyPayloadToBlockDisplay(
+                DmxBlockDisplayRegistry.getAt(
+                        level.dimension(),
+                        position
+                ),
                 payload
         );
     }
@@ -415,6 +435,29 @@ public final class ConsoleFixtureOutputHandler {
         if (group == null
                 || group.isUngrouped()) {
 
+            DmxBlockDisplayEntity sourceDisplay =
+                    DmxBlockDisplayRegistry.getByEntityId(
+                            level.dimension(),
+                            payload.targetEntityId()
+                    );
+
+            if (sourceDisplay == null) {
+                sourceDisplay = DmxBlockDisplayRegistry.getAt(
+                        level.dimension(),
+                        sourcePosition
+                );
+            }
+
+            if (sourceDisplay != null
+                    && !sourceDisplay.isRemoved()
+                    && !sourceDisplay.isUngrouped()) {
+                group = sourceDisplay.getFixtureGroup();
+            }
+        }
+
+        if (group == null
+                || group.isUngrouped()) {
+
             return;
         }
 
@@ -455,6 +498,14 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToNautiluses(
                 DmxMobFixtureRegistry.getNautilusesInGroup(
+                        level.dimension(),
+                        group
+                ),
+                payload
+        );
+
+        applyPayloadToBlockDisplays(
+                DmxBlockDisplayRegistry.getDisplaysInGroup(
                         level.dimension(),
                         group
                 ),
@@ -511,6 +562,13 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToNautiluses(
                 DmxMobFixtureRegistry.getNautilusesInDimension(
+                        level.dimension()
+                ),
+                payload
+        );
+
+        applyPayloadToBlockDisplays(
+                DmxBlockDisplayRegistry.getDisplaysInDimension(
                         level.dimension()
                 ),
                 payload
@@ -660,6 +718,20 @@ public final class ConsoleFixtureOutputHandler {
                     nautilus,
                     payload
             );
+        }
+    }
+
+    private static void applyPayloadToBlockDisplays(
+            List<DmxBlockDisplayEntity> displays,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (displays == null || displays.isEmpty() || payload == null) {
+            return;
+        }
+
+        for (DmxBlockDisplayEntity display :
+                new ArrayList<>(displays)) {
+            applyPayloadToBlockDisplay(display, payload);
         }
     }
 
@@ -1011,6 +1083,17 @@ public final class ConsoleFixtureOutputHandler {
         nautilus.applyConsoleDmxOutput(
                 payload
         );
+    }
+
+    private static void applyPayloadToBlockDisplay(
+            DmxBlockDisplayEntity display,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (display == null || display.isRemoved() || payload == null) {
+            return;
+        }
+
+        display.applyConsoleDmxOutput(payload);
     }
 
     /*

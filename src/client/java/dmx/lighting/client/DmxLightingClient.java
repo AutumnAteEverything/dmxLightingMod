@@ -7,6 +7,7 @@ import dmx.lighting.ModBlockEntities;
 import dmx.lighting.ModBlocks;
 import dmx.lighting.ModEntities;
 import dmx.lighting.client.render.DmxFixtureBlockEntityRenderer;
+import dmx.lighting.client.render.DmxBlockDisplayRenderer;
 import dmx.lighting.client.render.DmxEndermanRenderer;
 import dmx.lighting.client.render.DmxNautilusRenderer;
 import dmx.lighting.client.render.DmxParrotRenderer;
@@ -89,6 +90,11 @@ public class DmxLightingClient implements ClientModInitializer {
         EntityRendererRegistry.register(
                 ModEntities.DMX_NAUTILUS,
                 DmxNautilusRenderer::new
+        );
+
+        EntityRendererRegistry.register(
+                ModEntities.DMX_BLOCK_DISPLAY,
+                DmxBlockDisplayRenderer::new
         );
     }
 

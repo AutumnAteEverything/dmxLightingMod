@@ -203,6 +203,16 @@ DMX Wardens retain normal Minecraft Warden behavior and aggression.
 
 DMX Nautiluses retain normal Nautilus swimming, taming, riding, saddle, armor, and breeding behavior. They are marked persistent so an unattended show Nautilus does not despawn.
 
+## DMX Block Display summon
+
+DMX Block Displays are DMX-only visual entities that register with the Lighting Console. Their default patch is universe 1, channels 1-5 for red, green, blue, dimmer, and strobe.
+
+```mcfunction
+/summon dmxlighting:dmx_block_display ~ ~ ~ {dmx_fixture_name:"Display 1",dmx_group_name:"Video Wall",dmx_group_key:"video wall",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104,dmx_parameter_strobe:105,dmx_display_skin:2,dmx_display_skin_channel:106}
+```
+
+They accept the normal display entity tags, including `transformation`, `interpolation_duration`, `start_interpolation`, `teleport_duration`, `billboard`, `brightness`, `view_range`, `shadow_radius`, `shadow_strength`, `width`, and `height`. See [DMX Blocks](DMX_BLOCK.md) for a negative-scale example.
+
 ## Control mode and manual output
 
 Set a fixture to DMX or Manual mode:

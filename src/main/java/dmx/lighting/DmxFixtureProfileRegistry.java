@@ -146,6 +146,10 @@ public final class DmxFixtureProfileRegistry {
                 DmxNautilusProfile.INSTANCE
         );
 
+        register(
+                DmxBlockDisplayProfile.INSTANCE
+        );
+
         initialized =
                 true;
     }

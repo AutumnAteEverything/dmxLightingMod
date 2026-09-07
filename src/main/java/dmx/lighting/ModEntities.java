@@ -50,6 +50,15 @@ public final class ModEntities {
                     )
             );
 
+    public static final ResourceKey<EntityType<?>>
+    DMX_BLOCK_DISPLAY_KEY =
+            ResourceKey.create(
+                    Registries.ENTITY_TYPE,
+                    DmxLighting.id(
+                            "dmx_block_display"
+                    )
+            );
+
     public static final EntityType<DmxParrotEntity> DMX_PARROT =
             Registry.register(
                     BuiltInRegistries.ENTITY_TYPE,
@@ -149,6 +158,31 @@ public final class ModEntities {
                             )
                             .build(
                                     DMX_NAUTILUS_KEY
+                            )
+            );
+
+    public static final EntityType<DmxBlockDisplayEntity>
+    DMX_BLOCK_DISPLAY =
+            Registry.register(
+                    BuiltInRegistries.ENTITY_TYPE,
+                    DMX_BLOCK_DISPLAY_KEY,
+                    EntityType.Builder
+                            .of(
+                                    DmxBlockDisplayEntity::new,
+                                    MobCategory.MISC
+                            )
+                            .sized(
+                                    1.0F,
+                                    1.0F
+                            )
+                            .clientTrackingRange(
+                                    16
+                            )
+                            .updateInterval(
+                                    1
+                            )
+                            .build(
+                                    DMX_BLOCK_DISPLAY_KEY
                             )
             );
 

@@ -38,6 +38,7 @@ The server owns saved fixture configuration and authoritative output. Client scr
 | Identity/grouping | `FixtureIdentity`, `FixtureGroupName`, `DmxFixtureRegistry` | Names, groups, profiles, and loaded-fixture discovery |
 | Fixture types | `DmxFixtureProfileRegistry`, `RgbParProfile`, `StaticSpotProfile` | Selects supported visual fixture models and compatibility aliases |
 | Pixel block | `DmxPixelBlock`, `DmxPixelBlockEntity` | RGB/dimmer/strobe surface, five skins, and DMX skin selection |
+| Block display | `DmxBlockDisplayEntity`, `DmxBlockDisplayRegistry` | Transformable, summonable pixel surfaces with entity persistence and console discovery |
 | DMX mobs | `DmxParrotEntity`, `DmxEndermanEntity`, `DmxWardenEntity`, `DmxNautilusEntity`, `DmxMobFixtureRegistry` | Moving RGB/dimmer fixtures, persistence, loaded-entity discovery, and automatic-show output |
 | Console | `LightingConsole`, `LightingConsoleScreen`, console payload handlers | Browser summaries, patch analysis, and targeted output |
 | Beams/light | `FixtureBeamDirection`, `FixtureBeamSettings`, `FixtureBeamLightManager`, client renderers | Beam geometry, orientation, sampling, and light behavior |
@@ -46,7 +47,7 @@ The server owns saved fixture configuration and authoritative output. Client scr
 
 ## Persistence
 
-Fixture block entities save identity, universe, explicit parameter channels, control mode, manual values, beam/mount configuration, interpolation settings, and other render state. DMX Blocks add selected skin, skin channel, and rendered skin state. DMX mobs save their identity, group, RGB/dimmer patch, and color-fade settings directly on the entity.
+Fixture block entities save identity, universe, explicit parameter channels, control mode, manual values, beam/mount configuration, interpolation settings, and other render state. DMX Blocks add selected skin, skin channel, and rendered skin state. DMX mobs save their identity, group, RGB/dimmer patch, and color-fade settings directly on the entity. DMX Block Displays save equivalent DMX Block settings alongside the vanilla display transformation data inherited from Minecraft.
 
 Because state is stored in the world, changes to persistence keys need migration/default handling. Never assume a new key exists in an older world.
 

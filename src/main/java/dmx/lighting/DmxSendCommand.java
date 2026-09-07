@@ -192,6 +192,10 @@ public final class DmxSendCommand {
                 universe
         );
 
+        DmxBlockDisplayRegistry.refreshInUniverse(
+                universe
+        );
+
         int endChannel =
                 startChannel
                         + values.length

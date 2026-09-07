@@ -22,6 +22,7 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Full-cube **DMX Block** with RGB, dimmer, strobe, and five selectable skins.
 - Optional DMX channel for selecting the DMX Block skin.
 - Emissive DMX Block surfaces that remain visible in darkness while emitting no Minecraft block light.
+- Summonable **DMX Block Displays** with the same emissive skins and DMX controls, plus vanilla display transformations including negative scale.
 - **DMX Parrot**, **DMX Enderman**, **DMX Warden**, and **DMX Nautilus** mobs with RGB/dimmer patching, color fades, and emissive DMX color rendering.
 - Handheld, right-docked **Lighting Console** with Fixtures, Groups, Universes, Patch, and Output views.
 - Live output to one fixture, one group, or all loaded fixtures.
@@ -77,12 +78,21 @@ For a DMX Block patched to channels 101-105 as red, green, blue, dimmer, and ski
 
 That makes the block bright red and selects skin 3.
 
+Summon a transformable DMX Block Display with RGB, dimmer, and strobe on channels 101-105:
+
+```mcfunction
+/summon dmxlighting:dmx_block_display ~ ~ ~ {dmx_fixture_name:"Display 1",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104,dmx_parameter_strobe:105}
+```
+
+It appears in the Lighting Console and supports Minecraft's normal display-entity `transformation` data. See [DMX Blocks](docs/DMX_BLOCK.md) for an inside-out example.
+
 ## Items and blocks
 
 | Name | Registry ID | Creative tab | Purpose |
 | --- | --- | --- | --- |
 | DMX Fixture | `dmxlighting:dmx_block` | Functional Blocks | Configurable PAR/Spotlight fixture with movement, beam, and light controls |
 | DMX Block | `dmxlighting:dmx_pixel_block` | Functional Blocks | Emissive RGB surface with dimmer, strobe, and five skins; emits no world light |
+| DMX Block Display | `dmxlighting:dmx_block_display` | Summon command | Transformable emissive DMX Block visual with console registration and no world light |
 | Lighting Console | `dmxlighting:lighting_console` | Tools & Utilities | Portable browser, patch view, and live control surface |
 | DMX Parrot Spawn Egg | `dmxlighting:dmx_parrot_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable parrot mob that appears in the console |
 | DMX Enderman Spawn Egg | `dmxlighting:dmx_enderman_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Enderman mob that appears in the console |

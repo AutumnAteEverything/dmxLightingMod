@@ -1,6 +1,7 @@
 package dmx.lighting.client;
 
 import dmx.lighting.ConsoleFixtureOutputPayload;
+import dmx.lighting.DmxBlockDisplayProfile;
 import dmx.lighting.DmxEndermanProfile;
 import dmx.lighting.DmxFixtureProfile;
 import dmx.lighting.DmxFixtureProfileRegistry;
@@ -361,6 +362,9 @@ public class LightingConsoleScreen extends Screen {
      */
 
     private BlockPos selectedPosition;
+    private String selectedTargetKind;
+    private int selectedTargetEntityId =
+            FixtureBrowserEntry.NO_TARGET_ENTITY_ID;
 
     private String selectedGroupKey;
 
@@ -1378,6 +1382,18 @@ public class LightingConsoleScreen extends Screen {
                                 outputTarget
                         );
 
+        boolean dmxBlockDisplayTarget =
+                visible
+                        && isSelectedDmxBlockDisplay()
+                        && ConsoleFixtureOutputPayload.TARGET_FIXTURE
+                        .equals(
+                                outputTarget
+                        );
+
+        boolean compactDmxEntityTarget =
+                dmxMobFixtureTarget
+                        || dmxBlockDisplayTarget;
+
         setWidgetVisible(
                 outputFixtureTargetButton,
                 visible
@@ -1411,13 +1427,13 @@ public class LightingConsoleScreen extends Screen {
         setWidgetVisible(
                 outputWhiteSlider,
                 visible
-                        && !dmxMobFixtureTarget
+                        && !compactDmxEntityTarget
         );
 
         setWidgetVisible(
                 outputAmberSlider,
                 visible
-                        && !dmxMobFixtureTarget
+                        && !compactDmxEntityTarget
         );
 
         setWidgetVisible(
@@ -1428,25 +1444,25 @@ public class LightingConsoleScreen extends Screen {
         setWidgetVisible(
                 outputPanSlider,
                 visible
-                        && !dmxMobFixtureTarget
+                        && !compactDmxEntityTarget
         );
 
         setWidgetVisible(
                 outputTiltSlider,
                 visible
-                        && !dmxMobFixtureTarget
+                        && !compactDmxEntityTarget
         );
 
         setWidgetVisible(
                 outputBeamWidthSlider,
                 visible
-                        && !dmxMobFixtureTarget
+                        && !compactDmxEntityTarget
         );
 
         setWidgetVisible(
                 outputBeamLengthSlider,
                 visible
-                        && !dmxMobFixtureTarget
+                        && !compactDmxEntityTarget
         );
 
         setWidgetVisible(
@@ -1463,8 +1479,8 @@ public class LightingConsoleScreen extends Screen {
         if (outputApplyButton != null) {
             outputApplyButton.setMessage(
                     Component.literal(
-                            dmxMobFixtureTarget
-                                    ? "Apply DMX Mob Output"
+                            compactDmxEntityTarget
+                                    ? "Apply DMX Output"
                                     : "Apply All Output"
                     )
             );
@@ -1657,6 +1673,17 @@ public class LightingConsoleScreen extends Screen {
     }
 
     private int getApplyAllMaskForCurrentTarget() {
+        if (isSelectedDmxBlockDisplay()
+                && ConsoleFixtureOutputPayload.TARGET_FIXTURE.equals(
+                        outputTarget
+                )) {
+            return ConsoleFixtureOutputPayload.APPLY_RED
+                    | ConsoleFixtureOutputPayload.APPLY_GREEN
+                    | ConsoleFixtureOutputPayload.APPLY_BLUE
+                    | ConsoleFixtureOutputPayload.APPLY_DIMMER
+                    | ConsoleFixtureOutputPayload.APPLY_STROBE;
+        }
+
         if (isSelectedDmxMob()
                 && ConsoleFixtureOutputPayload.TARGET_FIXTURE.equals(
                         outputTarget
@@ -1693,6 +1720,14 @@ public class LightingConsoleScreen extends Screen {
                 )
                 || DmxNautilusProfile.ID.equals(
                         fixtureType
+                );
+    }
+
+    private boolean isSelectedDmxBlockDisplay() {
+        FixtureBrowserEntry selected = getSelectedBrowserEntry();
+        return selected != null
+                && DmxBlockDisplayProfile.ID.equals(
+                        selected.fixtureType()
                 );
     }
 
@@ -2233,11 +2268,17 @@ public class LightingConsoleScreen extends Screen {
     private void restoreFixtureSelectionAfterRefresh() {
         if (selectedPosition != null
                 && findBrowserEntryIndex(
-                        selectedPosition
+                        selectedPosition,
+                        selectedTargetKind,
+                        selectedTargetEntityId
                 ) < 0) {
 
             selectedPosition =
                     null;
+            selectedTargetKind =
+                    null;
+            selectedTargetEntityId =
+                    FixtureBrowserEntry.NO_TARGET_ENTITY_ID;
         }
     }
 
@@ -2341,6 +2382,15 @@ public class LightingConsoleScreen extends Screen {
                     new DmxNautilusScreen(
                             selectedEntry
                     )
+            );
+            return;
+        }
+
+        if (DmxBlockDisplayProfile.ID.equals(
+                selectedEntry.fixtureType()
+        )) {
+            Minecraft.getInstance().setScreen(
+                    new DmxBlockDisplayScreen(selectedEntry)
             );
             return;
         }
@@ -2667,14 +2717,18 @@ public class LightingConsoleScreen extends Screen {
                     }
                 }
 
-                BlockPos position =
-                        getPositionAtCurrentViewIndex(
+                FixtureBrowserEntry selectedEntry =
+                        getEntryAtCurrentViewIndex(
                                 entryIndex
                         );
 
-                if (position != null) {
+                if (selectedEntry != null) {
                     selectedPosition =
-                            position.immutable();
+                            selectedEntry.position().immutable();
+                    selectedTargetKind =
+                            selectedEntry.targetKind();
+                    selectedTargetEntityId =
+                            selectedEntry.targetEntityId();
 
                     if (doubleClick) {
                         editSelectedFixture();
@@ -3086,7 +3140,7 @@ public class LightingConsoleScreen extends Screen {
     ) {
         boolean selected =
                 isSelected(
-                        entry.position()
+                        entry
                 );
 
         int rowColor =
@@ -3630,7 +3684,9 @@ public class LightingConsoleScreen extends Screen {
 
         boolean selected =
                 isSelected(
-                        entry.position()
+                        findBrowserEntry(
+                                entry
+                        )
                 );
 
         int rowColor =
@@ -3944,7 +4000,9 @@ public class LightingConsoleScreen extends Screen {
 
         int index =
                 findBrowserEntryIndex(
-                        selectedPosition
+                        selectedPosition,
+                        selectedTargetKind,
+                        selectedTargetEntityId
                 );
 
         return index < 0
@@ -4032,18 +4090,30 @@ public class LightingConsoleScreen extends Screen {
     }
 
     private int findBrowserEntryIndex(
-            BlockPos position
+            BlockPos position,
+            String targetKind,
+            int targetEntityId
     ) {
         for (
                 int index = 0;
                 index < entries.size();
                 index++
         ) {
-            if (position.equals(
-                    entries.get(
-                            index
-                    ).position()
-            )) {
+            FixtureBrowserEntry entry = entries.get(index);
+            boolean entityMatch = targetEntityId
+                    != FixtureBrowserEntry.NO_TARGET_ENTITY_ID
+                    && entry.targetEntityId() == targetEntityId;
+            boolean blockMatch = targetEntityId
+                    == FixtureBrowserEntry.NO_TARGET_ENTITY_ID
+                    && entry.targetEntityId()
+                    == FixtureBrowserEntry.NO_TARGET_ENTITY_ID
+                    && position.equals(entry.position())
+                    && java.util.Objects.equals(
+                            targetKind,
+                            entry.targetKind()
+                    );
+
+            if (entityMatch || blockMatch) {
                 return index;
             }
         }
@@ -4101,7 +4171,7 @@ public class LightingConsoleScreen extends Screen {
         return -1;
     }
 
-    private BlockPos getPositionAtCurrentViewIndex(
+    private FixtureBrowserEntry getEntryAtCurrentViewIndex(
             int index
     ) {
         if (currentView
@@ -4114,12 +4184,13 @@ public class LightingConsoleScreen extends Screen {
                 return null;
             }
 
-            return visiblePatchResults
-                    .get(
-                            index
-                    )
-                    .entry()
-                    .position();
+            return findBrowserEntry(
+                    visiblePatchResults
+                            .get(
+                                    index
+                            )
+                            .entry()
+            );
         }
 
         if (currentView
@@ -4132,23 +4203,49 @@ public class LightingConsoleScreen extends Screen {
                 return null;
             }
 
-            return visibleFixtureEntries
-                    .get(
-                            index
-                    )
-                    .position();
+            return visibleFixtureEntries.get(index);
         }
 
         return null;
     }
 
     private boolean isSelected(
-            BlockPos position
+            FixtureBrowserEntry entry
     ) {
-        return selectedPosition != null
-                && selectedPosition.equals(
-                        position
+        if (entry == null || selectedPosition == null) {
+            return false;
+        }
+
+        if (selectedTargetEntityId
+                != FixtureBrowserEntry.NO_TARGET_ENTITY_ID) {
+            return selectedTargetEntityId == entry.targetEntityId();
+        }
+
+        return entry.targetEntityId()
+                == FixtureBrowserEntry.NO_TARGET_ENTITY_ID
+                && selectedPosition.equals(entry.position())
+                && java.util.Objects.equals(
+                        selectedTargetKind,
+                        entry.targetKind()
                 );
+    }
+
+    private FixtureBrowserEntry findBrowserEntry(
+            PatchOccupancyEntry occupancy
+    ) {
+        if (occupancy == null) {
+            return null;
+        }
+
+        for (FixtureBrowserEntry entry : entries) {
+            if (occupancy.position().equals(entry.position())
+                    && occupancy.fixtureName().equals(entry.fixtureName())
+                    && occupancy.profileId().equals(entry.fixtureType())) {
+                return entry;
+            }
+        }
+
+        return null;
     }
 
     private boolean isSelectedGroup(

@@ -1,6 +1,6 @@
 # Lighting Console
 
-The Lighting Console is a handheld control surface for loaded DMX Fixtures and DMX Blocks. Hold it and right-click to open a panel docked to the right side of the screen.
+The Lighting Console is a handheld control surface for loaded DMX Fixtures, DMX Blocks, DMX Block Displays, and DMX mobs. Hold it and right-click to open a panel docked to the right side of the screen.
 
 ## Fixture discovery
 
@@ -49,3 +49,4 @@ The console sends only the parameters selected by its output controls. Applying 
 - Console output operates on loaded fixtures only.
 - Console control does not create an external DMX stream; it updates fixture state inside Minecraft.
 - Closing the screen does not delete fixture names, groups, patches, modes, or stored manual values.
+- DMX Block Displays are edited from their console row. Their vanilla display transformations remain command-driven.

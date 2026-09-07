@@ -505,6 +505,9 @@ public class DmxFixtureScreen extends Screen {
                                 profile -> !"dmx_pixel".equals(
                                         profile.id()
                                 )
+                                        && !"dmx_block_display".equals(
+                                                profile.id()
+                                        )
                         )
                         .collect(
                                 Collectors.toUnmodifiableList()

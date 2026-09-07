@@ -6,6 +6,8 @@ All notable changes to dmxLighting are documented here. This project follows a s
 
 ### Added
 
+- Summonable DMX Block Display entities with console editing and output, RGB, dimmer, strobe, five skins, optional DMX skin selection, color fades, automatic-show support, and the full vanilla display transformation system including negative scale.
+
 - Automatic DMX shows triggered by music discs playing in jukeboxes.
 - Beat-synchronized color and dimmer output for fixtures, DMX Blocks, and DMX mobs.
 - Beat-synchronized pan and tilt movement for fixture blocks.

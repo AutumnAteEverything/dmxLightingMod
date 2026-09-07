@@ -93,6 +93,9 @@ public record FixtureBrowserDataPayload(
      * green channel
      * blue channel
      * dimmer channel
+     * strobe channel
+     * skin
+     * skin channel
      *
      * color fade enabled
      * color fade time seconds
@@ -349,6 +352,18 @@ public record FixtureBrowserDataPayload(
                 entry.dimmerChannel()
         );
 
+        buffer.writeVarInt(
+                entry.strobeChannel()
+        );
+
+        buffer.writeVarInt(
+                entry.skin()
+        );
+
+        buffer.writeVarInt(
+                entry.skinDmxChannel()
+        );
+
         buffer.writeBoolean(
                 entry.colorInterpolationEnabled()
         );
@@ -508,6 +523,15 @@ public record FixtureBrowserDataPayload(
         int dimmerChannel =
                 buffer.readVarInt();
 
+        int strobeChannel =
+                buffer.readVarInt();
+
+        int skin =
+                buffer.readVarInt();
+
+        int skinDmxChannel =
+                buffer.readVarInt();
+
         boolean colorInterpolationEnabled =
                 buffer.readBoolean();
 
@@ -547,6 +571,9 @@ public record FixtureBrowserDataPayload(
                 greenChannel,
                 blueChannel,
                 dimmerChannel,
+                strobeChannel,
+                skin,
+                skinDmxChannel,
 
                 colorInterpolationEnabled,
                 colorInterpolationTimeSeconds

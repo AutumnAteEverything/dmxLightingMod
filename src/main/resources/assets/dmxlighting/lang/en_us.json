@@ -27,5 +27,6 @@
   "entity.dmxlighting.dmx_parrot": "dmxParrot",
   "entity.dmxlighting.dmx_enderman": "dmxEnderman",
   "entity.dmxlighting.dmx_warden": "dmxWarden",
-  "entity.dmxlighting.dmx_nautilus": "dmxNautilus"
+  "entity.dmxlighting.dmx_nautilus": "dmxNautilus",
+  "entity.dmxlighting.dmx_block_display": "DMX Block Display"
 }
