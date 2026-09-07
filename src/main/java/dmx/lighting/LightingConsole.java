@@ -115,10 +115,16 @@ public final class LightingConsole {
                         dimension
                 );
 
+        List<DmxWardenEntity> wardens =
+                DmxMobFixtureRegistry.getWardensInDimension(
+                        dimension
+                );
+
         return createSortedEntries(
                 blockFixtures,
                 parrots,
                 endermen,
+                wardens,
                 sortMode
         );
     }
@@ -138,6 +144,7 @@ public final class LightingConsole {
                 DmxFixtureRegistry.getAllFixtures(),
                 DmxMobFixtureRegistry.getAllParrots(),
                 DmxMobFixtureRegistry.getAllEndermen(),
+                DmxMobFixtureRegistry.getAllWardens(),
                 sortMode
         );
     }
@@ -191,10 +198,17 @@ public final class LightingConsole {
                         group
                 );
 
+        List<DmxWardenEntity> wardens =
+                DmxMobFixtureRegistry.getWardensInGroup(
+                        dimension,
+                        group
+                );
+
         return createSortedEntries(
                 blockFixtures,
                 parrots,
                 endermen,
+                wardens,
                 sortMode
         );
     }
@@ -240,10 +254,17 @@ public final class LightingConsole {
                         universe
                 );
 
+        List<DmxWardenEntity> wardens =
+                DmxMobFixtureRegistry.getWardensInUniverse(
+                        dimension,
+                        universe
+                );
+
         return createSortedEntries(
                 blockFixtures,
                 parrots,
                 endermen,
+                wardens,
                 sortMode
         );
     }
@@ -395,6 +416,7 @@ public final class LightingConsole {
 
         return createSortedEntries(
                 conflictingFixtures,
+                List.of(),
                 List.of(),
                 List.of(),
                 FixtureSortMode.PATCH
@@ -559,6 +581,7 @@ public final class LightingConsole {
             List<DmxFixtureBlockEntity> fixtures,
             List<DmxParrotEntity> parrots,
             List<DmxEndermanEntity> endermen,
+            List<DmxWardenEntity> wardens,
             FixtureSortMode sortMode
     ) {
         List<FixtureBrowserEntry> entries =
@@ -606,6 +629,22 @@ public final class LightingConsole {
                     entries.add(
                             FixtureBrowserEntry.fromDmxEnderman(
                                     enderman
+                            )
+                    );
+                }
+            }
+        }
+
+        if (wardens != null) {
+            for (DmxWardenEntity warden :
+                    wardens) {
+
+                if (warden != null
+                        && !warden.isRemoved()) {
+
+                    entries.add(
+                            FixtureBrowserEntry.fromDmxWarden(
+                                    warden
                             )
                     );
                 }

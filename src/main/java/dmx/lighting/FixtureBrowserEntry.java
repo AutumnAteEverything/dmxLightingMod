@@ -491,6 +491,78 @@ public record FixtureBrowserEntry(
     }
 
     /**
+     * Creates a browser entry from one loaded DMX Warden.
+     */
+    public static FixtureBrowserEntry fromDmxWarden(
+            DmxWardenEntity warden
+    ) {
+        Objects.requireNonNull(
+                warden,
+                "warden"
+        );
+
+        FixtureParameterMap map =
+                warden.getParameterMap();
+
+        int[] assignedChannels =
+                new int[] {
+                        map.getRedChannel(),
+                        map.getGreenChannel(),
+                        map.getBlueChannel(),
+                        map.getWhiteChannel(),
+                        map.getAmberChannel(),
+                        map.getDimmerChannel(),
+                        map.getPanChannel(),
+                        map.getTiltChannel(),
+                        map.getBeamWidthChannel(),
+                        map.getBeamLengthChannel(),
+                        map.getStrobeChannel()
+                };
+
+        FixtureOutput output =
+                warden.getCurrentOutput();
+
+        return new FixtureBrowserEntry(
+                warden.blockPosition(),
+                warden.getConsoleName(),
+                warden.getGroupDisplayName(),
+                DmxWardenProfile.ID,
+                warden.getUniverse(),
+                assignedChannels,
+                warden.getControlMode()
+                        .getSerializedName(),
+                warden.getOutputPackedRgb(),
+                warden.getMinecraftLightLevel(),
+
+                output.getRed(),
+                output.getGreen(),
+                output.getBlue(),
+                output.getWhite(),
+                output.getAmber(),
+                output.getDimmer(),
+
+                output.getPan(),
+                output.getTilt(),
+
+                output.getBeamWidth(),
+                output.getBeamLength(),
+
+                output.getStrobe(),
+
+                TARGET_MOB,
+                warden.getId(),
+
+                map.getRedChannel(),
+                map.getGreenChannel(),
+                map.getBlueChannel(),
+                map.getDimmerChannel(),
+
+                warden.isColorInterpolationEnabled(),
+                warden.getColorInterpolationTimeSeconds()
+        );
+    }
+
+    /**
      * Returns true when this entry represents an ungrouped fixture.
      */
     public boolean isUngrouped() {

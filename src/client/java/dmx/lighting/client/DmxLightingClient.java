@@ -10,6 +10,7 @@ import dmx.lighting.client.render.DmxFixtureBlockEntityRenderer;
 import dmx.lighting.client.render.DmxEndermanRenderer;
 import dmx.lighting.client.render.DmxParrotRenderer;
 import dmx.lighting.client.render.DmxPixelBlockEntityRenderer;
+import dmx.lighting.client.render.DmxWardenRenderer;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
@@ -77,6 +78,11 @@ public class DmxLightingClient implements ClientModInitializer {
         EntityRendererRegistry.register(
                 ModEntities.DMX_ENDERMAN,
                 DmxEndermanRenderer::new
+        );
+
+        EntityRendererRegistry.register(
+                ModEntities.DMX_WARDEN,
+                DmxWardenRenderer::new
         );
     }
 

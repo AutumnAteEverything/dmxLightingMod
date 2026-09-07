@@ -59,6 +59,16 @@ public final class ModItems {
                             )
             );
 
+    public static final SpawnEggItem DMX_WARDEN_SPAWN_EGG =
+            register(
+                    "dmx_warden_spawn_egg",
+                    SpawnEggItem::new,
+                    new Item.Properties()
+                            .spawnEgg(
+                                    ModEntities.DMX_WARDEN
+                            )
+            );
+
     private ModItems() {
         // Utility class: do not instantiate.
     }
@@ -120,6 +130,14 @@ public final class ModItems {
         ).register(
                 output -> output.accept(
                         DMX_ENDERMAN_SPAWN_EGG
+                )
+        );
+
+        CreativeModeTabEvents.modifyOutputEvent(
+                TOOLS_AND_UTILITIES_TAB
+        ).register(
+                output -> output.accept(
+                        DMX_WARDEN_SPAWN_EGG
                 )
         );
 

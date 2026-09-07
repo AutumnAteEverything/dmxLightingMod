@@ -5,6 +5,7 @@ import dmx.lighting.DmxEndermanProfile;
 import dmx.lighting.DmxFixtureProfile;
 import dmx.lighting.DmxFixtureProfileRegistry;
 import dmx.lighting.DmxParrotProfile;
+import dmx.lighting.DmxWardenProfile;
 import dmx.lighting.FixtureBrowserEntry;
 import dmx.lighting.PatchConflictAnalyzer;
 import dmx.lighting.PatchConflictResult;
@@ -1685,6 +1686,9 @@ public class LightingConsoleScreen extends Screen {
         )
                 || DmxEndermanProfile.ID.equals(
                         fixtureType
+                )
+                || DmxWardenProfile.ID.equals(
+                        fixtureType
                 );
     }
 
@@ -2309,6 +2313,17 @@ public class LightingConsoleScreen extends Screen {
         )) {
             Minecraft.getInstance().setScreen(
                     new DmxEndermanScreen(
+                            selectedEntry
+                    )
+            );
+            return;
+        }
+
+        if (DmxWardenProfile.ID.equals(
+                selectedEntry.fixtureType()
+        )) {
+            Minecraft.getInstance().setScreen(
+                    new DmxWardenScreen(
                             selectedEntry
                     )
             );

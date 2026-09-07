@@ -75,6 +75,10 @@ import java.util.Locale;
  *     Saves name, group, universe, RGBD patch data, and color fade
  *     settings for a DMX Enderman.
  *
+ * UpdateDmxWardenPayload
+ *     Saves name, group, universe, RGBD patch data, and color fade
+ *     settings for a DMX Warden.
+ *
  * RequestFixtureBrowserPayload
  *     Requests a current browser snapshot for the player's dimension.
  *
@@ -181,6 +185,11 @@ public final class DmxNetworking {
         PayloadTypeRegistry.serverboundPlay().register(
                 UpdateDmxEndermanPayload.TYPE,
                 UpdateDmxEndermanPayload.STREAM_CODEC
+        );
+
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateDmxWardenPayload.TYPE,
+                UpdateDmxWardenPayload.STREAM_CODEC
         );
 
         PayloadTypeRegistry.serverboundPlay().register(
@@ -369,6 +378,17 @@ public final class DmxNetworking {
                 (payload, context) ->
                         context.server().execute(
                                 () -> handleDmxEndermanUpdate(
+                                        context.player(),
+                                        payload
+                                )
+                        )
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(
+                UpdateDmxWardenPayload.TYPE,
+                (payload, context) ->
+                        context.server().execute(
+                                () -> handleDmxWardenUpdate(
                                         context.player(),
                                         payload
                                 )
@@ -1276,6 +1296,117 @@ public final class DmxNetworking {
                 Component.literal(
                         "Updated "
                                 + enderman.getConsoleName()
+                                + "."
+                )
+        );
+    }
+
+    private static void handleDmxWardenUpdate(
+            ServerPlayer player,
+            UpdateDmxWardenPayload payload
+    ) {
+        if (player == null
+                || payload == null) {
+
+            return;
+        }
+
+        ServerLevel level =
+                (ServerLevel) player.level();
+
+        DmxWardenEntity warden =
+                DmxMobFixtureRegistry.getWardenByEntityId(
+                        level.dimension(),
+                        payload.entityId()
+                );
+
+        if (warden == null) {
+            Entity entity =
+                    level.getEntity(
+                            payload.entityId()
+                    );
+
+            if (entity instanceof DmxWardenEntity foundWarden) {
+                warden =
+                        foundWarden;
+
+                DmxMobFixtureRegistry.register(
+                        foundWarden
+                );
+            }
+        }
+
+        if (warden == null
+                || warden.isRemoved()) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "That DMX Warden is not currently loaded."
+                    )
+            );
+
+            return;
+        }
+
+        if (!isValidParameterChannel(
+                payload.redChannel()
+        )
+                || !isValidParameterChannel(
+                        payload.greenChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.blueChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.dimmerChannel()
+                )) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "DMX Warden channels must be blank or 1-512."
+                    )
+            );
+
+            return;
+        }
+
+        int universe =
+                clamp(
+                        payload.universe(),
+                        DmxFixtureBlockEntity.MIN_UNIVERSE,
+                        DmxFixtureBlockEntity.MAX_UNIVERSE
+                );
+
+        warden.setFixtureName(
+                payload.fixtureName()
+        );
+
+        warden.setFixtureGroup(
+                FixtureGroupName.of(
+                        payload.groupName()
+                )
+        );
+
+        warden.setUniverse(
+                universe
+        );
+
+        warden.setParameterMap(
+                payload.redChannel(),
+                payload.greenChannel(),
+                payload.blueChannel(),
+                payload.dimmerChannel()
+        );
+
+        warden.setColorInterpolation(
+                payload.colorInterpolationEnabled(),
+                payload.colorInterpolationTimeSeconds()
+        );
+
+        player.sendSystemMessage(
+                Component.literal(
+                        "Updated "
+                                + warden.getConsoleName()
                                 + "."
                 )
         );

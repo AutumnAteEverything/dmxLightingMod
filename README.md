@@ -19,7 +19,7 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Full-cube **DMX Block** with RGB, dimmer, strobe, and five selectable skins.
 - Optional DMX channel for selecting the DMX Block skin.
 - Emissive DMX Block surfaces that remain visible in darkness while emitting no Minecraft block light.
-- **DMX Parrot** and **DMX Enderman** mobs with RGB/dimmer patching, color fades, and emissive DMX color rendering.
+- **DMX Parrot**, **DMX Enderman**, and **DMX Warden** mobs with RGB/dimmer patching, color fades, and emissive DMX color rendering.
 - Handheld, right-docked **Lighting Console** with Fixtures, Groups, Universes, Patch, and Output views.
 - Live output to one fixture, one group, or all loaded fixtures.
 - Creative inventory registration and search terms for the mod items.
@@ -79,6 +79,7 @@ That makes the block bright red and selects skin 3.
 | Lighting Console | `dmxlighting:lighting_console` | Tools & Utilities | Portable browser, patch view, and live control surface |
 | DMX Parrot Spawn Egg | `dmxlighting:dmx_parrot_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable parrot mob that appears in the console |
 | DMX Enderman Spawn Egg | `dmxlighting:dmx_enderman_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Enderman mob that appears in the console |
+| DMX Warden Spawn Egg | `dmxlighting:dmx_warden_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Warden mob that appears in the console |
 
 See the detailed guides:
 

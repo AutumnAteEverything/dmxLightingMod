@@ -30,6 +30,11 @@ public final class DmxMobFixtureRegistry {
             Map<UUID, DmxEndermanEntity>
     > ENDERMEN_BY_DIMENSION = new HashMap<>();
 
+    private static final Map<
+            ResourceKey<Level>,
+            Map<UUID, DmxWardenEntity>
+    > WARDENS_BY_DIMENSION = new HashMap<>();
+
     private DmxMobFixtureRegistry() {
         // Utility class.
     }
@@ -77,6 +82,29 @@ public final class DmxMobFixtureRegistry {
                 .put(
                         enderman.getUUID(),
                         enderman
+                );
+    }
+
+    public static synchronized void register(
+            DmxWardenEntity warden
+    ) {
+        if (!isUsableServerWarden(
+                warden
+        )) {
+            return;
+        }
+
+        Level level =
+                warden.level();
+
+        WARDENS_BY_DIMENSION
+                .computeIfAbsent(
+                        level.dimension(),
+                        ignored -> new HashMap<>()
+                )
+                .put(
+                        warden.getUUID(),
+                        warden
                 );
     }
 
@@ -148,6 +176,40 @@ public final class DmxMobFixtureRegistry {
         }
     }
 
+    public static synchronized void unregister(
+            DmxWardenEntity warden
+    ) {
+        if (warden == null) {
+            return;
+        }
+
+        Level level =
+                warden.level();
+
+        if (level == null) {
+            return;
+        }
+
+        Map<UUID, DmxWardenEntity> dimensionWardens =
+                WARDENS_BY_DIMENSION.get(
+                        level.dimension()
+                );
+
+        if (dimensionWardens == null) {
+            return;
+        }
+
+        dimensionWardens.remove(
+                warden.getUUID()
+        );
+
+        if (dimensionWardens.isEmpty()) {
+            WARDENS_BY_DIMENSION.remove(
+                    level.dimension()
+            );
+        }
+    }
+
     public static synchronized List<DmxParrotEntity>
     getParrotsInDimension(
             ResourceKey<Level> dimension
@@ -199,6 +261,33 @@ public final class DmxMobFixtureRegistry {
 
         return List.copyOf(
                 dimensionEndermen.values()
+        );
+    }
+
+    public static synchronized List<DmxWardenEntity>
+    getWardensInDimension(
+            ResourceKey<Level> dimension
+    ) {
+        if (dimension == null) {
+            return List.of();
+        }
+
+        Map<UUID, DmxWardenEntity> dimensionWardens =
+                WARDENS_BY_DIMENSION.get(
+                        dimension
+                );
+
+        if (dimensionWardens == null) {
+            return List.of();
+        }
+
+        removeInvalidWardens(
+                dimension,
+                dimensionWardens
+        );
+
+        return List.copyOf(
+                dimensionWardens.values()
         );
     }
 
@@ -267,6 +356,43 @@ public final class DmxMobFixtureRegistry {
             )) {
                 matches.add(
                         enderman
+                );
+            }
+        }
+
+        return List.copyOf(
+                matches
+        );
+    }
+
+    public static synchronized List<DmxWardenEntity>
+    getWardensInGroup(
+            ResourceKey<Level> dimension,
+            FixtureGroupName group
+    ) {
+        if (dimension == null
+                || group == null
+                || group.isUngrouped()) {
+
+            return List.of();
+        }
+
+        String targetKey =
+                group.key();
+
+        List<DmxWardenEntity> matches =
+                new ArrayList<>();
+
+        for (DmxWardenEntity warden :
+                getWardensInDimension(
+                        dimension
+                )) {
+
+            if (targetKey.equals(
+                    warden.getGroupKey()
+            )) {
+                matches.add(
+                        warden
                 );
             }
         }
@@ -348,6 +474,42 @@ public final class DmxMobFixtureRegistry {
         );
     }
 
+    public static synchronized List<DmxWardenEntity>
+    getWardensInUniverse(
+            ResourceKey<Level> dimension,
+            int universe
+    ) {
+        int safeUniverse =
+                Math.max(
+                        FixturePatch.MIN_UNIVERSE,
+                        Math.min(
+                                FixturePatch.MAX_UNIVERSE,
+                                universe
+                        )
+                );
+
+        List<DmxWardenEntity> matches =
+                new ArrayList<>();
+
+        for (DmxWardenEntity warden :
+                getWardensInDimension(
+                        dimension
+                )) {
+
+            if (warden.getUniverse()
+                    == safeUniverse) {
+
+                matches.add(
+                        warden
+                );
+            }
+        }
+
+        return List.copyOf(
+                matches
+        );
+    }
+
     public static void refreshParrotsInUniverse(
             int universe
     ) {
@@ -376,6 +538,16 @@ public final class DmxMobFixtureRegistry {
                     == universe) {
 
                 enderman.refreshFromDmx();
+            }
+        }
+
+        for (DmxWardenEntity warden :
+                getAllWardens()) {
+
+            if (warden.getUniverse()
+                    == universe) {
+
+                warden.refreshFromDmx();
             }
         }
     }
@@ -424,6 +596,31 @@ public final class DmxMobFixtureRegistry {
                     enderman.blockPosition()
             )) {
                 return enderman;
+            }
+        }
+
+        return null;
+    }
+
+    public static synchronized DmxWardenEntity getWardenAt(
+            ResourceKey<Level> dimension,
+            BlockPos position
+    ) {
+        if (dimension == null
+                || position == null) {
+
+            return null;
+        }
+
+        for (DmxWardenEntity warden :
+                getWardensInDimension(
+                        dimension
+                )) {
+
+            if (position.equals(
+                    warden.blockPosition()
+            )) {
+                return warden;
             }
         }
 
@@ -482,6 +679,32 @@ public final class DmxMobFixtureRegistry {
         return null;
     }
 
+    public static synchronized DmxWardenEntity getWardenByEntityId(
+            ResourceKey<Level> dimension,
+            int entityId
+    ) {
+        if (dimension == null
+                || entityId
+                == FixtureBrowserEntry.NO_TARGET_ENTITY_ID) {
+
+            return null;
+        }
+
+        for (DmxWardenEntity warden :
+                getWardensInDimension(
+                        dimension
+                )) {
+
+            if (warden.getId()
+                    == entityId) {
+
+                return warden;
+            }
+        }
+
+        return null;
+    }
+
     public static synchronized List<DmxParrotEntity>
     getAllParrots() {
         List<DmxParrotEntity> parrots =
@@ -532,6 +755,31 @@ public final class DmxMobFixtureRegistry {
         );
     }
 
+    public static synchronized List<DmxWardenEntity>
+    getAllWardens() {
+        List<DmxWardenEntity> wardens =
+                new ArrayList<>();
+
+        List<ResourceKey<Level>> dimensions =
+                new ArrayList<>(
+                        WARDENS_BY_DIMENSION.keySet()
+                );
+
+        for (ResourceKey<Level> dimension :
+                dimensions) {
+
+            wardens.addAll(
+                    getWardensInDimension(
+                            dimension
+                    )
+            );
+        }
+
+        return List.copyOf(
+                wardens
+        );
+    }
+
     public static synchronized void clearDimension(
             ResourceKey<Level> dimension
     ) {
@@ -546,11 +794,16 @@ public final class DmxMobFixtureRegistry {
         ENDERMEN_BY_DIMENSION.remove(
                 dimension
         );
+
+        WARDENS_BY_DIMENSION.remove(
+                dimension
+        );
     }
 
     public static synchronized void clearAll() {
         PARROTS_BY_DIMENSION.clear();
         ENDERMEN_BY_DIMENSION.clear();
+        WARDENS_BY_DIMENSION.clear();
     }
 
     private static void removeInvalidParrots(
@@ -619,6 +872,39 @@ public final class DmxMobFixtureRegistry {
         }
     }
 
+    private static void removeInvalidWardens(
+            ResourceKey<Level> dimension,
+            Map<UUID, DmxWardenEntity> wardens
+    ) {
+        Collection<UUID> ids =
+                new ArrayList<>(
+                        wardens.keySet()
+                );
+
+        for (UUID id :
+                ids) {
+
+            DmxWardenEntity warden =
+                    wardens.get(
+                            id
+                    );
+
+            if (!isUsableServerWarden(
+                    warden
+            )) {
+                wardens.remove(
+                        id
+                );
+            }
+        }
+
+        if (wardens.isEmpty()) {
+            WARDENS_BY_DIMENSION.remove(
+                    dimension
+            );
+        }
+    }
+
     private static boolean isUsableServerParrot(
             DmxParrotEntity parrot
     ) {
@@ -646,6 +932,22 @@ public final class DmxMobFixtureRegistry {
 
         Level level =
                 enderman.level();
+
+        return level != null
+                && !level.isClientSide();
+    }
+
+    private static boolean isUsableServerWarden(
+            DmxWardenEntity warden
+    ) {
+        if (warden == null
+                || warden.isRemoved()) {
+
+            return false;
+        }
+
+        Level level =
+                warden.level();
 
         return level != null
                 && !level.isClientSide();

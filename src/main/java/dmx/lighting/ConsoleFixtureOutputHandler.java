@@ -169,6 +169,23 @@ public final class ConsoleFixtureOutputHandler {
             return;
         }
 
+        DmxWardenEntity targetedWarden =
+                DmxMobFixtureRegistry.getWardenByEntityId(
+                        level.dimension(),
+                        payload.targetEntityId()
+                );
+
+        if (targetedWarden != null
+                && !targetedWarden.isRemoved()) {
+
+            applyPayloadToWarden(
+                    targetedWarden,
+                    payload
+            );
+
+            return;
+        }
+
         DmxFixtureBlockEntity fixture =
                 DmxFixtureRegistry.getFixture(
                         level.dimension(),
@@ -204,6 +221,17 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToEnderman(
                 enderman,
+                payload
+        );
+
+        DmxWardenEntity warden =
+                DmxMobFixtureRegistry.getWardenAt(
+                        level.dimension(),
+                        position
+                );
+
+        applyPayloadToWarden(
+                warden,
                 payload
         );
     }
@@ -307,6 +335,32 @@ public final class ConsoleFixtureOutputHandler {
         if (group == null
                 || group.isUngrouped()) {
 
+            DmxWardenEntity sourceWarden =
+                    DmxMobFixtureRegistry.getWardenByEntityId(
+                            level.dimension(),
+                            payload.targetEntityId()
+                    );
+
+            if (sourceWarden == null) {
+                sourceWarden =
+                        DmxMobFixtureRegistry.getWardenAt(
+                                level.dimension(),
+                                sourcePosition
+                        );
+            }
+
+            if (sourceWarden != null
+                    && !sourceWarden.isRemoved()
+                    && !sourceWarden.isUngrouped()) {
+
+                group =
+                        sourceWarden.getFixtureGroup();
+            }
+        }
+
+        if (group == null
+                || group.isUngrouped()) {
+
             return;
         }
 
@@ -331,6 +385,14 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToEndermen(
                 DmxMobFixtureRegistry.getEndermenInGroup(
+                        level.dimension(),
+                        group
+                ),
+                payload
+        );
+
+        applyPayloadToWardens(
+                DmxMobFixtureRegistry.getWardensInGroup(
                         level.dimension(),
                         group
                 ),
@@ -373,6 +435,13 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToEndermen(
                 DmxMobFixtureRegistry.getEndermenInDimension(
+                        level.dimension()
+                ),
+                payload
+        );
+
+        applyPayloadToWardens(
+                DmxMobFixtureRegistry.getWardensInDimension(
                         level.dimension()
                 ),
                 payload
@@ -468,6 +537,32 @@ public final class ConsoleFixtureOutputHandler {
 
             applyPayloadToEnderman(
                     enderman,
+                    payload
+            );
+        }
+    }
+
+    private static void applyPayloadToWardens(
+            List<DmxWardenEntity> wardens,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (wardens == null
+                || wardens.isEmpty()
+                || payload == null) {
+
+            return;
+        }
+
+        List<DmxWardenEntity> safeWardens =
+                new ArrayList<>(
+                        wardens
+                );
+
+        for (DmxWardenEntity warden :
+                safeWardens) {
+
+            applyPayloadToWarden(
+                    warden,
                     payload
             );
         }
@@ -787,6 +882,22 @@ public final class ConsoleFixtureOutputHandler {
         }
 
         enderman.applyConsoleDmxOutput(
+                payload
+        );
+    }
+
+    private static void applyPayloadToWarden(
+            DmxWardenEntity warden,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (warden == null
+                || warden.isRemoved()
+                || payload == null) {
+
+            return;
+        }
+
+        warden.applyConsoleDmxOutput(
                 payload
         );
     }

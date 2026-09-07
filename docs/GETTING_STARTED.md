@@ -10,6 +10,7 @@ In Creative mode, search for `DMX`. The search should show:
 - DMX Block
 - DMX Parrot Spawn Egg
 - DMX Enderman Spawn Egg
+- DMX Warden Spawn Egg
 - Lighting Console
 
 The two blocks are also in Functional Blocks. The console and DMX mob spawn eggs are in Tools & Utilities.

@@ -7,6 +7,8 @@ All notable changes to dmxLighting are documented here. This project follows a s
 ### Added
 
 - Thorough GitHub documentation, user guides, command reference, texture guide, contributor guidance, issue templates, and release checklist.
+- DMX Warden mob with RGB/dimmer patching, console editing, color fades, spawn egg support, and emissive DMX-colored rendering.
+- DMX Wardens ignore non-player mobs while still allowing normal Warden aggression toward survival players.
 
 ### Changed
 

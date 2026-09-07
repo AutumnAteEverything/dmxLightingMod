@@ -106,6 +106,12 @@ Enderman example:
 /summon dmxlighting:dmx_enderman ~ ~ ~ {dmx_fixture_name:"Stage Enderman 1",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104}
 ```
 
+Warden example:
+
+```mcfunction
+/summon dmxlighting:dmx_warden ~ ~ ~ {dmx_fixture_name:"Stage Warden 1",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104}
+```
+
 To place a DMX mob in a console group at summon time:
 
 ```mcfunction
@@ -114,6 +120,10 @@ To place a DMX mob in a console group at summon time:
 
 ```mcfunction
 /summon dmxlighting:dmx_enderman ~ ~ ~ {dmx_fixture_name:"Ender Wash 1",dmx_group_name:"Endermen",dmx_group_key:"endermen",dmx_universe:1,dmx_parameter_red:211,dmx_parameter_green:212,dmx_parameter_blue:213,dmx_parameter_dimmer:214}
+```
+
+```mcfunction
+/summon dmxlighting:dmx_warden ~ ~ ~ {dmx_fixture_name:"Warden Wash 1",dmx_group_name:"Wardens",dmx_group_key:"wardens",dmx_universe:1,dmx_parameter_red:221,dmx_parameter_green:222,dmx_parameter_blue:223,dmx_parameter_dimmer:224}
 ```
 
 Important saved-data fields:
@@ -136,15 +146,17 @@ dmx_color_interpolation_enabled
 dmx_color_interpolation_time_seconds
 ```
 
-For example, this spawns a grouped Enderman whose visible color fades over two seconds:
+For example, this spawns a grouped Warden whose visible color fades over two seconds:
 
 ```mcfunction
-/summon dmxlighting:dmx_enderman ~ ~ ~ {dmx_fixture_name:"Ender Fade 1",dmx_group_name:"Endermen",dmx_group_key:"endermen",dmx_universe:1,dmx_parameter_red:211,dmx_parameter_green:212,dmx_parameter_blue:213,dmx_parameter_dimmer:214,dmx_color_interpolation_enabled:1,dmx_color_interpolation_time_seconds:2.0f}
+/summon dmxlighting:dmx_warden ~ ~ ~ {dmx_fixture_name:"Warden Fade 1",dmx_group_name:"Wardens",dmx_group_key:"wardens",dmx_universe:1,dmx_parameter_red:221,dmx_parameter_green:222,dmx_parameter_blue:223,dmx_parameter_dimmer:224,dmx_color_interpolation_enabled:1,dmx_color_interpolation_time_seconds:2.0f}
 ```
 
-Names do not have to be unique. If a DMX mob has no saved name, the console gives it a generated `dmxParrot` or `dmxEnderman` label using part of its UUID. Unique names are still recommended when several DMX mobs are in the same show file or group.
+Names do not have to be unique. If a DMX mob has no saved name, the console gives it a generated `dmxParrot`, `dmxEnderman`, or `dmxWarden` label using part of its UUID. Unique names are still recommended when several DMX mobs are in the same show file or group.
 
 DMX mobs are DMX-only for now. The Lighting Console Output view writes to their assigned DMX channels instead of putting individual mobs into Manual mode.
+
+DMX Wardens ignore non-player mobs while still allowing normal Warden aggression toward survival players.
 
 ## Control mode and manual output
 

@@ -138,6 +138,10 @@ public final class DmxFixtureProfileRegistry {
                 DmxEndermanProfile.INSTANCE
         );
 
+        register(
+                DmxWardenProfile.INSTANCE
+        );
+
         initialized =
                 true;
     }
