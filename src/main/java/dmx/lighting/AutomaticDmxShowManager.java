@@ -16,11 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Builds a temporary lighting show from music playing in a jukebox.
+ * Builds temporary beat-driven lighting shows from jukeboxes and
+ * explicit command pulses.
  *
  * The generated output never writes to DmxUniverseManager. Fixtures
  * therefore return to their existing DMX or manual values as soon as
- * playback stops.
+ * the active show ends.
  */
 public final class AutomaticDmxShowManager {
 
@@ -32,6 +33,21 @@ public final class AutomaticDmxShowManager {
 
     private static final long SHOW_UPDATE_INTERVAL_TICKS =
             2L;
+
+    private static final long COMMAND_PULSE_TIMEOUT_TICKS =
+            60L;
+
+    private static final double DEFAULT_PULSE_INTERVAL_TICKS =
+            10.0D;
+
+    private static final double MINIMUM_PULSE_INTERVAL_TICKS =
+            2.0D;
+
+    private static final double PULSE_INTERVAL_SMOOTHING =
+            0.35D;
+
+    private static final int COMMAND_PULSE_PALETTE_SEED =
+            "dmxlighting:command_pulse".hashCode();
 
     private static final DiscBeatProfile CUSTOM_DISC_FALLBACK =
             new DiscBeatProfile(
@@ -92,6 +108,11 @@ public final class AutomaticDmxShowManager {
             ResourceKey<Level>,
             Map<BlockPos, ActiveJukebox>
     > ACTIVE_JUKEBOXES = new HashMap<>();
+
+    private static final Map<
+            ResourceKey<Level>,
+            ActiveCommandPulse
+    > ACTIVE_COMMAND_PULSES = new HashMap<>();
 
     private static boolean enabled =
             true;
@@ -196,8 +217,8 @@ public final class AutomaticDmxShowManager {
     }
 
     /**
-     * Returns an automatic-show output, or null when no jukebox is
-     * currently controlling this dimension.
+     * Returns an automatic-show output, or null when no beat-driven
+     * show is currently controlling this dimension.
      */
     public static synchronized FixtureOutput createOutput(
             Level level,
@@ -205,10 +226,32 @@ public final class AutomaticDmxShowManager {
             FixtureOutput underlyingOutput,
             boolean allowMovement
     ) {
-        if (!enabled
-                || level == null
+        if (level == null
                 || level.isClientSide()) {
 
+            return null;
+        }
+
+        FixtureOutput base =
+                underlyingOutput == null
+                        ? FixtureOutput.BLACKOUT
+                        : underlyingOutput;
+
+        ActiveCommandPulse commandPulse =
+                findActiveCommandPulse(
+                        level
+                );
+
+        if (commandPulse != null) {
+            return buildCommandPulseOutput(
+                    commandPulse,
+                    level.getGameTime(),
+                    base,
+                    allowMovement
+            );
+        }
+
+        if (!enabled) {
             return null;
         }
 
@@ -222,15 +265,121 @@ public final class AutomaticDmxShowManager {
             return null;
         }
 
-        FixtureOutput base =
-                underlyingOutput == null
-                        ? FixtureOutput.BLACKOUT
-                        : underlyingOutput;
-
         return buildShowOutput(
                 jukebox,
                 base,
                 allowMovement
+        );
+    }
+
+    public static synchronized void triggerCommandPulse(
+            Level level
+    ) {
+        if (level == null || level.isClientSide()) {
+            return;
+        }
+
+        long currentGameTime =
+                level.getGameTime();
+
+        ActiveCommandPulse previous =
+                findActiveCommandPulse(
+                        level
+                );
+
+        if (previous == null) {
+            ACTIVE_COMMAND_PULSES.put(
+                    level.dimension(),
+                    new ActiveCommandPulse(
+                            1L,
+                            currentGameTime,
+                            DEFAULT_PULSE_INTERVAL_TICKS,
+                            false
+                    )
+            );
+
+            return;
+        }
+
+        long elapsedTicks =
+                currentGameTime
+                        - previous.lastPulseGameTime();
+
+        double estimatedInterval =
+                previous.estimatedIntervalTicks();
+
+        boolean tempoMeasured =
+                previous.tempoMeasured();
+
+        if (elapsedTicks > 0L) {
+            double measuredInterval =
+                    Math.clamp(
+                            (double) elapsedTicks,
+                            MINIMUM_PULSE_INTERVAL_TICKS,
+                            (double) COMMAND_PULSE_TIMEOUT_TICKS
+                    );
+
+            estimatedInterval =
+                    tempoMeasured
+                            ? estimatedInterval
+                                    * (1.0D - PULSE_INTERVAL_SMOOTHING)
+                                    + measuredInterval
+                                    * PULSE_INTERVAL_SMOOTHING
+                            : measuredInterval;
+
+            tempoMeasured =
+                    true;
+        }
+
+        ACTIVE_COMMAND_PULSES.put(
+                level.dimension(),
+                new ActiveCommandPulse(
+                        previous.pulsesReceived() + 1L,
+                        currentGameTime,
+                        estimatedInterval,
+                        tempoMeasured
+                )
+        );
+    }
+
+    public static synchronized boolean stopCommandPulse(
+            Level level
+    ) {
+        if (level == null) {
+            return false;
+        }
+
+        return ACTIVE_COMMAND_PULSES.remove(
+                level.dimension()
+        ) != null;
+    }
+
+    public static synchronized PulseShowInfo getPulseShowInfo(
+            Level level
+    ) {
+        ActiveCommandPulse pulse =
+                findActiveCommandPulse(
+                        level
+                );
+
+        if (pulse == null) {
+            return null;
+        }
+
+        long elapsedTicks =
+                level.getGameTime()
+                        - pulse.lastPulseGameTime();
+
+        return new PulseShowInfo(
+                pulse.pulsesReceived(),
+                TICKS_PER_MINUTE
+                        / pulse.estimatedIntervalTicks(),
+                pulse.tempoMeasured(),
+                Math.max(
+                        0.0D,
+                        (COMMAND_PULSE_TIMEOUT_TICKS - elapsedTicks)
+                                / 20.0D
+                )
         );
     }
 
@@ -381,6 +530,54 @@ public final class AutomaticDmxShowManager {
                 adjustedTicks
                         / ticksPerBeat;
 
+        return buildBeatShowOutput(
+                beatPosition,
+                jukebox.discItemId().hashCode(),
+                base,
+                allowMovement
+        );
+    }
+
+    private static FixtureOutput buildCommandPulseOutput(
+            ActiveCommandPulse pulse,
+            long currentGameTime,
+            FixtureOutput base,
+            boolean allowMovement
+    ) {
+        double elapsedTicks =
+                Math.max(
+                        0.0D,
+                        currentGameTime
+                                - pulse.lastPulseGameTime()
+                );
+
+        double beatFraction =
+                Math.min(
+                        0.999999D,
+                        elapsedTicks
+                                / pulse.estimatedIntervalTicks()
+                );
+
+        double beatPosition =
+                pulse.pulsesReceived()
+                        - 1L
+                        + beatFraction;
+
+        return buildBeatShowOutput(
+                beatPosition,
+                COMMAND_PULSE_PALETTE_SEED,
+                base,
+                allowMovement
+        );
+    }
+
+    private static FixtureOutput buildBeatShowOutput(
+            double beatPosition,
+            int paletteSeed,
+            FixtureOutput base,
+            boolean allowMovement
+    ) {
+
         long beatIndex =
                 (long) Math.floor(
                         beatPosition
@@ -415,12 +612,6 @@ public final class AutomaticDmxShowManager {
                         )
                 );
 
-        int paletteSeed =
-                Math.floorMod(
-                        jukebox.discItemId().hashCode(),
-                        COLOR_PALETTE.length
-                );
-
         int paletteStep =
                 (int) Math.floorDiv(
                         beatIndex,
@@ -430,7 +621,10 @@ public final class AutomaticDmxShowManager {
         int[] color =
                 COLOR_PALETTE[
                         Math.floorMod(
-                                paletteSeed + paletteStep,
+                                Math.floorMod(
+                                        paletteSeed,
+                                        COLOR_PALETTE.length
+                                ) + paletteStep,
                                 COLOR_PALETTE.length
                         )
                 ];
@@ -492,6 +686,45 @@ public final class AutomaticDmxShowManager {
         );
 
         return output;
+    }
+
+    private static ActiveCommandPulse findActiveCommandPulse(
+            Level level
+    ) {
+        if (level == null || level.isClientSide()) {
+            return null;
+        }
+
+        ResourceKey<Level> dimension =
+                level.dimension();
+
+        ActiveCommandPulse pulse =
+                ACTIVE_COMMAND_PULSES.get(
+                        dimension
+                );
+
+        if (pulse == null) {
+            return null;
+        }
+
+        long currentGameTime =
+                level.getGameTime();
+
+        long elapsedTicks =
+                currentGameTime
+                        - pulse.lastPulseGameTime();
+
+        if (elapsedTicks < 0L
+                || elapsedTicks >= COMMAND_PULSE_TIMEOUT_TICKS) {
+
+            ACTIVE_COMMAND_PULSES.remove(
+                    dimension
+            );
+
+            return null;
+        }
+
+        return pulse;
     }
 
     private static void removeStaleJukeboxes(
@@ -603,6 +836,14 @@ public final class AutomaticDmxShowManager {
     ) {
     }
 
+    private record ActiveCommandPulse(
+            long pulsesReceived,
+            long lastPulseGameTime,
+            double estimatedIntervalTicks,
+            boolean tempoMeasured
+    ) {
+    }
+
     public record ActiveShowInfo(
             BlockPos position,
             String discItemId,
@@ -610,6 +851,14 @@ public final class AutomaticDmxShowManager {
             long ticksSinceSongStarted,
             boolean builtInProfile,
             boolean steadyBeat
+    ) {
+    }
+
+    public record PulseShowInfo(
+            long pulsesReceived,
+            double estimatedBpm,
+            boolean tempoMeasured,
+            double secondsUntilTimeout
     ) {
     }
 }

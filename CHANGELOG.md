@@ -15,10 +15,12 @@ All notable changes to dmxLighting are documented here. This project follows a s
 - DMX Warden mob with RGB/dimmer patching, console editing, color fades, spawn egg support, and emissive DMX-colored rendering.
 - Generic 60, 70, 80, 90, 100, 110, 120, 130, and 140 BPM music discs for custom resource-pack audio.
 - Short example songs and a ready-to-zip generic music resource-pack template.
+- `/dmxPulse`, `/dmxPulse status`, and `/dmxPulse stop` for externally timed, non-destructive beat shows with an automatic three-second timeout.
 
 ### Changed
 
 - `/dmxsend` accepts any valid number of consecutive DMX values instead of a fixed four-value footprint.
+- Generic BPM disc item names now end in `disc` so they appear in searches for music discs.
 
 ## [1.0.0] - Unreleased
 

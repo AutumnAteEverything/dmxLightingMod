@@ -13,6 +13,18 @@ While a record is playing, every loaded DMX fixture, DMX Block, DMX Parrot, DMX 
 
 If more than one jukebox is playing, each fixture or mob follows the nearest active jukebox in its dimension.
 
+## Command-pulse shows
+
+`/dmxPulse` starts the same style of beat-driven show without requiring a jukebox. Send the command once for every beat supplied by an external program, command block, or player:
+
+```mcfunction
+/dmxPulse
+```
+
+Each pulse changes the show on that beat. The mod measures the interval between received pulses to smooth fixture movement, but it does not invent beats after the commands stop. Three seconds after the last pulse, the show times out and all fixtures and mobs return to their underlying output. Use `/dmxPulse stop` to end it immediately or `/dmxPulse status` to inspect its pulse count, estimated BPM, and timeout.
+
+A command-pulse show takes temporary priority over a jukebox show in the same dimension. If the jukebox is still playing when command pulses time out, its show resumes. Command pulses also work while jukebox Automatic DMX is turned off with `/automaticdmx off`.
+
 ## DMX safety
 
 Automatic DMX is a temporary output layer. It does not write into the in-game DMX universes and does not replace a fixture's saved DMX or manual values. Commands, console output, and external automation can continue changing DMX while a record is playing. When playback stops, those underlying values become visible again.
@@ -66,7 +78,7 @@ These values were checked against the actual 26.1 game audio as well as publishe
 
 ## Generic BPM discs
 
-dmxLighting also provides `generic60bpm`, `generic70bpm`, `generic80bpm`, `generic90bpm`, `generic100bpm`, `generic110bpm`, `generic120bpm`, `generic130bpm`, and `generic140bpm`. Each disc always drives Automatic DMX at the tempo in its name. The supplied audio is a short example song that can be replaced by a resource pack.
+dmxLighting also provides `generic60bpm disc`, `generic70bpm disc`, `generic80bpm disc`, `generic90bpm disc`, `generic100bpm disc`, `generic110bpm disc`, `generic120bpm disc`, `generic130bpm disc`, and `generic140bpm disc`. Each disc always drives Automatic DMX at the tempo in its name. The supplied audio is a short example song that can be replaced by a resource pack.
 
 For example:
 

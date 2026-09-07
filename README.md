@@ -1,6 +1,6 @@
 # dmxLighting
 
-dmxLighting is a Fabric mod for building and operating theatrical-style lighting in Minecraft. It provides configurable fixture blocks, emissive RGB blocks, a handheld lighting console, manual controls, an in-game DMX universe, fixture groups, patch inspection, visible beams, optional smooth pan/tilt movement and color fades, and jukebox-driven automatic light shows.
+dmxLighting is a Fabric mod for building and operating theatrical-style lighting in Minecraft. It provides configurable fixture blocks, emissive RGB blocks, a handheld lighting console, manual controls, an in-game DMX universe, fixture groups, patch inspection, visible beams, optional smooth pan/tilt movement and color fades, jukebox-driven automatic light shows, and externally timed beat pulses.
 
 > [!IMPORTANT]
 > The current release simulates DMX inside Minecraft. It does **not** yet receive Art-Net, sACN, USB-DMX, or data from a physical lighting console.
@@ -15,6 +15,7 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Optional pan/tilt interpolation with a user-defined movement time.
 - Optional RGB color fade time for fixtures, DMX Blocks, and DMX mobs.
 - Automatic jukebox shows with beat-synchronized color, dimmer, and fixture movement.
+- `/dmxPulse` instant-party shows driven one beat at a time by commands.
 - Nine generic music discs from 60 to 140 BPM for resource-pack music.
 - Mount orientation controls separate from live pan/tilt offsets.
 - Colored lenses, visible fixture beams, and Minecraft light output.
@@ -50,6 +51,8 @@ For multiplayer, install the mod and Fabric API on both the server and every con
 No configuration file is required for a first run.
 
 Automatic DMX is enabled by default. Insert a music disc into a jukebox to make loaded DMX fixtures and mobs in that dimension follow its beat. The show is a temporary visual layer and does not overwrite DMX or manual values.
+
+For an externally controlled show, send `/dmxPulse` once per beat. The temporary pulse show ends three seconds after the final command, returning every fixture and mob to its underlying output.
 
 ## Quick start
 

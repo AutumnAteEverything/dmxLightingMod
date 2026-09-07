@@ -16,7 +16,7 @@ dmxLighting is split into common/server-authoritative state and client-only pres
                      ▼
            resolved underlying output
                      │
-      playing jukebox│ optional temporary overlay
+  jukebox/command beat│ optional temporary overlay
                      ▼
      effective fixture output and block-entity sync
           │                         │
@@ -32,7 +32,7 @@ The server owns saved fixture configuration and authoritative output. Client scr
 | --- | --- | --- |
 | Initialization | `DmxLighting`, `DmxLightingClient` | Registers blocks, items, block entities, commands, payloads, screens, and renderers |
 | DMX values | `DmxUniverse`, `DmxUniverseManager` | Stores in-game universe/channel values |
-| Automatic DMX | `AutomaticDmxShowManager`, `JukeboxBlockEntityMixin`, `AutomaticDmxCommand` | Tracks jukebox playback and builds non-destructive beat-driven output |
+| Automatic DMX | `AutomaticDmxShowManager`, `JukeboxBlockEntityMixin`, `AutomaticDmxCommand`, `DmxPulseCommand` | Tracks jukebox playback and command pulses, then builds non-destructive beat-driven output |
 | Fixture state | `DmxFixtureBlockEntity`, `FixtureState`, `FixtureOutput` | Persists configuration and resolves DMX/manual output |
 | Parameter patch | `FixtureParameterMap` | Maps each supported parameter to an absolute channel or unassigned state |
 | Identity/grouping | `FixtureIdentity`, `FixtureGroupName`, `DmxFixtureRegistry` | Names, groups, profiles, and loaded-fixture discovery |
@@ -59,7 +59,7 @@ The current fixture editor does not rely on one fixed base address. Every parame
 
 DMX and manual values coexist. The selected fixture mode decides which source is active. Beam Width and Beam Length also have independent source choices while the fixture remains in DMX mode. Pan/tilt interpolation and visible color interpolation operate after source resolution so they can smooth rendered target changes without changing the underlying DMX/manual values.
 
-Automatic DMX is a transient layer above that source resolution. Its block-entity output is synchronized to clients but omitted from world saves, and it never writes to `DmxUniverseManager` or the stored manual output.
+Automatic DMX is a transient layer above that source resolution. Jukebox playback or command pulses can drive the layer, with an active command-pulse show taking priority. Its block-entity output is synchronized to clients but omitted from world saves, and it never writes to `DmxUniverseManager` or the stored manual output.
 
 ## Networking boundary
 

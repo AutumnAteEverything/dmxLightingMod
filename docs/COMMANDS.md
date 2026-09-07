@@ -16,6 +16,25 @@ Automatic DMX is enabled by default and follows music discs playing in jukeboxes
 
 Built-in discs use individual starting BPM profiles. Custom music discs use a 120 BPM fallback in this version. See [Automatic DMX](AUTOMATIC_DMX.md) for behavior and testing notes.
 
+## Command-pulse shows
+
+Send one command on every beat to run an instant beat-driven show in the current dimension:
+
+```mcfunction
+/dmxPulse
+```
+
+The beat command intentionally sends no chat response, so repeated pulses do not fill the chat. Fixtures and mobs use the same color, dimmer, and movement pattern as a jukebox show. The interval between pulses is measured to keep movement smooth, but the mod never creates additional beats after the incoming pulses stop.
+
+```mcfunction
+/dmxPulse status
+/dmxPulse stop
+```
+
+`status` reports the received pulse count, estimated BPM, and remaining timeout. `stop` ends the command-pulse show immediately. Otherwise it times out three seconds after the final pulse. The show is a temporary output layer: it does not rewrite DMX values, and the previous DMX/manual output becomes visible again when the show ends. If a jukebox show is active, the command pulses temporarily take priority and the jukebox resumes after the timeout.
+
+Command-pulse shows remain available when `/automaticdmx off` has disabled jukebox shows. The lowercase `/dmxpulse` spelling is also accepted.
+
 ## Raw DMX output
 
 ### `/dmx`
