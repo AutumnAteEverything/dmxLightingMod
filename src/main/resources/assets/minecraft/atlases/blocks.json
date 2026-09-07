@@ -1,0 +1,16 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "dmxlighting:entity/dmx_fixture"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "dmxlighting:entity/dmx_fixture_lens"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "dmxlighting:entity/dmx_fixture_spotlight_lens"
+    }
+  ]
+}

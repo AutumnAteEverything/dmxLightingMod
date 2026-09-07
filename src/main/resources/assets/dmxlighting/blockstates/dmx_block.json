@@ -1,0 +1,9 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "dmxlighting:block/dmx_block"
+      }
+    }
+  ]
+}
