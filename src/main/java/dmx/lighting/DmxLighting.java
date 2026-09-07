@@ -26,6 +26,7 @@ public class DmxLighting implements ModInitializer {
         DmxBulkAddressCommand.initialize();
         DmxSendCommand.initialize();
         DmxControlCommand.initialize();
+        AutomaticDmxCommand.initialize();
 
         LOGGER.info("dmxLighting loaded successfully.");
     }

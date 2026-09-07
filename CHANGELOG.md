@@ -6,9 +6,13 @@ All notable changes to dmxLighting are documented here. This project follows a s
 
 ### Added
 
+- Automatic DMX shows triggered by music discs playing in jukeboxes.
+- Beat-synchronized color and dimmer output for fixtures, DMX Blocks, and DMX mobs.
+- Beat-synchronized pan and tilt movement for fixture blocks.
+- Built-in disc BPM profiles and a 120 BPM fallback for custom music discs.
+- `/automaticdmx on`, `/automaticdmx off`, and `/automaticdmx status` commands.
 - Thorough GitHub documentation, user guides, command reference, texture guide, contributor guidance, issue templates, and release checklist.
 - DMX Warden mob with RGB/dimmer patching, console editing, color fades, spawn egg support, and emissive DMX-colored rendering.
-- DMX Wardens ignore non-player mobs while still allowing normal Warden aggression toward survival players.
 
 ### Changed
 

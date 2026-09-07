@@ -1,6 +1,6 @@
 # dmxLighting
 
-dmxLighting is a Fabric mod for building and operating theatrical-style lighting in Minecraft. It provides configurable fixture blocks, emissive RGB blocks, a handheld lighting console, manual controls, an in-game DMX universe, fixture groups, patch inspection, visible beams, and optional smooth pan/tilt movement and color fades.
+dmxLighting is a Fabric mod for building and operating theatrical-style lighting in Minecraft. It provides configurable fixture blocks, emissive RGB blocks, a handheld lighting console, manual controls, an in-game DMX universe, fixture groups, patch inspection, visible beams, optional smooth pan/tilt movement and color fades, and jukebox-driven automatic light shows.
 
 > [!IMPORTANT]
 > The current release simulates DMX inside Minecraft. It does **not** yet receive Art-Net, sACN, USB-DMX, or data from a physical lighting console.
@@ -14,6 +14,7 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Manual and DMX operating modes, with optional visible color fades.
 - Optional pan/tilt interpolation with a user-defined movement time.
 - Optional RGB color fade time for fixtures, DMX Blocks, and DMX mobs.
+- Automatic jukebox shows with beat-synchronized color, dimmer, and fixture movement.
 - Mount orientation controls separate from live pan/tilt offsets.
 - Colored lenses, visible fixture beams, and Minecraft light output.
 - Full-cube **DMX Block** with RGB, dimmer, strobe, and five selectable skins.
@@ -46,6 +47,8 @@ For multiplayer, install the mod and Fabric API on both the server and every con
 5. Start Minecraft with the Fabric profile.
 
 No configuration file is required for a first run.
+
+Automatic DMX is enabled by default. Insert a music disc into a jukebox to make loaded DMX fixtures and mobs in that dimension follow its beat. The show is a temporary visual layer and does not overwrite DMX or manual values.
 
 ## Quick start
 
@@ -87,6 +90,7 @@ See the detailed guides:
 - [DMX Fixtures](docs/FIXTURES.md)
 - [DMX Blocks](docs/DMX_BLOCK.md)
 - [Lighting Console](docs/LIGHTING_CONSOLE.md)
+- [Automatic DMX and jukebox shows](docs/AUTOMATIC_DMX.md)
 - [Commands](docs/COMMANDS.md)
 - [Resource packs and textures](docs/RESOURCE_PACKS.md)
 - [Troubleshooting](docs/TROUBLESHOOTING.md)

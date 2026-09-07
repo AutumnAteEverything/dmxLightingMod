@@ -2,6 +2,20 @@
 
 Coordinates use Minecraft's normal block-position syntax, including relative coordinates such as `~ ~-1 ~`. Universes and channels are one-based; DMX values range from 0 to 255.
 
+## Automatic DMX
+
+Automatic DMX is enabled by default and follows music discs playing in jukeboxes.
+
+```mcfunction
+/automaticdmx status
+/automaticdmx on
+/automaticdmx off
+```
+
+`status` lists active jukebox shows and their BPM in the current dimension. Turning Automatic DMX off immediately returns fixtures and mobs to their underlying DMX or manual output. The command does not clear or rewrite DMX channels.
+
+Built-in discs use individual starting BPM profiles. Custom music discs use a 120 BPM fallback in this version. See [Automatic DMX](AUTOMATIC_DMX.md) for behavior and testing notes.
+
 ## Raw DMX output
 
 ### `/dmx`
@@ -156,7 +170,7 @@ Names do not have to be unique. If a DMX mob has no saved name, the console give
 
 DMX mobs are DMX-only for now. The Lighting Console Output view writes to their assigned DMX channels instead of putting individual mobs into Manual mode.
 
-DMX Wardens ignore non-player mobs while still allowing normal Warden aggression toward survival players.
+DMX Wardens retain normal Minecraft Warden behavior and aggression.
 
 ## Control mode and manual output
 

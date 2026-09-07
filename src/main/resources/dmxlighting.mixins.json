@@ -3,7 +3,8 @@
 	"package": "dmx.lighting.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"JukeboxBlockEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

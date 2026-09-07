@@ -680,26 +680,41 @@ public class DmxParrotEntity extends Parrot {
     }
 
     public void refreshFromDmx() {
+        FixtureOutput underlyingOutput =
+                new FixtureOutput(
+                        readChannel(
+                                parameterMap.getRedChannel()
+                        ),
+                        readChannel(
+                                parameterMap.getGreenChannel()
+                        ),
+                        readChannel(
+                                parameterMap.getBlueChannel()
+                        ),
+                        0,
+                        0,
+                        readChannel(
+                                parameterMap.getDimmerChannel()
+                        ),
+                        128,
+                        128,
+                        0,
+                        0,
+                        0
+                );
+
+        FixtureOutput showOutput =
+                AutomaticDmxShowManager.createOutput(
+                        level(),
+                        blockPosition(),
+                        underlyingOutput,
+                        false
+                );
+
         dmxOutput.set(
-                readChannel(
-                        parameterMap.getRedChannel()
-                ),
-                readChannel(
-                        parameterMap.getGreenChannel()
-                ),
-                readChannel(
-                        parameterMap.getBlueChannel()
-                ),
-                0,
-                0,
-                readChannel(
-                        parameterMap.getDimmerChannel()
-                ),
-                128,
-                128,
-                0,
-                0,
-                0
+                showOutput == null
+                        ? underlyingOutput
+                        : showOutput
         );
 
         refreshSyncedOutput();

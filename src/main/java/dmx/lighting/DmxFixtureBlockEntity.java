@@ -78,6 +78,12 @@ public class DmxFixtureBlockEntity extends BlockEntity {
     private static final int PARAMETER_MAP_VERSION =
             1;
 
+    private static final String AUTOMATIC_DMX_ACTIVE_KEY =
+            "automatic_dmx_active";
+
+    private static final String AUTOMATIC_DMX_PREFIX =
+            "automatic_dmx_";
+
     public static final float MIN_PAN_TILT_INTERPOLATION_TIME_SECONDS =
             0.05F;
 
@@ -191,6 +197,17 @@ public class DmxFixtureBlockEntity extends BlockEntity {
 
     private final ColorInterpolationState colorInterpolation =
             new ColorInterpolationState();
+
+    /*
+     * Jukebox output is transient. It is synchronized to clients but
+     * deliberately omitted from world saves so the fixture's DMX and
+     * manual values remain authoritative underneath the show.
+     */
+    private boolean automaticDmxActive =
+            false;
+
+    private final FixtureOutput automaticDmxOutput =
+            new FixtureOutput();
 
     /*
      * -----------------------------------------------------------------
@@ -759,13 +776,15 @@ public class DmxFixtureBlockEntity extends BlockEntity {
      */
 
     public int getActiveBeamWidth() {
-        return fixtureState
-                .getActiveBeamWidth();
+        return automaticDmxActive
+                ? automaticDmxOutput.getBeamWidth()
+                : fixtureState.getActiveBeamWidth();
     }
 
     public int getActiveBeamLength() {
-        return fixtureState
-                .getActiveBeamLength();
+        return automaticDmxActive
+                ? automaticDmxOutput.getBeamLength()
+                : fixtureState.getActiveBeamLength();
     }
 
     public int getResolvedBeamWidthDegrees() {
@@ -1254,6 +1273,41 @@ public class DmxFixtureBlockEntity extends BlockEntity {
         applyDmxOutput(
                 newOutput
         );
+
+        refreshAutomaticDmxOutput();
+    }
+
+    private void refreshAutomaticDmxOutput() {
+        FixtureOutput showOutput =
+                AutomaticDmxShowManager.createOutput(
+                        level,
+                        worldPosition,
+                        fixtureState.copyActiveOutput(),
+                        !(this instanceof DmxPixelBlockEntity)
+                );
+
+        boolean showActive =
+                showOutput != null;
+
+        if (automaticDmxActive == showActive
+                && (!showActive
+                || automaticDmxOutput.equals(
+                        showOutput
+                ))) {
+
+            return;
+        }
+
+        automaticDmxActive =
+                showActive;
+
+        if (showActive) {
+            automaticDmxOutput.set(
+                    showOutput
+            );
+        }
+
+        setChanged();
     }
 
     public FixtureOutput readParameterMappedDmxOutput() {
@@ -1503,43 +1557,53 @@ public class DmxFixtureBlockEntity extends BlockEntity {
      */
 
     public int getActiveRed() {
-        return fixtureState.getActiveRed();
+        return getEffectiveActiveOutput()
+                .getRed();
     }
 
     public int getActiveGreen() {
-        return fixtureState.getActiveGreen();
+        return getEffectiveActiveOutput()
+                .getGreen();
     }
 
     public int getActiveBlue() {
-        return fixtureState.getActiveBlue();
+        return getEffectiveActiveOutput()
+                .getBlue();
     }
 
     public int getActiveWhite() {
-        return fixtureState.getActiveWhite();
+        return getEffectiveActiveOutput()
+                .getWhite();
     }
 
     public int getActiveDimmer() {
-        return fixtureState.getActiveDimmer();
+        return getEffectiveActiveOutput()
+                .getDimmer();
     }
 
     public int getActivePan() {
-        return fixtureState.getActivePan();
+        return getEffectiveActiveOutput()
+                .getPan();
     }
 
     public int getActiveTilt() {
-        return fixtureState.getActiveTilt();
+        return getEffectiveActiveOutput()
+                .getTilt();
     }
 
     public int getActiveZoom() {
-        return fixtureState.getActiveZoom();
+        return getEffectiveActiveOutput()
+                .getZoom();
     }
 
     public int getActiveStrobe() {
-        return fixtureState.getActiveStrobe();
+        return getEffectiveActiveOutput()
+                .getStrobe();
     }
 
     public int getActiveGobo() {
-        return fixtureState.getActiveGobo();
+        return getEffectiveActiveOutput()
+                .getGobo();
     }
 
     /*
@@ -1549,23 +1613,28 @@ public class DmxFixtureBlockEntity extends BlockEntity {
      */
 
     public int getOutputRed() {
-        return fixtureState.getOutputRed();
+        return getEffectiveActiveOutput()
+                .getOutputRed();
     }
 
     public int getOutputGreen() {
-        return fixtureState.getOutputGreen();
+        return getEffectiveActiveOutput()
+                .getOutputGreen();
     }
 
     public int getOutputBlue() {
-        return fixtureState.getOutputBlue();
+        return getEffectiveActiveOutput()
+                .getOutputBlue();
     }
 
     public int getOutputWhite() {
-        return fixtureState.getOutputWhite();
+        return getEffectiveActiveOutput()
+                .getOutputWhite();
     }
 
     public int getOutputPackedRgb() {
-        return fixtureState.getPackedRgb();
+        return getEffectiveActiveOutput()
+                .getPackedRgb();
     }
 
     public int getSmoothedOutputPackedRgb() {
@@ -1577,7 +1646,14 @@ public class DmxFixtureBlockEntity extends BlockEntity {
     }
 
     public int getMinecraftLightLevel() {
-        return fixtureState.getMinecraftLightLevel();
+        return getEffectiveActiveOutput()
+                .getMinecraftLightLevel();
+    }
+
+    private FixtureOutput getEffectiveActiveOutput() {
+        return automaticDmxActive
+                ? automaticDmxOutput
+                : fixtureState.getActiveOutput();
     }
 
     /*
@@ -2335,6 +2411,66 @@ public class DmxFixtureBlockEntity extends BlockEntity {
                 loadedBeamLengthControlMode
         );
 
+        automaticDmxActive =
+                input.getIntOr(
+                        AUTOMATIC_DMX_ACTIVE_KEY,
+                        0
+                ) != 0;
+
+        automaticDmxOutput.set(
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "red",
+                        0
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "green",
+                        0
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "blue",
+                        0
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "white",
+                        0
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "amber",
+                        0
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "dimmer",
+                        0
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "pan",
+                        128
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "tilt",
+                        128
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "beam_width",
+                        0
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "beam_length",
+                        0
+                ),
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "strobe",
+                        0
+                )
+        );
+
+        automaticDmxOutput.setGobo(
+                input.getIntOr(
+                        AUTOMATIC_DMX_PREFIX + "gobo",
+                        0
+                )
+        );
+
         boolean visibleOutputChanged =
                 oldOutputRgb
                         != getOutputPackedRgb()
@@ -2367,9 +2503,77 @@ public class DmxFixtureBlockEntity extends BlockEntity {
     public CompoundTag getUpdateTag(
             HolderLookup.Provider registryLookup
     ) {
-        return saveWithoutMetadata(
-                registryLookup
+        CompoundTag tag =
+                saveWithoutMetadata(
+                        registryLookup
+                );
+
+        tag.putInt(
+                AUTOMATIC_DMX_ACTIVE_KEY,
+                automaticDmxActive ? 1 : 0
         );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "red",
+                automaticDmxOutput.getRed()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "green",
+                automaticDmxOutput.getGreen()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "blue",
+                automaticDmxOutput.getBlue()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "white",
+                automaticDmxOutput.getWhite()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "amber",
+                automaticDmxOutput.getAmber()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "dimmer",
+                automaticDmxOutput.getDimmer()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "pan",
+                automaticDmxOutput.getPan()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "tilt",
+                automaticDmxOutput.getTilt()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "beam_width",
+                automaticDmxOutput.getBeamWidth()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "beam_length",
+                automaticDmxOutput.getBeamLength()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "strobe",
+                automaticDmxOutput.getStrobe()
+        );
+
+        tag.putInt(
+                AUTOMATIC_DMX_PREFIX + "gobo",
+                automaticDmxOutput.getGobo()
+        );
+
+        return tag;
     }
 
     @Override
