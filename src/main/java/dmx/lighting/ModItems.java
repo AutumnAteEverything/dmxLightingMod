@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 
 import java.util.function.Function;
 
@@ -36,6 +37,26 @@ public final class ModItems {
                     LightingConsoleItem::new,
                     new Item.Properties()
                             .stacksTo(1)
+            );
+
+    public static final SpawnEggItem DMX_PARROT_SPAWN_EGG =
+            register(
+                    "dmx_parrot_spawn_egg",
+                    SpawnEggItem::new,
+                    new Item.Properties()
+                            .spawnEgg(
+                                    ModEntities.DMX_PARROT
+                            )
+            );
+
+    public static final SpawnEggItem DMX_ENDERMAN_SPAWN_EGG =
+            register(
+                    "dmx_enderman_spawn_egg",
+                    SpawnEggItem::new,
+                    new Item.Properties()
+                            .spawnEgg(
+                                    ModEntities.DMX_ENDERMAN
+                            )
             );
 
     private ModItems() {
@@ -83,6 +104,22 @@ public final class ModItems {
         ).register(
                 output -> output.accept(
                         LIGHTING_CONSOLE
+                )
+        );
+
+        CreativeModeTabEvents.modifyOutputEvent(
+                TOOLS_AND_UTILITIES_TAB
+        ).register(
+                output -> output.accept(
+                        DMX_PARROT_SPAWN_EGG
+                )
+        );
+
+        CreativeModeTabEvents.modifyOutputEvent(
+                TOOLS_AND_UTILITIES_TAB
+        ).register(
+                output -> output.accept(
+                        DMX_ENDERMAN_SPAWN_EGG
                 )
         );
 

@@ -24,7 +24,10 @@ import java.util.Locale;
  *     Applies output to every loaded fixture in the player's current
  *     dimension.
  *
- * Output changes modify each fixture's stored MANUAL values.
+ * Output changes modify each block fixture's stored MANUAL values.
+ *
+ * DMX mobs write to their assigned DMX channels instead, because they
+ * are DMX-only for now.
  *
  * They do not automatically change the whole-fixture DMX / Manual
  * control mode.
@@ -132,20 +135,75 @@ public final class ConsoleFixtureOutputHandler {
             return;
         }
 
+        DmxParrotEntity targetedParrot =
+                DmxMobFixtureRegistry.getParrotByEntityId(
+                        level.dimension(),
+                        payload.targetEntityId()
+                );
+
+        if (targetedParrot != null
+                && !targetedParrot.isRemoved()) {
+
+            applyPayloadToParrot(
+                    targetedParrot,
+                    payload
+            );
+
+            return;
+        }
+
+        DmxEndermanEntity targetedEnderman =
+                DmxMobFixtureRegistry.getEndermanByEntityId(
+                        level.dimension(),
+                        payload.targetEntityId()
+                );
+
+        if (targetedEnderman != null
+                && !targetedEnderman.isRemoved()) {
+
+            applyPayloadToEnderman(
+                    targetedEnderman,
+                    payload
+            );
+
+            return;
+        }
+
         DmxFixtureBlockEntity fixture =
                 DmxFixtureRegistry.getFixture(
                         level.dimension(),
                         position
                 );
 
-        if (fixture == null
-                || fixture.isRemoved()) {
+        if (fixture != null
+                && !fixture.isRemoved()) {
 
+            applyPayloadToFixture(
+                    fixture,
+                    payload
+            );
             return;
         }
 
-        applyPayloadToFixture(
-                fixture,
+        DmxParrotEntity parrot =
+                DmxMobFixtureRegistry.getParrotAt(
+                        level.dimension(),
+                        position
+                );
+
+        applyPayloadToParrot(
+                parrot,
+                payload
+        );
+
+        DmxEndermanEntity enderman =
+                DmxMobFixtureRegistry.getEndermanAt(
+                        level.dimension(),
+                        position
+                );
+
+        applyPayloadToEnderman(
+                enderman,
                 payload
         );
     }
@@ -183,15 +241,68 @@ public final class ConsoleFixtureOutputHandler {
                         sourcePosition
                 );
 
-        if (sourceFixture == null
-                || sourceFixture.isRemoved()
-                || sourceFixture.isUngrouped()) {
+        FixtureGroupName group =
+                null;
 
-            return;
+        if (sourceFixture != null
+                && !sourceFixture.isRemoved()
+                && !sourceFixture.isUngrouped()) {
+
+            group =
+                    sourceFixture.getFixtureGroup();
         }
 
-        FixtureGroupName group =
-                sourceFixture.getFixtureGroup();
+        if (group == null
+                || group.isUngrouped()) {
+
+            DmxParrotEntity sourceParrot =
+                    DmxMobFixtureRegistry.getParrotByEntityId(
+                            level.dimension(),
+                            payload.targetEntityId()
+                    );
+
+            if (sourceParrot == null) {
+                sourceParrot =
+                        DmxMobFixtureRegistry.getParrotAt(
+                                level.dimension(),
+                                sourcePosition
+                        );
+            }
+
+            if (sourceParrot != null
+                    && !sourceParrot.isRemoved()
+                    && !sourceParrot.isUngrouped()) {
+
+                group =
+                        sourceParrot.getFixtureGroup();
+            }
+        }
+
+        if (group == null
+                || group.isUngrouped()) {
+
+            DmxEndermanEntity sourceEnderman =
+                    DmxMobFixtureRegistry.getEndermanByEntityId(
+                            level.dimension(),
+                            payload.targetEntityId()
+                    );
+
+            if (sourceEnderman == null) {
+                sourceEnderman =
+                        DmxMobFixtureRegistry.getEndermanAt(
+                                level.dimension(),
+                                sourcePosition
+                        );
+            }
+
+            if (sourceEnderman != null
+                    && !sourceEnderman.isRemoved()
+                    && !sourceEnderman.isUngrouped()) {
+
+                group =
+                        sourceEnderman.getFixtureGroup();
+            }
+        }
 
         if (group == null
                 || group.isUngrouped()) {
@@ -207,6 +318,22 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToFixtures(
                 fixtures,
+                payload
+        );
+
+        applyPayloadToParrots(
+                DmxMobFixtureRegistry.getParrotsInGroup(
+                        level.dimension(),
+                        group
+                ),
+                payload
+        );
+
+        applyPayloadToEndermen(
+                DmxMobFixtureRegistry.getEndermenInGroup(
+                        level.dimension(),
+                        group
+                ),
                 payload
         );
     }
@@ -234,6 +361,20 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToFixtures(
                 fixtures,
+                payload
+        );
+
+        applyPayloadToParrots(
+                DmxMobFixtureRegistry.getParrotsInDimension(
+                        level.dimension()
+                ),
+                payload
+        );
+
+        applyPayloadToEndermen(
+                DmxMobFixtureRegistry.getEndermenInDimension(
+                        level.dimension()
+                ),
                 payload
         );
     }
@@ -275,6 +416,58 @@ public final class ConsoleFixtureOutputHandler {
 
             applyPayloadToFixture(
                     fixture,
+                    payload
+            );
+        }
+    }
+
+    private static void applyPayloadToParrots(
+            List<DmxParrotEntity> parrots,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (parrots == null
+                || parrots.isEmpty()
+                || payload == null) {
+
+            return;
+        }
+
+        List<DmxParrotEntity> safeParrots =
+                new ArrayList<>(
+                        parrots
+                );
+
+        for (DmxParrotEntity parrot :
+                safeParrots) {
+
+            applyPayloadToParrot(
+                    parrot,
+                    payload
+            );
+        }
+    }
+
+    private static void applyPayloadToEndermen(
+            List<DmxEndermanEntity> endermen,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (endermen == null
+                || endermen.isEmpty()
+                || payload == null) {
+
+            return;
+        }
+
+        List<DmxEndermanEntity> safeEndermen =
+                new ArrayList<>(
+                        endermen
+                );
+
+        for (DmxEndermanEntity enderman :
+                safeEndermen) {
+
+            applyPayloadToEnderman(
+                    enderman,
                     payload
             );
         }
@@ -564,6 +757,38 @@ public final class ConsoleFixtureOutputHandler {
         if (changed) {
             fixture.setChanged();
         }
+    }
+
+    private static void applyPayloadToParrot(
+            DmxParrotEntity parrot,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (parrot == null
+                || parrot.isRemoved()
+                || payload == null) {
+
+            return;
+        }
+
+        parrot.applyConsoleDmxOutput(
+                payload
+        );
+    }
+
+    private static void applyPayloadToEnderman(
+            DmxEndermanEntity enderman,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (enderman == null
+                || enderman.isRemoved()
+                || payload == null) {
+
+            return;
+        }
+
+        enderman.applyConsoleDmxOutput(
+                payload
+        );
     }
 
     /*

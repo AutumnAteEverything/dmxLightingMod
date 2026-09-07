@@ -48,7 +48,18 @@ public record FixtureBrowserEntry(
         int manualBeamWidth,
         int manualBeamLength,
 
-        int manualStrobe
+        int manualStrobe,
+
+        String targetKind,
+        int targetEntityId,
+
+        int redChannel,
+        int greenChannel,
+        int blueChannel,
+        int dimmerChannel,
+
+        boolean colorInterpolationEnabled,
+        float colorInterpolationTimeSeconds
 ) {
 
     public static final String DEFAULT_NAME =
@@ -62,6 +73,15 @@ public record FixtureBrowserEntry(
 
     public static final String DEFAULT_MODE =
             "dmx";
+
+    public static final String TARGET_BLOCK =
+            "block";
+
+    public static final String TARGET_MOB =
+            "mob";
+
+    public static final int NO_TARGET_ENTITY_ID =
+            -1;
 
     /**
      * Creates and sanitizes one browser entry.
@@ -172,6 +192,54 @@ public record FixtureBrowserEntry(
                 clampDmx(
                         manualStrobe
                 );
+
+        targetKind =
+                cleanIdentifier(
+                        targetKind,
+                        TARGET_BLOCK
+                );
+
+        if (!TARGET_MOB.equals(
+                targetKind
+        )) {
+            targetKind =
+                    TARGET_BLOCK;
+        }
+
+        targetEntityId =
+                TARGET_MOB.equals(
+                        targetKind
+                )
+                        ? Math.max(
+                                NO_TARGET_ENTITY_ID,
+                                targetEntityId
+                        )
+                        : NO_TARGET_ENTITY_ID;
+
+        redChannel =
+                cleanDmxChannel(
+                        redChannel
+                );
+
+        greenChannel =
+                cleanDmxChannel(
+                        greenChannel
+                );
+
+        blueChannel =
+                cleanDmxChannel(
+                        blueChannel
+                );
+
+        dimmerChannel =
+                cleanDmxChannel(
+                        dimmerChannel
+                );
+
+        colorInterpolationTimeSeconds =
+                ColorInterpolationSettings.clampTimeSeconds(
+                        colorInterpolationTimeSeconds
+                );
     }
 
     /**
@@ -263,7 +331,162 @@ public record FixtureBrowserEntry(
                 fixture.getManualBeamWidth(),
                 fixture.getManualBeamLength(),
 
-                fixture.getManualStrobe()
+                fixture.getManualStrobe(),
+
+                TARGET_BLOCK,
+                NO_TARGET_ENTITY_ID,
+
+                map.getRedChannel(),
+                map.getGreenChannel(),
+                map.getBlueChannel(),
+                map.getDimmerChannel(),
+
+                fixture.isColorInterpolationEnabled(),
+                fixture.getColorInterpolationTimeSeconds()
+        );
+    }
+
+    /**
+     * Creates a browser entry from one loaded DMX mob.
+     */
+    public static FixtureBrowserEntry fromDmxParrot(
+            DmxParrotEntity parrot
+    ) {
+        Objects.requireNonNull(
+                parrot,
+                "parrot"
+        );
+
+        FixtureParameterMap map =
+                parrot.getParameterMap();
+
+        int[] assignedChannels =
+                new int[] {
+                        map.getRedChannel(),
+                        map.getGreenChannel(),
+                        map.getBlueChannel(),
+                        map.getWhiteChannel(),
+                        map.getAmberChannel(),
+                        map.getDimmerChannel(),
+                        map.getPanChannel(),
+                        map.getTiltChannel(),
+                        map.getBeamWidthChannel(),
+                        map.getBeamLengthChannel(),
+                        map.getStrobeChannel()
+                };
+
+        FixtureOutput output =
+                parrot.getCurrentOutput();
+
+        return new FixtureBrowserEntry(
+                parrot.blockPosition(),
+                parrot.getConsoleName(),
+                parrot.getGroupDisplayName(),
+                DmxParrotProfile.ID,
+                parrot.getUniverse(),
+                assignedChannels,
+                parrot.getControlMode()
+                        .getSerializedName(),
+                parrot.getOutputPackedRgb(),
+                parrot.getMinecraftLightLevel(),
+
+                output.getRed(),
+                output.getGreen(),
+                output.getBlue(),
+                output.getWhite(),
+                output.getAmber(),
+                output.getDimmer(),
+
+                output.getPan(),
+                output.getTilt(),
+
+                output.getBeamWidth(),
+                output.getBeamLength(),
+
+                output.getStrobe(),
+
+                TARGET_MOB,
+                parrot.getId(),
+
+                map.getRedChannel(),
+                map.getGreenChannel(),
+                map.getBlueChannel(),
+                map.getDimmerChannel(),
+
+                parrot.isColorInterpolationEnabled(),
+                parrot.getColorInterpolationTimeSeconds()
+        );
+    }
+
+    /**
+     * Creates a browser entry from one loaded DMX Enderman.
+     */
+    public static FixtureBrowserEntry fromDmxEnderman(
+            DmxEndermanEntity enderman
+    ) {
+        Objects.requireNonNull(
+                enderman,
+                "enderman"
+        );
+
+        FixtureParameterMap map =
+                enderman.getParameterMap();
+
+        int[] assignedChannels =
+                new int[] {
+                        map.getRedChannel(),
+                        map.getGreenChannel(),
+                        map.getBlueChannel(),
+                        map.getWhiteChannel(),
+                        map.getAmberChannel(),
+                        map.getDimmerChannel(),
+                        map.getPanChannel(),
+                        map.getTiltChannel(),
+                        map.getBeamWidthChannel(),
+                        map.getBeamLengthChannel(),
+                        map.getStrobeChannel()
+                };
+
+        FixtureOutput output =
+                enderman.getCurrentOutput();
+
+        return new FixtureBrowserEntry(
+                enderman.blockPosition(),
+                enderman.getConsoleName(),
+                enderman.getGroupDisplayName(),
+                DmxEndermanProfile.ID,
+                enderman.getUniverse(),
+                assignedChannels,
+                enderman.getControlMode()
+                        .getSerializedName(),
+                enderman.getOutputPackedRgb(),
+                enderman.getMinecraftLightLevel(),
+
+                output.getRed(),
+                output.getGreen(),
+                output.getBlue(),
+                output.getWhite(),
+                output.getAmber(),
+                output.getDimmer(),
+
+                output.getPan(),
+                output.getTilt(),
+
+                output.getBeamWidth(),
+                output.getBeamLength(),
+
+                output.getStrobe(),
+
+                TARGET_MOB,
+                enderman.getId(),
+
+                map.getRedChannel(),
+                map.getGreenChannel(),
+                map.getBlueChannel(),
+                map.getDimmerChannel(),
+
+                enderman.isColorInterpolationEnabled(),
+                enderman.getColorInterpolationTimeSeconds()
         );
     }
 
@@ -274,6 +497,18 @@ public record FixtureBrowserEntry(
         return DEFAULT_GROUP.equalsIgnoreCase(
                 groupName
         );
+    }
+
+    /**
+     * Returns true when this row targets a moving DMX mob rather than a
+     * block fixture.
+     */
+    public boolean isMobTarget() {
+        return TARGET_MOB.equals(
+                targetKind
+        )
+                && targetEntityId
+                != NO_TARGET_ENTITY_ID;
     }
 
     /**
@@ -429,6 +664,24 @@ public record FixtureBrowserEntry(
                 FixtureOutput.MIN_VALUE,
                 FixtureOutput.MAX_VALUE
         );
+    }
+
+    private static int cleanDmxChannel(
+            int channel
+    ) {
+        if (channel
+                == FixtureParameterMap.UNASSIGNED) {
+
+            return FixtureParameterMap.UNASSIGNED;
+        }
+
+        if (!FixtureParameterMap.isAssigned(
+                channel
+        )) {
+            return FixtureParameterMap.UNASSIGNED;
+        }
+
+        return channel;
     }
 
     private static String formatChannel(

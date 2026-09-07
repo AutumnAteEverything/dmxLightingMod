@@ -5,7 +5,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.List;
@@ -34,6 +36,9 @@ import java.util.Locale;
  * UpdateFixturePanTiltInterpolationPayload
  *     Stores optional Pan/Tilt smoothing and its transition time.
  *
+ * UpdateFixtureColorInterpolationPayload
+ *     Stores optional visible RGB fade and its transition time.
+ *
  * UpdateFixtureBeamSettingsPayload
  *     Temporary compatibility packet for the former stored visual beam
  *     settings.
@@ -61,6 +66,14 @@ import java.util.Locale;
  *
  * SetFixtureModePayload
  *     Changes a fixture between DMX and Manual modes.
+ *
+ * UpdateDmxParrotPayload
+ *     Saves name, group, universe, RGBD patch data, and color fade
+ *     settings for a DMX parrot.
+ *
+ * UpdateDmxEndermanPayload
+ *     Saves name, group, universe, RGBD patch data, and color fade
+ *     settings for a DMX Enderman.
  *
  * RequestFixtureBrowserPayload
  *     Requests a current browser snapshot for the player's dimension.
@@ -117,6 +130,11 @@ public final class DmxNetworking {
                 UpdateFixturePanTiltInterpolationPayload.STREAM_CODEC
         );
 
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateFixtureColorInterpolationPayload.TYPE,
+                UpdateFixtureColorInterpolationPayload.STREAM_CODEC
+        );
+
         /*
          * Temporary compatibility registration.
          */
@@ -153,6 +171,16 @@ public final class DmxNetworking {
         PayloadTypeRegistry.serverboundPlay().register(
                 SetFixtureModePayload.TYPE,
                 SetFixtureModePayload.STREAM_CODEC
+        );
+
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateDmxParrotPayload.TYPE,
+                UpdateDmxParrotPayload.STREAM_CODEC
+        );
+
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateDmxEndermanPayload.TYPE,
+                UpdateDmxEndermanPayload.STREAM_CODEC
         );
 
         PayloadTypeRegistry.serverboundPlay().register(
@@ -238,6 +266,17 @@ public final class DmxNetworking {
         );
 
         ServerPlayNetworking.registerGlobalReceiver(
+                UpdateFixtureColorInterpolationPayload.TYPE,
+                (payload, context) ->
+                        context.server().execute(
+                                () -> handleColorInterpolationUpdate(
+                                        context.player(),
+                                        payload
+                                )
+                        )
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(
                 UpdateFixtureBeamSettingsPayload.TYPE,
                 (payload, context) ->
                         context.server().execute(
@@ -308,6 +347,28 @@ public final class DmxNetworking {
                 (payload, context) ->
                         context.server().execute(
                                 () -> handleModeChange(
+                                        context.player(),
+                                        payload
+                                )
+                        )
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(
+                UpdateDmxParrotPayload.TYPE,
+                (payload, context) ->
+                        context.server().execute(
+                                () -> handleDmxParrotUpdate(
+                                        context.player(),
+                                        payload
+                                )
+                        )
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(
+                UpdateDmxEndermanPayload.TYPE,
+                (payload, context) ->
+                        context.server().execute(
+                                () -> handleDmxEndermanUpdate(
                                         context.player(),
                                         payload
                                 )
@@ -625,6 +686,26 @@ public final class DmxNetworking {
         }
 
         fixture.setPanTiltInterpolation(
+                payload.enabled(),
+                payload.timeSeconds()
+        );
+    }
+
+    private static void handleColorInterpolationUpdate(
+            ServerPlayer player,
+            UpdateFixtureColorInterpolationPayload payload
+    ) {
+        DmxFixtureBlockEntity fixture =
+                getFixture(
+                        player,
+                        payload.position()
+                );
+
+        if (fixture == null) {
+            return;
+        }
+
+        fixture.setColorInterpolation(
                 payload.enabled(),
                 payload.timeSeconds()
         );
@@ -977,6 +1058,228 @@ public final class DmxNetworking {
      * Browser
      * -----------------------------------------------------------------
      */
+
+    private static void handleDmxParrotUpdate(
+            ServerPlayer player,
+            UpdateDmxParrotPayload payload
+    ) {
+        if (player == null
+                || payload == null) {
+
+            return;
+        }
+
+        ServerLevel level =
+                (ServerLevel) player.level();
+
+        DmxParrotEntity parrot =
+                DmxMobFixtureRegistry.getParrotByEntityId(
+                        level.dimension(),
+                        payload.entityId()
+                );
+
+        if (parrot == null) {
+            Entity entity =
+                    level.getEntity(
+                            payload.entityId()
+                    );
+
+            if (entity instanceof DmxParrotEntity foundParrot) {
+                parrot =
+                        foundParrot;
+
+                DmxMobFixtureRegistry.register(
+                        foundParrot
+                );
+            }
+        }
+
+        if (parrot == null
+                || parrot.isRemoved()) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "That DMX parrot is not currently loaded."
+                    )
+            );
+
+            return;
+        }
+
+        if (!isValidParameterChannel(
+                payload.redChannel()
+        )
+                || !isValidParameterChannel(
+                        payload.greenChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.blueChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.dimmerChannel()
+                )) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "DMX parrot channels must be blank or 1-512."
+                    )
+            );
+
+            return;
+        }
+
+        int universe =
+                clamp(
+                        payload.universe(),
+                        DmxFixtureBlockEntity.MIN_UNIVERSE,
+                        DmxFixtureBlockEntity.MAX_UNIVERSE
+                );
+
+        parrot.setFixtureName(
+                payload.fixtureName()
+        );
+
+        parrot.setFixtureGroup(
+                FixtureGroupName.of(
+                        payload.groupName()
+                )
+        );
+
+        parrot.setUniverse(
+                universe
+        );
+
+        parrot.setParameterMap(
+                payload.redChannel(),
+                payload.greenChannel(),
+                payload.blueChannel(),
+                payload.dimmerChannel()
+        );
+
+        parrot.setColorInterpolation(
+                payload.colorInterpolationEnabled(),
+                payload.colorInterpolationTimeSeconds()
+        );
+
+        player.sendSystemMessage(
+                Component.literal(
+                        "Updated "
+                                + parrot.getConsoleName()
+                                + "."
+                )
+        );
+    }
+
+    private static void handleDmxEndermanUpdate(
+            ServerPlayer player,
+            UpdateDmxEndermanPayload payload
+    ) {
+        if (player == null
+                || payload == null) {
+
+            return;
+        }
+
+        ServerLevel level =
+                (ServerLevel) player.level();
+
+        DmxEndermanEntity enderman =
+                DmxMobFixtureRegistry.getEndermanByEntityId(
+                        level.dimension(),
+                        payload.entityId()
+                );
+
+        if (enderman == null) {
+            Entity entity =
+                    level.getEntity(
+                            payload.entityId()
+                    );
+
+            if (entity instanceof DmxEndermanEntity foundEnderman) {
+                enderman =
+                        foundEnderman;
+
+                DmxMobFixtureRegistry.register(
+                        foundEnderman
+                );
+            }
+        }
+
+        if (enderman == null
+                || enderman.isRemoved()) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "That DMX Enderman is not currently loaded."
+                    )
+            );
+
+            return;
+        }
+
+        if (!isValidParameterChannel(
+                payload.redChannel()
+        )
+                || !isValidParameterChannel(
+                        payload.greenChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.blueChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.dimmerChannel()
+                )) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "DMX Enderman channels must be blank or 1-512."
+                    )
+            );
+
+            return;
+        }
+
+        int universe =
+                clamp(
+                        payload.universe(),
+                        DmxFixtureBlockEntity.MIN_UNIVERSE,
+                        DmxFixtureBlockEntity.MAX_UNIVERSE
+                );
+
+        enderman.setFixtureName(
+                payload.fixtureName()
+        );
+
+        enderman.setFixtureGroup(
+                FixtureGroupName.of(
+                        payload.groupName()
+                )
+        );
+
+        enderman.setUniverse(
+                universe
+        );
+
+        enderman.setParameterMap(
+                payload.redChannel(),
+                payload.greenChannel(),
+                payload.blueChannel(),
+                payload.dimmerChannel()
+        );
+
+        enderman.setColorInterpolation(
+                payload.colorInterpolationEnabled(),
+                payload.colorInterpolationTimeSeconds()
+        );
+
+        player.sendSystemMessage(
+                Component.literal(
+                        "Updated "
+                                + enderman.getConsoleName()
+                                + "."
+                )
+        );
+    }
 
     private static void handleBrowserRequest(
             ServerPlayer player

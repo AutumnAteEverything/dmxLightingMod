@@ -1,8 +1,10 @@
 package dmx.lighting.client;
 
 import dmx.lighting.ConsoleFixtureOutputPayload;
+import dmx.lighting.DmxEndermanProfile;
 import dmx.lighting.DmxFixtureProfile;
 import dmx.lighting.DmxFixtureProfileRegistry;
+import dmx.lighting.DmxParrotProfile;
 import dmx.lighting.FixtureBrowserEntry;
 import dmx.lighting.PatchConflictAnalyzer;
 import dmx.lighting.PatchConflictResult;
@@ -1010,6 +1012,7 @@ public class LightingConsoleScreen extends Screen {
         );
 
         updateOutputTargetButtonMessages();
+        updateOutputWidgetVisibility();
     }
 
     private Button createOutputTargetButton(
@@ -1365,6 +1368,14 @@ public class LightingConsoleScreen extends Screen {
                 currentView
                         == ConsoleView.OUTPUT;
 
+        boolean dmxMobFixtureTarget =
+                visible
+                        && isSelectedDmxMob()
+                        && ConsoleFixtureOutputPayload.TARGET_FIXTURE
+                        .equals(
+                                outputTarget
+                        );
+
         setWidgetVisible(
                 outputFixtureTargetButton,
                 visible
@@ -1398,11 +1409,13 @@ public class LightingConsoleScreen extends Screen {
         setWidgetVisible(
                 outputWhiteSlider,
                 visible
+                        && !dmxMobFixtureTarget
         );
 
         setWidgetVisible(
                 outputAmberSlider,
                 visible
+                        && !dmxMobFixtureTarget
         );
 
         setWidgetVisible(
@@ -1413,32 +1426,47 @@ public class LightingConsoleScreen extends Screen {
         setWidgetVisible(
                 outputPanSlider,
                 visible
+                        && !dmxMobFixtureTarget
         );
 
         setWidgetVisible(
                 outputTiltSlider,
                 visible
+                        && !dmxMobFixtureTarget
         );
 
         setWidgetVisible(
                 outputBeamWidthSlider,
                 visible
+                        && !dmxMobFixtureTarget
         );
 
         setWidgetVisible(
                 outputBeamLengthSlider,
                 visible
+                        && !dmxMobFixtureTarget
         );
 
         setWidgetVisible(
                 outputStrobeSlider,
                 visible
+                        && !dmxMobFixtureTarget
         );
 
         setWidgetVisible(
                 outputApplyButton,
                 visible
         );
+
+        if (outputApplyButton != null) {
+            outputApplyButton.setMessage(
+                    Component.literal(
+                            dmxMobFixtureTarget
+                                    ? "Apply DMX Mob Output"
+                                    : "Apply All Output"
+                    )
+            );
+        }
     }
 
     private static void setWidgetVisible(
@@ -1473,7 +1501,7 @@ public class LightingConsoleScreen extends Screen {
 
     private void applyConsoleOutput() {
         sendConsoleOutput(
-                ConsoleFixtureOutputPayload.APPLY_ALL,
+                getApplyAllMaskForCurrentTarget(),
                 true
         );
     }
@@ -1520,7 +1548,8 @@ public class LightingConsoleScreen extends Screen {
 
                         outputStrobe,
 
-                        applyMask
+                        applyMask,
+                        resolveOutputTargetEntityId()
                 )
         );
 
@@ -1598,6 +1627,65 @@ public class LightingConsoleScreen extends Screen {
         );
 
         return null;
+    }
+
+    private int resolveOutputTargetEntityId() {
+        FixtureBrowserEntry targetEntry =
+                null;
+
+        if (ConsoleFixtureOutputPayload.TARGET_FIXTURE.equals(
+                outputTarget
+        )) {
+            targetEntry =
+                    getSelectedBrowserEntry();
+        } else if (ConsoleFixtureOutputPayload.TARGET_GROUP.equals(
+                outputTarget
+        )) {
+            targetEntry =
+                    findOutputGroupFixture();
+        }
+
+        if (targetEntry == null
+                || !targetEntry.isMobTarget()) {
+
+            return ConsoleFixtureOutputPayload.NO_TARGET_ENTITY_ID;
+        }
+
+        return targetEntry.targetEntityId();
+    }
+
+    private int getApplyAllMaskForCurrentTarget() {
+        if (isSelectedDmxMob()
+                && ConsoleFixtureOutputPayload.TARGET_FIXTURE.equals(
+                        outputTarget
+                )) {
+
+            return ConsoleFixtureOutputPayload.APPLY_RED
+                    | ConsoleFixtureOutputPayload.APPLY_GREEN
+                    | ConsoleFixtureOutputPayload.APPLY_BLUE
+                    | ConsoleFixtureOutputPayload.APPLY_DIMMER;
+        }
+
+        return ConsoleFixtureOutputPayload.APPLY_ALL;
+    }
+
+    private boolean isSelectedDmxMob() {
+        FixtureBrowserEntry selected =
+                getSelectedBrowserEntry();
+
+        if (selected == null) {
+            return false;
+        }
+
+        String fixtureType =
+                selected.fixtureType();
+
+        return DmxParrotProfile.ID.equals(
+                fixtureType
+        )
+                || DmxEndermanProfile.ID.equals(
+                        fixtureType
+                );
     }
 
     private FixtureBrowserEntry findOutputGroupFixture() {
@@ -2202,6 +2290,28 @@ public class LightingConsoleScreen extends Screen {
                 getSelectedBrowserEntry();
 
         if (selectedEntry == null) {
+            return;
+        }
+
+        if (DmxParrotProfile.ID.equals(
+                selectedEntry.fixtureType()
+        )) {
+            Minecraft.getInstance().setScreen(
+                    new DmxParrotScreen(
+                            selectedEntry
+                    )
+            );
+            return;
+        }
+
+        if (DmxEndermanProfile.ID.equals(
+                selectedEntry.fixtureType()
+        )) {
+            Minecraft.getInstance().setScreen(
+                    new DmxEndermanScreen(
+                            selectedEntry
+                    )
+            );
             return;
         }
 

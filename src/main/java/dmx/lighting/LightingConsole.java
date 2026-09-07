@@ -100,13 +100,25 @@ public final class LightingConsole {
             ResourceKey<Level> dimension,
             FixtureSortMode sortMode
     ) {
-        List<DmxFixtureBlockEntity> fixtures =
+        List<DmxFixtureBlockEntity> blockFixtures =
                 DmxFixtureRegistry.getFixturesInDimension(
                         dimension
                 );
 
+        List<DmxParrotEntity> parrots =
+                DmxMobFixtureRegistry.getParrotsInDimension(
+                        dimension
+                );
+
+        List<DmxEndermanEntity> endermen =
+                DmxMobFixtureRegistry.getEndermenInDimension(
+                        dimension
+                );
+
         return createSortedEntries(
-                fixtures,
+                blockFixtures,
+                parrots,
+                endermen,
                 sortMode
         );
     }
@@ -124,6 +136,8 @@ public final class LightingConsole {
     ) {
         return createSortedEntries(
                 DmxFixtureRegistry.getAllFixtures(),
+                DmxMobFixtureRegistry.getAllParrots(),
+                DmxMobFixtureRegistry.getAllEndermen(),
                 sortMode
         );
     }
@@ -154,14 +168,33 @@ public final class LightingConsole {
             String groupName,
             FixtureSortMode sortMode
     ) {
-        List<DmxFixtureBlockEntity> fixtures =
-                DmxFixtureRegistry.getFixturesInGroup(
-                        dimension,
+        FixtureGroupName group =
+                FixtureGroupName.of(
                         groupName
                 );
 
+        List<DmxFixtureBlockEntity> blockFixtures =
+                DmxFixtureRegistry.getFixturesInGroup(
+                        dimension,
+                        group
+                );
+
+        List<DmxParrotEntity> parrots =
+                DmxMobFixtureRegistry.getParrotsInGroup(
+                        dimension,
+                        group
+                );
+
+        List<DmxEndermanEntity> endermen =
+                DmxMobFixtureRegistry.getEndermenInGroup(
+                        dimension,
+                        group
+                );
+
         return createSortedEntries(
-                fixtures,
+                blockFixtures,
+                parrots,
+                endermen,
                 sortMode
         );
     }
@@ -189,14 +222,28 @@ public final class LightingConsole {
             int universe,
             FixtureSortMode sortMode
     ) {
-        List<DmxFixtureBlockEntity> fixtures =
+        List<DmxFixtureBlockEntity> blockFixtures =
                 DmxFixtureRegistry.getFixturesInUniverse(
                         dimension,
                         universe
                 );
 
+        List<DmxParrotEntity> parrots =
+                DmxMobFixtureRegistry.getParrotsInUniverse(
+                        dimension,
+                        universe
+                );
+
+        List<DmxEndermanEntity> endermen =
+                DmxMobFixtureRegistry.getEndermenInUniverse(
+                        dimension,
+                        universe
+                );
+
         return createSortedEntries(
-                fixtures,
+                blockFixtures,
+                parrots,
+                endermen,
                 sortMode
         );
     }
@@ -348,6 +395,8 @@ public final class LightingConsole {
 
         return createSortedEntries(
                 conflictingFixtures,
+                List.of(),
+                List.of(),
                 FixtureSortMode.PATCH
         );
     }
@@ -508,6 +557,8 @@ public final class LightingConsole {
      */
     private static List<FixtureBrowserEntry> createSortedEntries(
             List<DmxFixtureBlockEntity> fixtures,
+            List<DmxParrotEntity> parrots,
+            List<DmxEndermanEntity> endermen,
             FixtureSortMode sortMode
     ) {
         List<FixtureBrowserEntry> entries =
@@ -523,6 +574,38 @@ public final class LightingConsole {
                     entries.add(
                             FixtureBrowserEntry.fromFixture(
                                     fixture
+                            )
+                    );
+                }
+            }
+        }
+
+        if (parrots != null) {
+            for (DmxParrotEntity parrot :
+                    parrots) {
+
+                if (parrot != null
+                        && !parrot.isRemoved()) {
+
+                    entries.add(
+                            FixtureBrowserEntry.fromDmxParrot(
+                                    parrot
+                            )
+                    );
+                }
+            }
+        }
+
+        if (endermen != null) {
+            for (DmxEndermanEntity enderman :
+                    endermen) {
+
+                if (enderman != null
+                        && !enderman.isRemoved()) {
+
+                    entries.add(
+                            FixtureBrowserEntry.fromDmxEnderman(
+                                    enderman
                             )
                     );
                 }

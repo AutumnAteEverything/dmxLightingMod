@@ -8,9 +8,11 @@ In Creative mode, search for `DMX`. The search should show:
 
 - DMX Fixture
 - DMX Block
+- DMX Parrot Spawn Egg
+- DMX Enderman Spawn Egg
 - Lighting Console
 
-The two blocks are also in Functional Blocks. The console is in Tools & Utilities.
+The two blocks are also in Functional Blocks. The console and DMX mob spawn eggs are in Tools & Utilities.
 
 ## 2. Place and configure a fixture
 

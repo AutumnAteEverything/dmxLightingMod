@@ -130,6 +130,14 @@ public final class DmxFixtureProfileRegistry {
                 DmxPixelProfile.INSTANCE
         );
 
+        register(
+                DmxParrotProfile.INSTANCE
+        );
+
+        register(
+                DmxEndermanProfile.INSTANCE
+        );
+
         initialized =
                 true;
     }

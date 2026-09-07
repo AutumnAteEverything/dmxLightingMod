@@ -1,6 +1,6 @@
 # dmxLighting
 
-dmxLighting is a Fabric mod for building and operating theatrical-style lighting in Minecraft. It provides configurable fixture blocks, emissive RGB blocks, a handheld lighting console, manual controls, an in-game DMX universe, fixture groups, patch inspection, visible beams, and optional smooth pan/tilt movement.
+dmxLighting is a Fabric mod for building and operating theatrical-style lighting in Minecraft. It provides configurable fixture blocks, emissive RGB blocks, a handheld lighting console, manual controls, an in-game DMX universe, fixture groups, patch inspection, visible beams, and optional smooth pan/tilt movement and color fades.
 
 > [!IMPORTANT]
 > The current release simulates DMX inside Minecraft. It does **not** yet receive Art-Net, sACN, USB-DMX, or data from a physical lighting console.
@@ -11,16 +11,18 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 
 - Configurable **DMX Fixture** with PAR and Spotlight visual models.
 - Explicit channel assignment for red, green, blue, white, amber, dimmer, pan, tilt, beam width, beam length, and strobe.
-- Manual and DMX operating modes, with immediate output updates.
+- Manual and DMX operating modes, with optional visible color fades.
 - Optional pan/tilt interpolation with a user-defined movement time.
+- Optional RGB color fade time for fixtures, DMX Blocks, and DMX mobs.
 - Mount orientation controls separate from live pan/tilt offsets.
 - Colored lenses, visible fixture beams, and Minecraft light output.
 - Full-cube **DMX Block** with RGB, dimmer, strobe, and five selectable skins.
 - Optional DMX channel for selecting the DMX Block skin.
 - Emissive DMX Block surfaces that remain visible in darkness while emitting no Minecraft block light.
+- **DMX Parrot** and **DMX Enderman** mobs with RGB/dimmer patching, color fades, and emissive DMX color rendering.
 - Handheld, right-docked **Lighting Console** with Fixtures, Groups, Universes, Patch, and Output views.
 - Live output to one fixture, one group, or all loaded fixtures.
-- Creative inventory registration and search terms for all three items.
+- Creative inventory registration and search terms for the mod items.
 - Commands for raw channel output, consecutive channel output, fixture configuration, inspection, and bulk addressing.
 - Persistent fixture configuration in saved worlds.
 
@@ -75,6 +77,8 @@ That makes the block bright red and selects skin 3.
 | DMX Fixture | `dmxlighting:dmx_block` | Functional Blocks | Configurable PAR/Spotlight fixture with movement, beam, and light controls |
 | DMX Block | `dmxlighting:dmx_pixel_block` | Functional Blocks | Emissive RGB surface with dimmer, strobe, and five skins; emits no world light |
 | Lighting Console | `dmxlighting:lighting_console` | Tools & Utilities | Portable browser, patch view, and live control surface |
+| DMX Parrot Spawn Egg | `dmxlighting:dmx_parrot_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable parrot mob that appears in the console |
+| DMX Enderman Spawn Egg | `dmxlighting:dmx_enderman_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Enderman mob that appears in the console |
 
 See the detailed guides:
 

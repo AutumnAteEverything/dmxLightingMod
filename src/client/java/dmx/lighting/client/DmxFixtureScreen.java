@@ -8,6 +8,7 @@ import dmx.lighting.FixtureParameterMap;
 import dmx.lighting.ManualFixtureOutputPayload;
 import dmx.lighting.SetFixtureModePayload;
 import dmx.lighting.UpdateFixtureBeamControlModesPayload;
+import dmx.lighting.UpdateFixtureColorInterpolationPayload;
 import dmx.lighting.UpdateFixtureGroupPayload;
 import dmx.lighting.UpdateFixtureMountOrientationPayload;
 import dmx.lighting.UpdateFixturePanTiltInterpolationPayload;
@@ -321,11 +322,20 @@ public class DmxFixtureScreen extends Screen {
     private Button panTiltInterpolationButton;
     private EditBox panTiltInterpolationTimeField;
 
+    private Button colorInterpolationButton;
+    private EditBox colorInterpolationTimeField;
+
     private boolean panTiltInterpolationEnabled;
 
     private float panTiltInterpolationTimeSeconds =
             DmxFixtureBlockEntity
                     .DEFAULT_PAN_TILT_INTERPOLATION_TIME_SECONDS;
+
+    private boolean colorInterpolationEnabled;
+
+    private float colorInterpolationTimeSeconds =
+            DmxFixtureBlockEntity
+                    .DEFAULT_COLOR_INTERPOLATION_TIME_SECONDS;
 
     /*
      * -----------------------------------------------------------------
@@ -427,6 +437,9 @@ public class DmxFixtureScreen extends Screen {
     private int positionSectionY =
             -1;
 
+    private int colorInterpolationControlsY =
+            -1;
+
     private int interpolationControlsY =
             -1;
 
@@ -518,6 +531,7 @@ public class DmxFixtureScreen extends Screen {
 
         createManualSliders();
 
+        createColorInterpolationControls();
         createPanTiltInterpolationControls();
 
         createBeamControlButtons();
@@ -575,6 +589,12 @@ public class DmxFixtureScreen extends Screen {
 
         panTiltInterpolationTimeSeconds =
                 fixture.getPanTiltInterpolationTimeSeconds();
+
+        colorInterpolationEnabled =
+                fixture.isColorInterpolationEnabled();
+
+        colorInterpolationTimeSeconds =
+                fixture.getColorInterpolationTimeSeconds();
 
         manualRed =
                 fixture.getManualRed();
@@ -1102,6 +1122,186 @@ public class DmxFixtureScreen extends Screen {
         );
 
         return slider;
+    }
+
+    /*
+     * -----------------------------------------------------------------
+     * Color interpolation controls
+     * -----------------------------------------------------------------
+     */
+
+    private void createColorInterpolationControls() {
+        int controlsLeft =
+                width / 2
+                        - SLIDER_WIDTH / 2;
+
+        colorInterpolationButton =
+                Button.builder(
+                        getColorInterpolationButtonMessage(),
+                        button -> toggleColorInterpolation()
+                )
+                .bounds(
+                        controlsLeft,
+                        0,
+                        INTERPOLATION_BUTTON_WIDTH,
+                        INTERPOLATION_ROW_HEIGHT
+                )
+                .build();
+
+        addRenderableWidget(
+                colorInterpolationButton
+        );
+
+        colorInterpolationTimeField =
+                new EditBox(
+                        font,
+                        controlsLeft
+                                + INTERPOLATION_BUTTON_WIDTH
+                                + INTERPOLATION_CONTROL_GAP,
+                        0,
+                        INTERPOLATION_TIME_FIELD_WIDTH,
+                        INTERPOLATION_ROW_HEIGHT,
+                        Component.literal(
+                                "Color fade time in seconds"
+                        )
+                );
+
+        colorInterpolationTimeField.setMaxLength(
+                6
+        );
+
+        colorInterpolationTimeField.setValue(
+                formatInterpolationSeconds(
+                        colorInterpolationTimeSeconds
+                )
+        );
+
+        addRenderableWidget(
+                colorInterpolationTimeField
+        );
+    }
+
+    private void toggleColorInterpolation() {
+        boolean newEnabled =
+                !colorInterpolationEnabled;
+
+        if (newEnabled
+                && !validateColorInterpolationTime()) {
+
+            setErrorStatus(
+                    "Color fade time must be between 0.05 and 60 seconds."
+            );
+
+            return;
+        }
+
+        if (!ClientPlayNetworking.canSend(
+                UpdateFixtureColorInterpolationPayload.TYPE
+        )) {
+            setErrorStatus(
+                    "Color fade packet is unavailable."
+            );
+
+            return;
+        }
+
+        colorInterpolationEnabled =
+                newEnabled;
+
+        updateColorInterpolationButtonMessage();
+
+        ClientPlayNetworking.send(
+                new UpdateFixtureColorInterpolationPayload(
+                        fixturePosition,
+                        colorInterpolationEnabled,
+                        colorInterpolationTimeSeconds
+                )
+        );
+
+        statusMessage =
+                Component.literal(
+                        colorInterpolationEnabled
+                                ? "Color fade enabled."
+                                : "Color fade disabled."
+                );
+
+        statusColor =
+                0xFF55FF55;
+    }
+
+    private boolean sendColorInterpolation() {
+        if (!validateColorInterpolationTime()) {
+            setErrorStatus(
+                    "Color fade time must be between 0.05 and 60 seconds."
+            );
+
+            return false;
+        }
+
+        if (!ClientPlayNetworking.canSend(
+                UpdateFixtureColorInterpolationPayload.TYPE
+        )) {
+            setErrorStatus(
+                    "Color fade packet is unavailable."
+            );
+
+            return false;
+        }
+
+        ClientPlayNetworking.send(
+                new UpdateFixtureColorInterpolationPayload(
+                        fixturePosition,
+                        colorInterpolationEnabled,
+                        colorInterpolationTimeSeconds
+                )
+        );
+
+        return true;
+    }
+
+    private boolean validateColorInterpolationTime() {
+        Double parsed =
+                parseDouble(
+                        colorInterpolationTimeField.getValue()
+                );
+
+        boolean valid =
+                parsed != null
+                        && parsed
+                        >= DmxFixtureBlockEntity
+                        .MIN_COLOR_INTERPOLATION_TIME_SECONDS
+                        && parsed
+                        <= DmxFixtureBlockEntity
+                        .MAX_COLOR_INTERPOLATION_TIME_SECONDS;
+
+        colorInterpolationTimeField.setTextColor(
+                valid
+                        ? 0xFFFFFFFF
+                        : 0xFFFF5555
+        );
+
+        if (valid) {
+            colorInterpolationTimeSeconds =
+                    parsed.floatValue();
+        }
+
+        return valid;
+    }
+
+    private Component getColorInterpolationButtonMessage() {
+        return Component.literal(
+                colorInterpolationEnabled
+                        ? "Color Fade: On"
+                        : "Color Fade: Off"
+        );
+    }
+
+    private void updateColorInterpolationButtonMessage() {
+        if (colorInterpolationButton != null) {
+            colorInterpolationButton.setMessage(
+                    getColorInterpolationButtonMessage()
+            );
+        }
     }
 
     /*
@@ -1794,6 +1994,13 @@ public class DmxFixtureScreen extends Screen {
                         true
                 );
 
+        colorInterpolationControlsY =
+                cursor;
+
+        cursor +=
+                INTERPOLATION_ROW_HEIGHT
+                        + INTERPOLATION_ROW_GAP;
+
         cursor +=
                 SECTION_TOP_GAP;
 
@@ -1945,6 +2152,7 @@ public class DmxFixtureScreen extends Screen {
         updateWidgetPositions();
         updateModeButtonStates();
         updateBeamControlButtonMessages();
+        updateColorInterpolationButtonMessage();
         updatePanTiltInterpolationButtonMessage();
     }
 
@@ -2197,6 +2405,28 @@ public class DmxFixtureScreen extends Screen {
                 true
         );
 
+        int interpolationLeft =
+                width / 2
+                        - SLIDER_WIDTH / 2;
+
+        setWidgetPosition(
+                colorInterpolationButton,
+                interpolationLeft,
+                colorInterpolationControlsY
+                        - scrollOffset,
+                true
+        );
+
+        setWidgetPosition(
+                colorInterpolationTimeField,
+                interpolationLeft
+                        + INTERPOLATION_BUTTON_WIDTH
+                        + INTERPOLATION_CONTROL_GAP,
+                colorInterpolationControlsY
+                        - scrollOffset,
+                true
+        );
+
         setSliderPosition(
                 dimmerSlider,
                 true
@@ -2211,10 +2441,6 @@ public class DmxFixtureScreen extends Screen {
                 tiltSlider,
                 true
         );
-
-        int interpolationLeft =
-                width / 2
-                        - SLIDER_WIDTH / 2;
 
         setWidgetPosition(
                 panTiltInterpolationButton,
@@ -2826,6 +3052,10 @@ public class DmxFixtureScreen extends Screen {
             return;
         }
 
+        if (!sendColorInterpolation()) {
+            return;
+        }
+
         if (!sendManualOutput(
                 false
         )) {
@@ -3112,8 +3342,17 @@ public class DmxFixtureScreen extends Screen {
         );
 
         cursor +=
-                SLIDER_SPACING
-                        + SECTION_TOP_GAP;
+                SLIDER_SPACING;
+
+        colorInterpolationControlsY =
+                cursor;
+
+        cursor +=
+                INTERPOLATION_ROW_HEIGHT
+                        + INTERPOLATION_ROW_GAP;
+
+        cursor +=
+                SECTION_TOP_GAP;
 
         cursor +=
                 SECTION_HEIGHT

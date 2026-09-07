@@ -85,6 +85,17 @@ public record FixtureBrowserDataPayload(
      * stored manual beam length
      *
      * stored manual strobe
+     *
+     * target kind
+     * target entity id
+     *
+     * red channel
+     * green channel
+     * blue channel
+     * dimmer channel
+     *
+     * color fade enabled
+     * color fade time seconds
      */
     public static final StreamCodec<
             RegistryFriendlyByteBuf,
@@ -306,6 +317,45 @@ public record FixtureBrowserDataPayload(
         buffer.writeVarInt(
                 entry.manualStrobe()
         );
+
+        /*
+         * -------------------------------------------------------------
+         * Target identity and editable DMX channels
+         * -------------------------------------------------------------
+         */
+
+        buffer.writeUtf(
+                entry.targetKind(),
+                16
+        );
+
+        buffer.writeVarInt(
+                entry.targetEntityId()
+        );
+
+        buffer.writeVarInt(
+                entry.redChannel()
+        );
+
+        buffer.writeVarInt(
+                entry.greenChannel()
+        );
+
+        buffer.writeVarInt(
+                entry.blueChannel()
+        );
+
+        buffer.writeVarInt(
+                entry.dimmerChannel()
+        );
+
+        buffer.writeBoolean(
+                entry.colorInterpolationEnabled()
+        );
+
+        buffer.writeFloat(
+                entry.colorInterpolationTimeSeconds()
+        );
     }
 
     /**
@@ -432,6 +482,38 @@ public record FixtureBrowserDataPayload(
         int manualStrobe =
                 buffer.readVarInt();
 
+        /*
+         * -------------------------------------------------------------
+         * Target identity and editable DMX channels
+         * -------------------------------------------------------------
+         */
+
+        String targetKind =
+                buffer.readUtf(
+                        16
+                );
+
+        int targetEntityId =
+                buffer.readVarInt();
+
+        int redChannel =
+                buffer.readVarInt();
+
+        int greenChannel =
+                buffer.readVarInt();
+
+        int blueChannel =
+                buffer.readVarInt();
+
+        int dimmerChannel =
+                buffer.readVarInt();
+
+        boolean colorInterpolationEnabled =
+                buffer.readBoolean();
+
+        float colorInterpolationTimeSeconds =
+                buffer.readFloat();
+
         return new FixtureBrowserEntry(
                 position,
                 fixtureName,
@@ -456,7 +538,18 @@ public record FixtureBrowserDataPayload(
                 manualBeamWidth,
                 manualBeamLength,
 
-                manualStrobe
+                manualStrobe,
+
+                targetKind,
+                targetEntityId,
+
+                redChannel,
+                greenChannel,
+                blueChannel,
+                dimmerChannel,
+
+                colorInterpolationEnabled,
+                colorInterpolationTimeSeconds
         );
     }
 

@@ -52,7 +52,7 @@ The current fixture editor does not rely on one fixed base address. Every parame
 
 ## Control modes
 
-DMX and manual values coexist. The selected fixture mode decides which source is active. Beam Width and Beam Length also have independent source choices while the fixture remains in DMX mode. Pan/tilt interpolation operates after source resolution so it can smooth target changes without delaying other parameters.
+DMX and manual values coexist. The selected fixture mode decides which source is active. Beam Width and Beam Length also have independent source choices while the fixture remains in DMX mode. Pan/tilt interpolation and visible color interpolation operate after source resolution so they can smooth rendered target changes without changing the underlying DMX/manual values.
 
 ## Networking boundary
 

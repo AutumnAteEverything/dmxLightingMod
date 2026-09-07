@@ -1,5 +1,9 @@
 {
   "block.dmxlighting.dmx_block": "DMX Fixture Block",
   "block.dmxlighting.dmx_pixel_block": "DMX Block",
-  "item.dmxlighting.lighting_console": "DMX Lighting Console"
+  "item.dmxlighting.lighting_console": "DMX Lighting Console",
+  "item.dmxlighting.dmx_parrot_spawn_egg": "DMX Parrot Spawn Egg",
+  "item.dmxlighting.dmx_enderman_spawn_egg": "DMX Enderman Spawn Egg",
+  "entity.dmxlighting.dmx_parrot": "dmxParrot",
+  "entity.dmxlighting.dmx_enderman": "dmxEnderman"
 }

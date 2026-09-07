@@ -44,6 +44,9 @@ public final class DmxPixelBlockEntity
     private boolean lastVisibleStrobeState =
             true;
 
+    private int lastVisiblePackedRgb =
+            -1;
+
     public DmxPixelBlockEntity(
             BlockPos blockPos,
             BlockState blockState
@@ -75,7 +78,7 @@ public final class DmxPixelBlockEntity
      */
     public int getVisiblePackedRgb() {
         return isVisibleStrobePhase()
-                ? getOutputPackedRgb()
+                ? getSmoothedOutputPackedRgb()
                 : 0;
     }
 
@@ -307,22 +310,36 @@ public final class DmxPixelBlockEntity
         ) % 2L == 0L;
     }
 
-    private void updateClientStrobeRendering() {
+    private void updateClientRendering() {
         if (level == null
                 || !level.isClientSide()) {
 
             return;
         }
 
+        boolean colorChanged =
+                updateColorInterpolation(
+                        0.0F
+                );
+
         boolean visible =
                 isVisibleStrobePhase();
 
-        if (visible == lastVisibleStrobeState) {
+        int visiblePackedRgb =
+                getVisiblePackedRgb();
+
+        if (!colorChanged
+                && visible == lastVisibleStrobeState
+                && visiblePackedRgb == lastVisiblePackedRgb) {
+
             return;
         }
 
         lastVisibleStrobeState =
                 visible;
+
+        lastVisiblePackedRgb =
+                visiblePackedRgb;
 
         BlockState state =
                 getBlockState();
@@ -342,7 +359,7 @@ public final class DmxPixelBlockEntity
             DmxPixelBlockEntity blockEntity
     ) {
         if (level.isClientSide()) {
-            blockEntity.updateClientStrobeRendering();
+            blockEntity.updateClientRendering();
             return;
         }
 

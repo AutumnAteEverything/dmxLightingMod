@@ -87,6 +87,15 @@ public class DmxFixtureBlockEntity extends BlockEntity {
     public static final float DEFAULT_PAN_TILT_INTERPOLATION_TIME_SECONDS =
             1.0F;
 
+    public static final float MIN_COLOR_INTERPOLATION_TIME_SECONDS =
+            ColorInterpolationSettings.MIN_TIME_SECONDS;
+
+    public static final float MAX_COLOR_INTERPOLATION_TIME_SECONDS =
+            ColorInterpolationSettings.MAX_TIME_SECONDS;
+
+    public static final float DEFAULT_COLOR_INTERPOLATION_TIME_SECONDS =
+            ColorInterpolationSettings.DEFAULT_TIME_SECONDS;
+
     private static final float TICKS_PER_SECOND =
             20.0F;
 
@@ -169,6 +178,19 @@ public class DmxFixtureBlockEntity extends BlockEntity {
 
     private double interpolationStartGameTime =
             0.0D;
+
+    /*
+     * Visible RGB fade is persisted per fixture. The in-progress
+     * transition is render-only and reconstructed on the client.
+     */
+    private boolean colorInterpolationEnabled =
+            false;
+
+    private float colorInterpolationTimeSeconds =
+            DEFAULT_COLOR_INTERPOLATION_TIME_SECONDS;
+
+    private final ColorInterpolationState colorInterpolation =
+            new ColorInterpolationState();
 
     /*
      * -----------------------------------------------------------------
@@ -432,6 +454,14 @@ public class DmxFixtureBlockEntity extends BlockEntity {
         return panTiltInterpolationTimeSeconds;
     }
 
+    public boolean isColorInterpolationEnabled() {
+        return colorInterpolationEnabled;
+    }
+
+    public float getColorInterpolationTimeSeconds() {
+        return colorInterpolationTimeSeconds;
+    }
+
     public void setPanTiltInterpolation(
             boolean enabled,
             float timeSeconds
@@ -456,6 +486,35 @@ public class DmxFixtureBlockEntity extends BlockEntity {
 
         if (!enabled) {
             snapPanTiltInterpolationToActiveOutput();
+        }
+
+        setChanged();
+    }
+
+    public void setColorInterpolation(
+            boolean enabled,
+            float timeSeconds
+    ) {
+        float safeTimeSeconds =
+                ColorInterpolationSettings.clampTimeSeconds(
+                        timeSeconds
+                );
+
+        if (colorInterpolationEnabled == enabled
+                && colorInterpolationTimeSeconds
+                == safeTimeSeconds) {
+
+            return;
+        }
+
+        colorInterpolationEnabled =
+                enabled;
+
+        colorInterpolationTimeSeconds =
+                safeTimeSeconds;
+
+        if (!enabled) {
+            snapColorInterpolationToActiveOutput();
         }
 
         setChanged();
@@ -528,6 +587,22 @@ public class DmxFixtureBlockEntity extends BlockEntity {
         }
     }
 
+    public boolean updateColorInterpolation(
+            float tickProgress
+    ) {
+        int activePackedRgb =
+                getOutputPackedRgb();
+
+        return colorInterpolation.update(
+                activePackedRgb,
+                colorInterpolationEnabled,
+                colorInterpolationTimeSeconds,
+                getInterpolationGameTime(
+                        tickProgress
+                )
+        );
+    }
+
     private void samplePanTiltInterpolation(
             double now
     ) {
@@ -571,6 +646,15 @@ public class DmxFixtureBlockEntity extends BlockEntity {
                 clampDmxValue(
                         getActiveTilt()
                 ),
+                getInterpolationGameTime(
+                        0.0F
+                )
+        );
+    }
+
+    private void snapColorInterpolationToActiveOutput() {
+        colorInterpolation.snapTo(
+                getOutputPackedRgb(),
                 getInterpolationGameTime(
                         0.0F
                 )
@@ -1484,6 +1568,14 @@ public class DmxFixtureBlockEntity extends BlockEntity {
         return fixtureState.getPackedRgb();
     }
 
+    public int getSmoothedOutputPackedRgb() {
+        return colorInterpolationEnabled
+                ? colorInterpolation.getDisplayedPackedRgb(
+                        getOutputPackedRgb()
+                )
+                : getOutputPackedRgb();
+    }
+
     public int getMinecraftLightLevel() {
         return fixtureState.getMinecraftLightLevel();
     }
@@ -1641,6 +1733,18 @@ public class DmxFixtureBlockEntity extends BlockEntity {
         output.putFloat(
                 "pan_tilt_interpolation_time_seconds",
                 panTiltInterpolationTimeSeconds
+        );
+
+        output.putInt(
+                "color_interpolation_enabled",
+                colorInterpolationEnabled
+                        ? 1
+                        : 0
+        );
+
+        output.putFloat(
+                "color_interpolation_time_seconds",
+                colorInterpolationTimeSeconds
         );
 
         output.putFloat(
@@ -1960,6 +2064,20 @@ public class DmxFixtureBlockEntity extends BlockEntity {
                         input.getFloatOr(
                                 "pan_tilt_interpolation_time_seconds",
                                 DEFAULT_PAN_TILT_INTERPOLATION_TIME_SECONDS
+                        )
+                );
+
+        colorInterpolationEnabled =
+                input.getIntOr(
+                        "color_interpolation_enabled",
+                        0
+                ) != 0;
+
+        colorInterpolationTimeSeconds =
+                ColorInterpolationSettings.clampTimeSeconds(
+                        input.getFloatOr(
+                                "color_interpolation_time_seconds",
+                                DEFAULT_COLOR_INTERPOLATION_TIME_SECONDS
                         )
                 );
 

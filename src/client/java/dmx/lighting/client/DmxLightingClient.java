@@ -5,10 +5,14 @@ import dmx.lighting.DmxLighting;
 import dmx.lighting.DmxPixelBlockEntity;
 import dmx.lighting.ModBlockEntities;
 import dmx.lighting.ModBlocks;
+import dmx.lighting.ModEntities;
 import dmx.lighting.client.render.DmxFixtureBlockEntityRenderer;
+import dmx.lighting.client.render.DmxEndermanRenderer;
+import dmx.lighting.client.render.DmxParrotRenderer;
 import dmx.lighting.client.render.DmxPixelBlockEntityRenderer;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 
@@ -42,6 +46,7 @@ public class DmxLightingClient implements ClientModInitializer {
         registerFixtureTint();
         registerFixtureInteraction();
         registerFixtureRenderer();
+        registerEntityRenderers();
 
         DmxLighting.LOGGER.info(
                 "Registered DMX fixture client features."
@@ -60,6 +65,18 @@ public class DmxLightingClient implements ClientModInitializer {
         BlockEntityRenderers.register(
                 ModBlockEntities.DMX_PIXEL_BLOCK_ENTITY,
                 DmxPixelBlockEntityRenderer::new
+        );
+    }
+
+    private static void registerEntityRenderers() {
+        EntityRendererRegistry.register(
+                ModEntities.DMX_PARROT,
+                DmxParrotRenderer::new
+        );
+
+        EntityRendererRegistry.register(
+                ModEntities.DMX_ENDERMAN,
+                DmxEndermanRenderer::new
         );
     }
 
@@ -161,7 +178,7 @@ public class DmxLightingClient implements ClientModInitializer {
                         }
 
                         return ARGB.opaque(
-                                fixture.getOutputPackedRgb()
+                                fixture.getSmoothedOutputPackedRgb()
                         );
                     }
 

@@ -221,8 +221,12 @@ public final class DmxFixtureBlockEntityRenderer
          * -------------------------------------------------------------
          */
 
+        fixture.updateColorInterpolation(
+                tickProgress
+        );
+
         state.setPackedRgb(
-                fixture.getOutputPackedRgb()
+                fixture.getSmoothedOutputPackedRgb()
         );
 
         /*

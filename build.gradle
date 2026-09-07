@@ -6,6 +6,14 @@ plugins {
 version = project.mod_version
 group = project.maven_group
 
+base {
+	archivesName = "dmxlighting-mc${project.minecraft_version}-v${project.mod_version}"
+}
+
+tasks.withType(org.gradle.api.tasks.bundling.AbstractArchiveTask).configureEach {
+	archiveVersion = ""
+}
+
 repositories {
 	// Add repositories to retrieve artifacts from in here.
 	// You should only use this when depending on other mods because

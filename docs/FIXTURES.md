@@ -59,9 +59,15 @@ For live pan and tilt, DMX value 128 represents zero offset. Values below and ab
 
 ### Pan/tilt interpolation
 
-The **Smooth** control enables optional pan/tilt interpolation. The adjacent time field specifies how long, from 0.05 to 60 seconds, a move should take. With smoothing off, pan and tilt jump immediately to their new values. Other parameters always update immediately.
+The **Smooth** control enables optional pan/tilt interpolation. The adjacent time field specifies how long, from 0.05 to 60 seconds, a move should take. With smoothing off, pan and tilt jump immediately to their new values.
 
 If a show requires exact snap changes, leave Smooth off. For slower moving-light motion, enable it and choose a positive duration.
+
+## Color fades
+
+The **Color Fade** control enables optional visible RGB fading. Its time field uses the same 0.05 to 60 second range as pan/tilt smoothing. It fades the rendered color after DMX/manual source selection, so red, green, blue, white, amber, and dimmer changes can ease visually while the console still shows the target values.
+
+Strobe, beam width, beam length, pan, and tilt timing are not changed by Color Fade.
 
 ## Beams and light
 

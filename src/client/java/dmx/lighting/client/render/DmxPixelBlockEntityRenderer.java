@@ -79,6 +79,10 @@ public final class DmxPixelBlockEntityRenderer
                 crumblingOverlay
         );
 
+        blockEntity.updateColorInterpolation(
+                tickProgress
+        );
+
         state.setPackedRgb(
                 blockEntity.getVisiblePackedRgb()
         );

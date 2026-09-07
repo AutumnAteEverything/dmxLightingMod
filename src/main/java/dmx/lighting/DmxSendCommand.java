@@ -188,6 +188,10 @@ public final class DmxSendCommand {
             );
         }
 
+        DmxMobFixtureRegistry.refreshMobFixturesInUniverse(
+                universe
+        );
+
         int endChannel =
                 startChannel
                         + values.length

@@ -5,6 +5,7 @@ import dmx.lighting.DmxPixelBlockEntity;
 import dmx.lighting.FixtureParameterMap;
 import dmx.lighting.ManualFixtureOutputPayload;
 import dmx.lighting.SetFixtureModePayload;
+import dmx.lighting.UpdateFixtureColorInterpolationPayload;
 import dmx.lighting.UpdateFixtureGroupPayload;
 import dmx.lighting.UpdateFixtureParameterMapPayload;
 import dmx.lighting.UpdateFixturePayload;
@@ -64,6 +65,9 @@ public final class DmxPixelBlockScreen
     private Button dmxModeButton;
     private Button manualModeButton;
     private Button skinButton;
+    private Button colorInterpolationButton;
+
+    private EditBox colorInterpolationTimeField;
 
     private Component statusMessage =
             Component.empty();
@@ -90,6 +94,12 @@ public final class DmxPixelBlockScreen
 
     private int selectedSkin =
             DmxPixelBlockEntity.MIN_SKIN;
+
+    private boolean colorInterpolationEnabled;
+
+    private float colorInterpolationTimeSeconds =
+            DmxFixtureBlockEntity
+                    .DEFAULT_COLOR_INTERPOLATION_TIME_SECONDS;
 
     private boolean screenReady;
 
@@ -293,7 +303,37 @@ public final class DmxPixelBlockScreen
                 );
 
         int modeY =
+                controlsTop + ROW_SPACING * 6 + 12;
+
+        int fadeY =
                 controlsTop + ROW_SPACING * 5 + 8;
+
+        colorInterpolationButton =
+                addRenderableWidget(
+                        Button.builder(
+                                getColorInterpolationButtonMessage(),
+                                button -> toggleColorInterpolation()
+                        )
+                        .bounds(
+                                centerX - 110,
+                                fadeY,
+                                105,
+                                FIELD_HEIGHT
+                        )
+                        .build()
+                );
+
+        colorInterpolationTimeField =
+                createTextField(
+                        centerX + 5,
+                        fadeY,
+                        72,
+                        6,
+                        formatInterpolationSeconds(
+                                colorInterpolationTimeSeconds
+                        ),
+                        "Color fade time in seconds"
+                );
 
         dmxModeButton =
                 addRenderableWidget(
@@ -410,6 +450,12 @@ public final class DmxPixelBlockScreen
 
         selectedSkin =
                 blockEntity.getSkin();
+
+        colorInterpolationEnabled =
+                blockEntity.isColorInterpolationEnabled();
+
+        colorInterpolationTimeSeconds =
+                blockEntity.getColorInterpolationTimeSeconds();
     }
 
     private void selectNextSkin() {
@@ -653,6 +699,9 @@ public final class DmxPixelBlockScreen
                 )
                 || !ClientPlayNetworking.canSend(
                         UpdatePixelBlockSkinPayload.TYPE
+                )
+                || !ClientPlayNetworking.canSend(
+                        UpdateFixtureColorInterpolationPayload.TYPE
                 )) {
 
             setError(
@@ -702,6 +751,10 @@ public final class DmxPixelBlockScreen
                 )
         );
 
+        if (!sendColorInterpolation()) {
+            return false;
+        }
+
         if (!sendManualOutput()) {
             return false;
         }
@@ -715,6 +768,119 @@ public final class DmxPixelBlockScreen
                 0xFF55FF55;
 
         return true;
+    }
+
+    private void toggleColorInterpolation() {
+        boolean newEnabled =
+                !colorInterpolationEnabled;
+
+        if (newEnabled
+                && !validateColorInterpolationTime()) {
+
+            setError(
+                    "Color fade time must be between 0.05 and 60 seconds."
+            );
+
+            return;
+        }
+
+        if (!ClientPlayNetworking.canSend(
+                UpdateFixtureColorInterpolationPayload.TYPE
+        )) {
+            setError(
+                    "Color fade packet is unavailable."
+            );
+
+            return;
+        }
+
+        colorInterpolationEnabled =
+                newEnabled;
+
+        updateColorInterpolationButtonMessage();
+
+        ClientPlayNetworking.send(
+                new UpdateFixtureColorInterpolationPayload(
+                        blockPosition,
+                        colorInterpolationEnabled,
+                        colorInterpolationTimeSeconds
+                )
+        );
+
+        statusMessage =
+                Component.literal(
+                        colorInterpolationEnabled
+                                ? "Color fade enabled."
+                                : "Color fade disabled."
+                );
+
+        statusColor =
+                0xFF55FF55;
+    }
+
+    private boolean sendColorInterpolation() {
+        if (!validateColorInterpolationTime()) {
+            setError(
+                    "Color fade time must be between 0.05 and 60 seconds."
+            );
+
+            return false;
+        }
+
+        ClientPlayNetworking.send(
+                new UpdateFixtureColorInterpolationPayload(
+                        blockPosition,
+                        colorInterpolationEnabled,
+                        colorInterpolationTimeSeconds
+                )
+        );
+
+        return true;
+    }
+
+    private boolean validateColorInterpolationTime() {
+        Double parsed =
+                parseDouble(
+                        colorInterpolationTimeField.getValue()
+                );
+
+        boolean valid =
+                parsed != null
+                        && parsed
+                        >= DmxFixtureBlockEntity
+                        .MIN_COLOR_INTERPOLATION_TIME_SECONDS
+                        && parsed
+                        <= DmxFixtureBlockEntity
+                        .MAX_COLOR_INTERPOLATION_TIME_SECONDS;
+
+        colorInterpolationTimeField.setTextColor(
+                valid
+                        ? 0xFFFFFFFF
+                        : 0xFFFF5555
+        );
+
+        if (valid) {
+            colorInterpolationTimeSeconds =
+                    parsed.floatValue();
+        }
+
+        return valid;
+    }
+
+    private Component getColorInterpolationButtonMessage() {
+        return Component.literal(
+                colorInterpolationEnabled
+                        ? "Fade: On"
+                        : "Fade: Off"
+        );
+    }
+
+    private void updateColorInterpolationButtonMessage() {
+        if (colorInterpolationButton != null) {
+            colorInterpolationButton.setMessage(
+                    getColorInterpolationButtonMessage()
+            );
+        }
     }
 
     private boolean sendManualOutput() {
@@ -794,6 +960,36 @@ public final class DmxPixelBlockScreen
         } catch (NumberFormatException exception) {
             return null;
         }
+    }
+
+    private static Double parseDouble(
+            String value
+    ) {
+        try {
+            return Double.parseDouble(
+                    value.trim()
+            );
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+    }
+
+    private static String formatInterpolationSeconds(
+            float seconds
+    ) {
+        if (seconds == Math.round(
+                seconds
+        )) {
+            return Integer.toString(
+                    Math.round(
+                            seconds
+                    )
+            );
+        }
+
+        return Float.toString(
+                seconds
+        );
     }
 
     private void setError(
@@ -917,7 +1113,8 @@ public final class DmxPixelBlockScreen
                 "Green",
                 "Blue",
                 "Dimmer",
-                "Strobe"
+                "Strobe",
+                "Color Fade"
         };
 
         for (int index = 0; index < labels.length; index++) {
@@ -927,6 +1124,11 @@ public final class DmxPixelBlockScreen
                     centerX - 150,
                     controlsTop
                             + ROW_SPACING * index
+                            + (
+                            index == 5
+                                    ? 8
+                                    : 0
+                    )
                             + 6,
                     0xFFFFFFFF,
                     false
@@ -938,7 +1140,7 @@ public final class DmxPixelBlockScreen
                     font,
                     statusMessage,
                     centerX,
-                    controlsTop + ROW_SPACING * 5 + 66,
+                    controlsTop + ROW_SPACING * 6 + 70,
                     statusColor
             );
         }

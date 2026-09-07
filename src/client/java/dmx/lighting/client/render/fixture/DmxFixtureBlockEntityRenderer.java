@@ -192,8 +192,12 @@ public final class DmxFixtureBlockEntityRenderer
          * - White-channel mixing
          * - Dimmer application
          */
+        fixture.updateColorInterpolation(
+                tickProgress
+        );
+
         state.setPackedRgb(
-                fixture.getOutputPackedRgb()
+                fixture.getSmoothedOutputPackedRgb()
         );
 
         /*

@@ -3,7 +3,8 @@
 	"package": "dmx.lighting.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"ExampleClientMixin"
+		"ExampleClientMixin",
+		"DmxEndermanParticleMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

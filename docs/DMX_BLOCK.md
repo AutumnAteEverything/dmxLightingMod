@@ -11,6 +11,7 @@ Right-click the block to set:
 - group;
 - red, green, blue, dimmer, and strobe channels;
 - manual RGB, dimmer, and strobe values;
+- optional visible color fade time;
 - control mode;
 - one of five visual skins;
 - an optional skin-selection DMX channel.
@@ -20,6 +21,8 @@ Blank channel fields are unassigned.
 ## Emissive appearance
 
 The colored skin is rendered full-bright so it remains visible in a dark room. The block always reports a Minecraft light level of zero, so it does not illuminate nearby blocks. A small amount of apparent edge color can still be produced by Minecraft rendering, shaders, bloom, or texture filtering; this is not world light emitted by the block.
+
+The **Fade** control eases visible RGB changes over 0.05 to 60 seconds. It affects the rendered color only; strobe still flashes on/off sharply and the block still emits no Minecraft block light.
 
 ## Strobe
 

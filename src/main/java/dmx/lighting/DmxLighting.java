@@ -16,6 +16,7 @@ public class DmxLighting implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("dmxLighting is initializing.");
         DmxFixtureProfileRegistry.initialize();
+        ModEntities.initialize();
         ModBlocks.initialize();
         ModBlockEntities.initialize();
         ModItems.initialize();

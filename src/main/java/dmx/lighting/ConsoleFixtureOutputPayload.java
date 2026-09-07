@@ -63,7 +63,8 @@ public record ConsoleFixtureOutputPayload(
 
         int strobe,
 
-        int applyMask
+        int applyMask,
+        int targetEntityId
 ) implements CustomPacketPayload {
 
     /*
@@ -132,6 +133,9 @@ public record ConsoleFixtureOutputPayload(
                     | APPLY_BEAM_WIDTH
                     | APPLY_BEAM_LENGTH
                     | APPLY_STROBE;
+
+    public static final int NO_TARGET_ENTITY_ID =
+            -1;
 
     /*
      * -----------------------------------------------------------------
@@ -207,7 +211,55 @@ public record ConsoleFixtureOutputPayload(
 
                 strobe,
 
-                APPLY_ALL
+                APPLY_ALL,
+                NO_TARGET_ENTITY_ID
+        );
+    }
+
+    public ConsoleFixtureOutputPayload(
+            BlockPos position,
+            String target,
+
+            int red,
+            int green,
+            int blue,
+            int white,
+            int amber,
+
+            int dimmer,
+
+            int pan,
+            int tilt,
+
+            int beamWidth,
+            int beamLength,
+
+            int strobe,
+
+            int applyMask
+    ) {
+        this(
+                position,
+                target,
+
+                red,
+                green,
+                blue,
+                white,
+                amber,
+
+                dimmer,
+
+                pan,
+                tilt,
+
+                beamWidth,
+                beamLength,
+
+                strobe,
+
+                applyMask,
+                NO_TARGET_ENTITY_ID
         );
     }
 
@@ -324,6 +376,8 @@ public record ConsoleFixtureOutputPayload(
 
                 buffer.readVarInt(),
 
+                buffer.readVarInt(),
+
                 buffer.readVarInt()
         );
     }
@@ -386,6 +440,10 @@ public record ConsoleFixtureOutputPayload(
 
         buffer.writeVarInt(
                 payload.applyMask()
+        );
+
+        buffer.writeVarInt(
+                payload.targetEntityId()
         );
     }
 
