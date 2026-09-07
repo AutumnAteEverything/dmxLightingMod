@@ -8,8 +8,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.SpawnEggItem;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -69,6 +71,73 @@ public final class ModItems {
                             )
             );
 
+    public static final Item GENERIC_60_BPM =
+            registerGenericDisc(
+                    "generic_60_bpm",
+                    ModJukeboxSongs.GENERIC_60_BPM
+            );
+
+    public static final Item GENERIC_70_BPM =
+            registerGenericDisc(
+                    "generic_70_bpm",
+                    ModJukeboxSongs.GENERIC_70_BPM
+            );
+
+    public static final Item GENERIC_80_BPM =
+            registerGenericDisc(
+                    "generic_80_bpm",
+                    ModJukeboxSongs.GENERIC_80_BPM
+            );
+
+    public static final Item GENERIC_90_BPM =
+            registerGenericDisc(
+                    "generic_90_bpm",
+                    ModJukeboxSongs.GENERIC_90_BPM
+            );
+
+    public static final Item GENERIC_100_BPM =
+            registerGenericDisc(
+                    "generic_100_bpm",
+                    ModJukeboxSongs.GENERIC_100_BPM
+            );
+
+    public static final Item GENERIC_110_BPM =
+            registerGenericDisc(
+                    "generic_110_bpm",
+                    ModJukeboxSongs.GENERIC_110_BPM
+            );
+
+    public static final Item GENERIC_120_BPM =
+            registerGenericDisc(
+                    "generic_120_bpm",
+                    ModJukeboxSongs.GENERIC_120_BPM
+            );
+
+    public static final Item GENERIC_130_BPM =
+            registerGenericDisc(
+                    "generic_130_bpm",
+                    ModJukeboxSongs.GENERIC_130_BPM
+            );
+
+    public static final Item GENERIC_140_BPM =
+            registerGenericDisc(
+                    "generic_140_bpm",
+                    ModJukeboxSongs.GENERIC_140_BPM
+            );
+
+    private static final List<Item> GENERIC_BPM_DISCS =
+            List.of(
+                    GENERIC_60_BPM,
+                    GENERIC_70_BPM,
+                    GENERIC_80_BPM,
+                    GENERIC_90_BPM,
+                    GENERIC_100_BPM,
+                    GENERIC_110_BPM,
+                    GENERIC_120_BPM,
+                    GENERIC_130_BPM,
+                    GENERIC_140_BPM
+            );
+
     private ModItems() {
         // Utility class: do not instantiate.
     }
@@ -104,6 +173,19 @@ public final class ModItems {
         return item;
     }
 
+    private static Item registerGenericDisc(
+            String name,
+            ResourceKey<JukeboxSong> song
+    ) {
+        return register(
+                name,
+                Item::new,
+                new Item.Properties()
+                        .stacksTo(1)
+                        .jukeboxPlayable(song)
+        );
+    }
+
     /**
      * Adds the Lighting Console to Creative inventory and forces this class
      * to load during mod initialization.
@@ -115,6 +197,16 @@ public final class ModItems {
                 output -> output.accept(
                         LIGHTING_CONSOLE
                 )
+        );
+
+        CreativeModeTabEvents.modifyOutputEvent(
+                TOOLS_AND_UTILITIES_TAB
+        ).register(
+                output -> {
+                    for (Item disc : GENERIC_BPM_DISCS) {
+                        output.accept(disc);
+                    }
+                }
         );
 
         CreativeModeTabEvents.modifyOutputEvent(

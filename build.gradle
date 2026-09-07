@@ -78,6 +78,19 @@ jar {
 	}
 }
 
+tasks.register('genericMusicResourcePack', Zip) {
+	group = 'build'
+	description = 'Packages the generic BPM disc starter resource pack.'
+	from('resourcePack/dmxlighting-generic-music-template')
+	archiveFileName = "dmxlighting-generic-music-template-mc${project.minecraft_version}.zip"
+	destinationDirectory = layout.buildDirectory.dir('distributions')
+	exclude '**/.DS_Store'
+}
+
+tasks.named('assemble') {
+	dependsOn tasks.named('genericMusicResourcePack')
+}
+
 // configure the maven publication
 publishing {
 	publications {

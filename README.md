@@ -15,6 +15,7 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Optional pan/tilt interpolation with a user-defined movement time.
 - Optional RGB color fade time for fixtures, DMX Blocks, and DMX mobs.
 - Automatic jukebox shows with beat-synchronized color, dimmer, and fixture movement.
+- Nine generic music discs from 60 to 140 BPM for resource-pack music.
 - Mount orientation controls separate from live pan/tilt offsets.
 - Colored lenses, visible fixture beams, and Minecraft light output.
 - Full-cube **DMX Block** with RGB, dimmer, strobe, and five selectable skins.
@@ -83,6 +84,7 @@ That makes the block bright red and selects skin 3.
 | DMX Parrot Spawn Egg | `dmxlighting:dmx_parrot_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable parrot mob that appears in the console |
 | DMX Enderman Spawn Egg | `dmxlighting:dmx_enderman_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Enderman mob that appears in the console |
 | DMX Warden Spawn Egg | `dmxlighting:dmx_warden_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Warden mob that appears in the console |
+| Generic BPM Discs | `dmxlighting:generic_60_bpm` through `generic_140_bpm` | Tools & Utilities | Resource-pack music slots with fixed Automatic DMX tempos |
 
 See the detailed guides:
 

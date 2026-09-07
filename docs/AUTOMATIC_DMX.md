@@ -64,6 +64,18 @@ The built-in 26.1 records use these profiles:
 
 These values were checked against the actual 26.1 game audio as well as published track metadata. Half-time and double-time readings are common for electronic music; the table uses the pulse that gives the most useful lighting movement. The cinematic profiles cannot follow every sound effect with a single repeating clock.
 
+## Generic BPM discs
+
+dmxLighting also provides `generic60bpm`, `generic70bpm`, `generic80bpm`, `generic90bpm`, `generic100bpm`, `generic110bpm`, `generic120bpm`, `generic130bpm`, and `generic140bpm`. Each disc always drives Automatic DMX at the tempo in its name. The supplied audio is a short example song that can be replaced by a resource pack.
+
+For example:
+
+```mcfunction
+/give @s dmxlighting:generic_120_bpm
+```
+
+Generic discs allow up to one hour of playback so longer replacement tracks are not cut off. Minecraft's server cannot determine the duration of audio supplied by a client resource pack. Eject the disc after a shorter replacement track ends; otherwise the jukebox and Automatic DMX remain active until the one-hour ceiling.
+
 Custom music discs are detected automatically. In this first version, a custom disc without its own profile uses a 120 BPM fallback beginning at the start of playback.
 
 Long fixture color-fade settings can soften or delay the beat colors. For the clearest first test, turn color fading off or use a short fade time. Pan/tilt interpolation can remain enabled.

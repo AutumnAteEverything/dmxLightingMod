@@ -19,6 +19,7 @@ public class DmxLighting implements ModInitializer {
         ModEntities.initialize();
         ModBlocks.initialize();
         ModBlockEntities.initialize();
+        ModSounds.initialize();
         ModItems.initialize();
         DmxNetworking.initialize();
 

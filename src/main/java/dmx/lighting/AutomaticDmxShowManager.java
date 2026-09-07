@@ -76,7 +76,16 @@ public final class AutomaticDmxShowManager {
                     cinematicProfile("minecraft:music_disc_5", 74.0D),
                     profile("minecraft:music_disc_pigstep", 113.0D),
                     profile("minecraft:music_disc_precipice", 136.0D),
-                    profile("minecraft:music_disc_tears", 99.0D)
+                    profile("minecraft:music_disc_tears", 99.0D),
+                    profile("dmxlighting:generic_60_bpm", 60.0D),
+                    profile("dmxlighting:generic_70_bpm", 70.0D),
+                    profile("dmxlighting:generic_80_bpm", 80.0D),
+                    profile("dmxlighting:generic_90_bpm", 90.0D),
+                    profile("dmxlighting:generic_100_bpm", 100.0D),
+                    profile("dmxlighting:generic_110_bpm", 110.0D),
+                    profile("dmxlighting:generic_120_bpm", 120.0D),
+                    profile("dmxlighting:generic_130_bpm", 130.0D),
+                    profile("dmxlighting:generic_140_bpm", 140.0D)
             );
 
     private static final Map<

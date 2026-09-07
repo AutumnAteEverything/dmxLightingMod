@@ -1,0 +1,47 @@
+{
+  "music_disc.generic_60_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_60_bpm", "stream": true }
+    ]
+  },
+  "music_disc.generic_70_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_70_bpm", "stream": true }
+    ]
+  },
+  "music_disc.generic_80_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_80_bpm", "stream": true }
+    ]
+  },
+  "music_disc.generic_90_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_90_bpm", "stream": true }
+    ]
+  },
+  "music_disc.generic_100_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_100_bpm", "stream": true }
+    ]
+  },
+  "music_disc.generic_110_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_110_bpm", "stream": true }
+    ]
+  },
+  "music_disc.generic_120_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_120_bpm", "stream": true }
+    ]
+  },
+  "music_disc.generic_130_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_130_bpm", "stream": true }
+    ]
+  },
+  "music_disc.generic_140_bpm": {
+    "sounds": [
+      { "name": "dmxlighting:music/generic_140_bpm", "stream": true }
+    ]
+  }
+}

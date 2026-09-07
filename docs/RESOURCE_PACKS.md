@@ -1,6 +1,6 @@
 # Resource packs and textures
 
-dmxLighting's appearance can be changed with a normal Minecraft resource pack. Resource packs are optional; the mod includes working default textures.
+dmxLighting's appearance and generic music-disc audio can be changed with a normal Minecraft resource pack. Resource packs are optional; the mod includes working default textures and short example songs.
 
 ## Customizable files
 
@@ -16,6 +16,15 @@ dmxLighting's appearance can be changed with a normal Minecraft resource pack. R
 | `assets/dmxlighting/textures/entity/dmx_fixture_lens.png` | PAR lens texture |
 | `assets/dmxlighting/textures/entity/dmx_fixture_spotlight_lens.png` | Spotlight lens texture |
 | `assets/dmxlighting/textures/item/lighting_console.png` | Lighting Console item texture |
+| `assets/dmxlighting/sounds/music/generic_60_bpm.ogg` | Audio played by `generic60bpm` |
+| `assets/dmxlighting/sounds/music/generic_70_bpm.ogg` | Audio played by `generic70bpm` |
+| `assets/dmxlighting/sounds/music/generic_80_bpm.ogg` | Audio played by `generic80bpm` |
+| `assets/dmxlighting/sounds/music/generic_90_bpm.ogg` | Audio played by `generic90bpm` |
+| `assets/dmxlighting/sounds/music/generic_100_bpm.ogg` | Audio played by `generic100bpm` |
+| `assets/dmxlighting/sounds/music/generic_110_bpm.ogg` | Audio played by `generic110bpm` |
+| `assets/dmxlighting/sounds/music/generic_120_bpm.ogg` | Audio played by `generic120bpm` |
+| `assets/dmxlighting/sounds/music/generic_130_bpm.ogg` | Audio played by `generic130bpm` |
+| `assets/dmxlighting/sounds/music/generic_140_bpm.ogg` | Audio played by `generic140bpm` |
 
 Files named `copy` in the source asset folder are not referenced by the mod and do not need to be included in a pack.
 
@@ -26,6 +35,11 @@ My dmxLighting Pack/
 ├── pack.mcmeta
 └── assets/
     └── dmxlighting/
+        ├── sounds/
+        │   └── music/
+        │       ├── generic_60_bpm.ogg
+        │       ├── generic_70_bpm.ogg
+        │       └── ... generic_140_bpm.ogg
         └── textures/
             ├── block/
             │   ├── dmx_pixel_block.png
@@ -54,6 +68,14 @@ The `pack_format` in `pack.mcmeta` must match the resource-pack version required
 - Test skins both in daylight and complete darkness.
 - Test with shaders disabled first; bloom and shader lighting can change the emissive appearance.
 
+## Replacing generic disc music
+
+The ready-made template is in `resourcePack/dmxlighting-generic-music-template`. Replace any guide track while keeping its exact lowercase filename and folder. Use Ogg Vorbis audio; mono, 44.1 kHz files are recommended for jukebox-style positional playback.
+
+The BPM is taken from the disc, not detected from the replacement audio. Trim unwanted silence before the first beat when precise synchronization matters. Music can contain an intro, but the light-show beat clock starts immediately when the disc begins.
+
+The generic discs have a one-hour playback ceiling because the server cannot inspect audio supplied by a client resource pack. Eject the disc when a shorter custom track finishes. Every listener needs the same resource pack to hear the same song in multiplayer.
+
 ## Installing a pack
 
 1. Put the resource-pack folder or ZIP in Minecraft's `resourcepacks` folder.
@@ -61,4 +83,4 @@ The `pack_format` in `pack.mcmeta` must match the resource-pack version required
 3. Enable the custom pack above the default resources.
 4. Load a world containing dmxLighting blocks and inspect every fixture profile and skin.
 
-Resource packs only replace visuals. They do not change channel mappings, saved fixture data, commands, or control behavior.
+Resource packs do not change BPM profiles, channel mappings, saved fixture data, commands, or control behavior.

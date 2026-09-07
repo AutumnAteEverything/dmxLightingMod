@@ -13,6 +13,8 @@ All notable changes to dmxLighting are documented here. This project follows a s
 - `/automaticdmx on`, `/automaticdmx off`, and `/automaticdmx status` commands.
 - Thorough GitHub documentation, user guides, command reference, texture guide, contributor guidance, issue templates, and release checklist.
 - DMX Warden mob with RGB/dimmer patching, console editing, color fades, spawn egg support, and emissive DMX-colored rendering.
+- Generic 60, 70, 80, 90, 100, 110, 120, 130, and 140 BPM music discs for custom resource-pack audio.
+- Short example songs and a ready-to-zip generic music resource-pack template.
 
 ### Changed
 
