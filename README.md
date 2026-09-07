@@ -23,7 +23,7 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Optional DMX channel for selecting the DMX Block skin.
 - Emissive DMX Block surfaces that remain visible in darkness while emitting no Minecraft block light.
 - Summonable **DMX Block Displays** with the same emissive skins and DMX controls, plus vanilla display transformations including negative scale.
-- **DMX Parrot**, **DMX Enderman**, **DMX Warden**, and **DMX Nautilus** mobs with RGB/dimmer patching, color fades, and emissive DMX color rendering.
+- **DMX Parrot**, **DMX Enderman**, **DMX Warden**, **DMX Nautilus**, **DMX Creaking**, and **DMX Axolotl** mobs with RGB/dimmer patching, color fades, and emissive DMX color rendering.
 - Handheld, right-docked **Lighting Console** with Fixtures, Groups, Universes, Patch, and Output views.
 - Live output to one fixture, one group, or all loaded fixtures.
 - Creative inventory registration and search terms for the mod items.
@@ -98,6 +98,8 @@ It appears in the Lighting Console and supports Minecraft's normal display-entit
 | DMX Enderman Spawn Egg | `dmxlighting:dmx_enderman_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Enderman mob that appears in the console |
 | DMX Warden Spawn Egg | `dmxlighting:dmx_warden_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Warden mob that appears in the console |
 | DMX Nautilus Spawn Egg | `dmxlighting:dmx_nautilus_spawn_egg` | Tools & Utilities | Spawns a persistent, DMX-addressable Nautilus that appears in the console |
+| DMX Creaking Spawn Egg | `dmxlighting:dmx_creaking_spawn_egg` | Tools & Utilities | Spawns a persistent standalone DMX Creaking; no Creaking Heart is required |
+| DMX Axolotl Spawn Egg | `dmxlighting:dmx_axolotl_spawn_egg` | Tools & Utilities | Spawns a persistent DMX Axolotl with normal aquatic behavior |
 | Generic BPM Discs | `dmxlighting:generic_60_bpm` through `generic_140_bpm` | Tools & Utilities | Resource-pack music slots with fixed Automatic DMX tempos |
 
 See the detailed guides:

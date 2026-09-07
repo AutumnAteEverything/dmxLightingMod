@@ -125,6 +125,12 @@ public final class LightingConsole {
                         dimension
                 );
 
+        List<DmxCreakingEntity> creakings =
+                DmxMobFixtureRegistry.getCreakingsInDimension(dimension);
+
+        List<DmxAxolotlEntity> axolotls =
+                DmxMobFixtureRegistry.getAxolotlsInDimension(dimension);
+
         List<DmxBlockDisplayEntity> blockDisplays =
                 DmxBlockDisplayRegistry.getDisplaysInDimension(
                         dimension
@@ -136,6 +142,8 @@ public final class LightingConsole {
                 endermen,
                 wardens,
                 nautiluses,
+                creakings,
+                axolotls,
                 blockDisplays,
                 sortMode
         );
@@ -158,6 +166,8 @@ public final class LightingConsole {
                 DmxMobFixtureRegistry.getAllEndermen(),
                 DmxMobFixtureRegistry.getAllWardens(),
                 DmxMobFixtureRegistry.getAllNautiluses(),
+                DmxMobFixtureRegistry.getAllCreakings(),
+                DmxMobFixtureRegistry.getAllAxolotls(),
                 DmxBlockDisplayRegistry.getAll(),
                 sortMode
         );
@@ -224,6 +234,12 @@ public final class LightingConsole {
                         group
                 );
 
+        List<DmxCreakingEntity> creakings =
+                DmxMobFixtureRegistry.getCreakingsInGroup(dimension, group);
+
+        List<DmxAxolotlEntity> axolotls =
+                DmxMobFixtureRegistry.getAxolotlsInGroup(dimension, group);
+
         List<DmxBlockDisplayEntity> blockDisplays =
                 DmxBlockDisplayRegistry.getDisplaysInGroup(
                         dimension,
@@ -236,6 +252,8 @@ public final class LightingConsole {
                 endermen,
                 wardens,
                 nautiluses,
+                creakings,
+                axolotls,
                 blockDisplays,
                 sortMode
         );
@@ -294,6 +312,12 @@ public final class LightingConsole {
                         universe
                 );
 
+        List<DmxCreakingEntity> creakings =
+                DmxMobFixtureRegistry.getCreakingsInUniverse(dimension, universe);
+
+        List<DmxAxolotlEntity> axolotls =
+                DmxMobFixtureRegistry.getAxolotlsInUniverse(dimension, universe);
+
         List<DmxBlockDisplayEntity> blockDisplays =
                 DmxBlockDisplayRegistry.getDisplaysInUniverse(
                         dimension,
@@ -306,6 +330,8 @@ public final class LightingConsole {
                 endermen,
                 wardens,
                 nautiluses,
+                creakings,
+                axolotls,
                 blockDisplays,
                 sortMode
         );
@@ -458,6 +484,8 @@ public final class LightingConsole {
 
         return createSortedEntries(
                 conflictingFixtures,
+                List.of(),
+                List.of(),
                 List.of(),
                 List.of(),
                 List.of(),
@@ -627,6 +655,8 @@ public final class LightingConsole {
             List<DmxEndermanEntity> endermen,
             List<DmxWardenEntity> wardens,
             List<DmxNautilusEntity> nautiluses,
+            List<DmxCreakingEntity> creakings,
+            List<DmxAxolotlEntity> axolotls,
             List<DmxBlockDisplayEntity> blockDisplays,
             FixtureSortMode sortMode
     ) {
@@ -709,6 +739,22 @@ public final class LightingConsole {
                                     nautilus
                             )
                     );
+                }
+            }
+        }
+
+        if (creakings != null) {
+            for (DmxCreakingEntity creaking : creakings) {
+                if (creaking != null && !creaking.isRemoved()) {
+                    entries.add(FixtureBrowserEntry.fromDmxCreaking(creaking));
+                }
+            }
+        }
+
+        if (axolotls != null) {
+            for (DmxAxolotlEntity axolotl : axolotls) {
+                if (axolotl != null && !axolotl.isRemoved()) {
+                    entries.add(FixtureBrowserEntry.fromDmxAxolotl(axolotl));
                 }
             }
         }

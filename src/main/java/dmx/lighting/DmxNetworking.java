@@ -206,6 +206,16 @@ public final class DmxNetworking {
         );
 
         PayloadTypeRegistry.serverboundPlay().register(
+                UpdateDmxCreakingPayload.TYPE,
+                UpdateDmxCreakingPayload.STREAM_CODEC
+        );
+
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateDmxAxolotlPayload.TYPE,
+                UpdateDmxAxolotlPayload.STREAM_CODEC
+        );
+
+        PayloadTypeRegistry.serverboundPlay().register(
                 UpdateDmxBlockDisplayPayload.TYPE,
                 UpdateDmxBlockDisplayPayload.STREAM_CODEC
         );
@@ -418,6 +428,28 @@ public final class DmxNetworking {
                 (payload, context) ->
                         context.server().execute(
                                 () -> handleDmxNautilusUpdate(
+                                        context.player(),
+                                        payload
+                                )
+                        )
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(
+                UpdateDmxCreakingPayload.TYPE,
+                (payload, context) ->
+                        context.server().execute(
+                                () -> handleDmxCreakingUpdate(
+                                        context.player(),
+                                        payload
+                                )
+                        )
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(
+                UpdateDmxAxolotlPayload.TYPE,
+                (payload, context) ->
+                        context.server().execute(
+                                () -> handleDmxAxolotlUpdate(
                                         context.player(),
                                         payload
                                 )
@@ -1562,6 +1594,229 @@ public final class DmxNetworking {
                 )
         );
     }
+
+    private static void handleDmxCreakingUpdate(
+            ServerPlayer player,
+            UpdateDmxCreakingPayload payload
+    ) {
+        if (player == null
+                || payload == null) {
+
+            return;
+        }
+
+        ServerLevel level =
+                (ServerLevel) player.level();
+
+        DmxCreakingEntity creaking =
+                DmxMobFixtureRegistry.getCreakingByEntityId(
+                        level.dimension(),
+                        payload.entityId()
+                );
+
+        if (creaking == null) {
+            Entity entity =
+                    level.getEntity(
+                            payload.entityId()
+                    );
+
+            if (entity instanceof DmxCreakingEntity foundCreaking) {
+                creaking =
+                        foundCreaking;
+
+                DmxMobFixtureRegistry.register(
+                        foundCreaking
+                );
+            }
+        }
+
+        if (creaking == null
+                || creaking.isRemoved()) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "That DMX Creaking is not currently loaded."
+                    )
+            );
+
+            return;
+        }
+
+        if (!isValidParameterChannel(
+                payload.redChannel()
+        )
+                || !isValidParameterChannel(
+                        payload.greenChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.blueChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.dimmerChannel()
+                )) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "DMX Creaking channels must be blank or 1-512."
+                    )
+            );
+
+            return;
+        }
+
+        int universe =
+                clamp(
+                        payload.universe(),
+                        DmxFixtureBlockEntity.MIN_UNIVERSE,
+                        DmxFixtureBlockEntity.MAX_UNIVERSE
+                );
+
+        creaking.setFixtureName(
+                payload.fixtureName()
+        );
+
+        creaking.setFixtureGroup(
+                FixtureGroupName.of(
+                        payload.groupName()
+                )
+        );
+
+        creaking.setUniverse(
+                universe
+        );
+
+        creaking.setParameterMap(
+                payload.redChannel(),
+                payload.greenChannel(),
+                payload.blueChannel(),
+                payload.dimmerChannel()
+        );
+
+        creaking.setColorInterpolation(
+                payload.colorInterpolationEnabled(),
+                payload.colorInterpolationTimeSeconds()
+        );
+
+        player.sendSystemMessage(
+                Component.literal(
+                        "Updated "
+                                + creaking.getConsoleName()
+                                + "."
+                )
+        );
+    }
+
+    private static void handleDmxAxolotlUpdate(
+            ServerPlayer player,
+            UpdateDmxAxolotlPayload payload
+    ) {
+        if (player == null
+                || payload == null) {
+
+            return;
+        }
+
+        ServerLevel level =
+                (ServerLevel) player.level();
+
+        DmxAxolotlEntity axolotl =
+                DmxMobFixtureRegistry.getAxolotlByEntityId(
+                        level.dimension(),
+                        payload.entityId()
+                );
+
+        if (axolotl == null) {
+            Entity entity =
+                    level.getEntity(
+                            payload.entityId()
+                    );
+
+            if (entity instanceof DmxAxolotlEntity foundAxolotl) {
+                axolotl =
+                        foundAxolotl;
+
+                DmxMobFixtureRegistry.register(
+                        foundAxolotl
+                );
+            }
+        }
+
+        if (axolotl == null
+                || axolotl.isRemoved()) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "That DMX Axolotl is not currently loaded."
+                    )
+            );
+
+            return;
+        }
+
+        if (!isValidParameterChannel(
+                payload.redChannel()
+        )
+                || !isValidParameterChannel(
+                        payload.greenChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.blueChannel()
+                )
+                || !isValidParameterChannel(
+                        payload.dimmerChannel()
+                )) {
+
+            player.sendSystemMessage(
+                    Component.literal(
+                            "DMX Axolotl channels must be blank or 1-512."
+                    )
+            );
+
+            return;
+        }
+
+        int universe =
+                clamp(
+                        payload.universe(),
+                        DmxFixtureBlockEntity.MIN_UNIVERSE,
+                        DmxFixtureBlockEntity.MAX_UNIVERSE
+                );
+
+        axolotl.setFixtureName(
+                payload.fixtureName()
+        );
+
+        axolotl.setFixtureGroup(
+                FixtureGroupName.of(
+                        payload.groupName()
+                )
+        );
+
+        axolotl.setUniverse(
+                universe
+        );
+
+        axolotl.setParameterMap(
+                payload.redChannel(),
+                payload.greenChannel(),
+                payload.blueChannel(),
+                payload.dimmerChannel()
+        );
+
+        axolotl.setColorInterpolation(
+                payload.colorInterpolationEnabled(),
+                payload.colorInterpolationTimeSeconds()
+        );
+
+        player.sendSystemMessage(
+                Component.literal(
+                        "Updated "
+                                + axolotl.getConsoleName()
+                                + "."
+                )
+        );
+    }
+
 
     private static void handleDmxBlockDisplayUpdate(
             ServerPlayer player,

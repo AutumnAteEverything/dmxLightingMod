@@ -40,6 +40,16 @@ public final class DmxMobFixtureRegistry {
             Map<UUID, DmxNautilusEntity>
     > NAUTILUSES_BY_DIMENSION = new HashMap<>();
 
+    private static final Map<
+            ResourceKey<Level>,
+            Map<UUID, DmxCreakingEntity>
+    > CREAKINGS_BY_DIMENSION = new HashMap<>();
+
+    private static final Map<
+            ResourceKey<Level>,
+            Map<UUID, DmxAxolotlEntity>
+    > AXOLOTLS_BY_DIMENSION = new HashMap<>();
+
     private DmxMobFixtureRegistry() {
         // Utility class.
     }
@@ -134,6 +144,26 @@ public final class DmxMobFixtureRegistry {
                         nautilus.getUUID(),
                         nautilus
                 );
+    }
+
+    public static synchronized void register(DmxCreakingEntity creaking) {
+        if (!isUsableServerCreaking(creaking)) {
+            return;
+        }
+
+        CREAKINGS_BY_DIMENSION
+                .computeIfAbsent(creaking.level().dimension(), ignored -> new HashMap<>())
+                .put(creaking.getUUID(), creaking);
+    }
+
+    public static synchronized void register(DmxAxolotlEntity axolotl) {
+        if (!isUsableServerAxolotl(axolotl)) {
+            return;
+        }
+
+        AXOLOTLS_BY_DIMENSION
+                .computeIfAbsent(axolotl.level().dimension(), ignored -> new HashMap<>())
+                .put(axolotl.getUUID(), axolotl);
     }
 
     public static synchronized void unregister(
@@ -272,6 +302,26 @@ public final class DmxMobFixtureRegistry {
         }
     }
 
+    public static synchronized void unregister(DmxCreakingEntity creaking) {
+        if (creaking != null) {
+            unregisterEntity(
+                    creaking.level(),
+                    creaking.getUUID(),
+                    CREAKINGS_BY_DIMENSION
+            );
+        }
+    }
+
+    public static synchronized void unregister(DmxAxolotlEntity axolotl) {
+        if (axolotl != null) {
+            unregisterEntity(
+                    axolotl.level(),
+                    axolotl.getUUID(),
+                    AXOLOTLS_BY_DIMENSION
+            );
+        }
+    }
+
     public static synchronized List<DmxParrotEntity>
     getParrotsInDimension(
             ResourceKey<Level> dimension
@@ -378,6 +428,42 @@ public final class DmxMobFixtureRegistry {
         return List.copyOf(
                 dimensionNautiluses.values()
         );
+    }
+
+    public static synchronized List<DmxCreakingEntity> getCreakingsInDimension(
+            ResourceKey<Level> dimension
+    ) {
+        Map<UUID, DmxCreakingEntity> entities =
+                dimension == null ? null : CREAKINGS_BY_DIMENSION.get(dimension);
+
+        if (entities == null) {
+            return List.of();
+        }
+
+        entities.values().removeIf(entity -> !isUsableServerCreaking(entity));
+        if (entities.isEmpty()) {
+            CREAKINGS_BY_DIMENSION.remove(dimension);
+            return List.of();
+        }
+        return List.copyOf(entities.values());
+    }
+
+    public static synchronized List<DmxAxolotlEntity> getAxolotlsInDimension(
+            ResourceKey<Level> dimension
+    ) {
+        Map<UUID, DmxAxolotlEntity> entities =
+                dimension == null ? null : AXOLOTLS_BY_DIMENSION.get(dimension);
+
+        if (entities == null) {
+            return List.of();
+        }
+
+        entities.values().removeIf(entity -> !isUsableServerAxolotl(entity));
+        if (entities.isEmpty()) {
+            AXOLOTLS_BY_DIMENSION.remove(dimension);
+            return List.of();
+        }
+        return List.copyOf(entities.values());
     }
 
     public static synchronized List<DmxParrotEntity>
@@ -528,6 +614,34 @@ public final class DmxMobFixtureRegistry {
         );
     }
 
+    public static synchronized List<DmxCreakingEntity> getCreakingsInGroup(
+            ResourceKey<Level> dimension,
+            FixtureGroupName group
+    ) {
+        if (group == null || group.isUngrouped()) {
+            return List.of();
+        }
+
+        String key = group.key();
+        return getCreakingsInDimension(dimension).stream()
+                .filter(entity -> key.equals(entity.getGroupKey()))
+                .toList();
+    }
+
+    public static synchronized List<DmxAxolotlEntity> getAxolotlsInGroup(
+            ResourceKey<Level> dimension,
+            FixtureGroupName group
+    ) {
+        if (group == null || group.isUngrouped()) {
+            return List.of();
+        }
+
+        String key = group.key();
+        return getAxolotlsInDimension(dimension).stream()
+                .filter(entity -> key.equals(entity.getGroupKey()))
+                .toList();
+    }
+
     public static synchronized List<DmxParrotEntity>
     getParrotsInUniverse(
             ResourceKey<Level> dimension,
@@ -672,6 +786,34 @@ public final class DmxMobFixtureRegistry {
         );
     }
 
+    public static synchronized List<DmxCreakingEntity> getCreakingsInUniverse(
+            ResourceKey<Level> dimension,
+            int universe
+    ) {
+        int safeUniverse = Math.clamp(
+                universe,
+                FixturePatch.MIN_UNIVERSE,
+                FixturePatch.MAX_UNIVERSE
+        );
+        return getCreakingsInDimension(dimension).stream()
+                .filter(entity -> entity.getUniverse() == safeUniverse)
+                .toList();
+    }
+
+    public static synchronized List<DmxAxolotlEntity> getAxolotlsInUniverse(
+            ResourceKey<Level> dimension,
+            int universe
+    ) {
+        int safeUniverse = Math.clamp(
+                universe,
+                FixturePatch.MIN_UNIVERSE,
+                FixturePatch.MAX_UNIVERSE
+        );
+        return getAxolotlsInDimension(dimension).stream()
+                .filter(entity -> entity.getUniverse() == safeUniverse)
+                .toList();
+    }
+
     public static void refreshParrotsInUniverse(
             int universe
     ) {
@@ -720,6 +862,18 @@ public final class DmxMobFixtureRegistry {
                     == universe) {
 
                 nautilus.refreshFromDmx();
+            }
+        }
+
+        for (DmxCreakingEntity creaking : getAllCreakings()) {
+            if (creaking.getUniverse() == universe) {
+                creaking.refreshFromDmx();
+            }
+        }
+
+        for (DmxAxolotlEntity axolotl : getAllAxolotls()) {
+            if (axolotl.getUniverse() == universe) {
+                axolotl.refreshFromDmx();
             }
         }
     }
@@ -822,6 +976,32 @@ public final class DmxMobFixtureRegistry {
         }
 
         return null;
+    }
+
+    public static synchronized DmxCreakingEntity getCreakingAt(
+            ResourceKey<Level> dimension,
+            BlockPos position
+    ) {
+        if (position == null) {
+            return null;
+        }
+        return getCreakingsInDimension(dimension).stream()
+                .filter(entity -> position.equals(entity.blockPosition()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static synchronized DmxAxolotlEntity getAxolotlAt(
+            ResourceKey<Level> dimension,
+            BlockPos position
+    ) {
+        if (position == null) {
+            return null;
+        }
+        return getAxolotlsInDimension(dimension).stream()
+                .filter(entity -> position.equals(entity.blockPosition()))
+                .findFirst()
+                .orElse(null);
     }
 
     public static synchronized DmxParrotEntity getParrotByEntityId(
@@ -928,6 +1108,26 @@ public final class DmxMobFixtureRegistry {
         return null;
     }
 
+    public static synchronized DmxCreakingEntity getCreakingByEntityId(
+            ResourceKey<Level> dimension,
+            int entityId
+    ) {
+        return getCreakingsInDimension(dimension).stream()
+                .filter(entity -> entity.getId() == entityId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static synchronized DmxAxolotlEntity getAxolotlByEntityId(
+            ResourceKey<Level> dimension,
+            int entityId
+    ) {
+        return getAxolotlsInDimension(dimension).stream()
+                .filter(entity -> entity.getId() == entityId)
+                .findFirst()
+                .orElse(null);
+    }
+
     public static synchronized List<DmxParrotEntity>
     getAllParrots() {
         List<DmxParrotEntity> parrots =
@@ -1028,6 +1228,22 @@ public final class DmxMobFixtureRegistry {
         );
     }
 
+    public static synchronized List<DmxCreakingEntity> getAllCreakings() {
+        return CREAKINGS_BY_DIMENSION.keySet().stream()
+                .toList()
+                .stream()
+                .flatMap(dimension -> getCreakingsInDimension(dimension).stream())
+                .toList();
+    }
+
+    public static synchronized List<DmxAxolotlEntity> getAllAxolotls() {
+        return AXOLOTLS_BY_DIMENSION.keySet().stream()
+                .toList()
+                .stream()
+                .flatMap(dimension -> getAxolotlsInDimension(dimension).stream())
+                .toList();
+    }
+
     public static synchronized void clearDimension(
             ResourceKey<Level> dimension
     ) {
@@ -1050,6 +1266,9 @@ public final class DmxMobFixtureRegistry {
         NAUTILUSES_BY_DIMENSION.remove(
                 dimension
         );
+
+        CREAKINGS_BY_DIMENSION.remove(dimension);
+        AXOLOTLS_BY_DIMENSION.remove(dimension);
     }
 
     public static synchronized void clearAll() {
@@ -1057,6 +1276,8 @@ public final class DmxMobFixtureRegistry {
         ENDERMEN_BY_DIMENSION.clear();
         WARDENS_BY_DIMENSION.clear();
         NAUTILUSES_BY_DIMENSION.clear();
+        CREAKINGS_BY_DIMENSION.clear();
+        AXOLOTLS_BY_DIMENSION.clear();
     }
 
     private static void removeInvalidParrots(
@@ -1253,5 +1474,39 @@ public final class DmxMobFixtureRegistry {
 
         return level != null
                 && !level.isClientSide();
+    }
+
+    private static <T> void unregisterEntity(
+            Level level,
+            UUID id,
+            Map<ResourceKey<Level>, Map<UUID, T>> entitiesByDimension
+    ) {
+        if (level == null) {
+            return;
+        }
+
+        Map<UUID, T> entities = entitiesByDimension.get(level.dimension());
+        if (entities == null) {
+            return;
+        }
+
+        entities.remove(id);
+        if (entities.isEmpty()) {
+            entitiesByDimension.remove(level.dimension());
+        }
+    }
+
+    private static boolean isUsableServerCreaking(DmxCreakingEntity creaking) {
+        return creaking != null
+                && !creaking.isRemoved()
+                && creaking.level() != null
+                && !creaking.level().isClientSide();
+    }
+
+    private static boolean isUsableServerAxolotl(DmxAxolotlEntity axolotl) {
+        return axolotl != null
+                && !axolotl.isRemoved()
+                && axolotl.level() != null
+                && !axolotl.level().isClientSide();
     }
 }

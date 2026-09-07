@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "dmxlighting:dmx_nautilus"
+    "dmxlighting:dmx_nautilus",
+    "dmxlighting:dmx_axolotl"
   ]
 }

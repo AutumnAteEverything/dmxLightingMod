@@ -6,6 +6,8 @@ All notable changes to dmxLighting are documented here. This project follows a s
 
 ### Added
 
+- DMX Creaking mob with standalone spawning, vanilla movement/aggression, RGB/dimmer patching, console editing, color fades, emissive rendering, and automatic-show support.
+- DMX Axolotl mob with vanilla aquatic behavior and variants, RGB/dimmer patching, console editing, color fades, emissive rendering, and automatic-show support.
 - Summonable DMX Block Display entities with console editing and output, RGB, dimmer, strobe, five skins, optional DMX skin selection, color fades, automatic-show support, and the full vanilla display transformation system including negative scale.
 
 - Automatic DMX shows triggered by music discs playing in jukeboxes.

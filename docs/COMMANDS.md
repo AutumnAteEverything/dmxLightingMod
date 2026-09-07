@@ -151,6 +151,18 @@ Nautilus example:
 /summon dmxlighting:dmx_nautilus ~ ~ ~ {dmx_fixture_name:"Water Wash 1",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104}
 ```
 
+Creaking example:
+
+```mcfunction
+/summon dmxlighting:dmx_creaking ~ ~ ~ {dmx_fixture_name:"Stage Creaking 1",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104}
+```
+
+Axolotl example:
+
+```mcfunction
+/summon dmxlighting:dmx_axolotl ~ ~ ~ {dmx_fixture_name:"Pool Axolotl 1",dmx_universe:1,dmx_parameter_red:101,dmx_parameter_green:102,dmx_parameter_blue:103,dmx_parameter_dimmer:104}
+```
+
 To place a DMX mob in a console group at summon time:
 
 ```mcfunction
@@ -195,13 +207,17 @@ For example, this spawns a grouped Warden whose visible color fades over two sec
 /summon dmxlighting:dmx_warden ~ ~ ~ {dmx_fixture_name:"Warden Fade 1",dmx_group_name:"Wardens",dmx_group_key:"wardens",dmx_universe:1,dmx_parameter_red:221,dmx_parameter_green:222,dmx_parameter_blue:223,dmx_parameter_dimmer:224,dmx_color_interpolation_enabled:1,dmx_color_interpolation_time_seconds:2.0f}
 ```
 
-Names do not have to be unique. If a DMX mob has no saved name, the console gives it a generated `dmxParrot`, `dmxEnderman`, `dmxWarden`, or `dmxNautilus` label using part of its UUID. Unique names are still recommended when several DMX mobs are in the same show file or group.
+Names do not have to be unique. If a DMX mob has no saved name, the console gives it a generated `dmxParrot`, `dmxEnderman`, `dmxWarden`, `dmxNautilus`, `dmxCreaking`, or `dmxAxolotl` label using part of its UUID. Unique names are still recommended when several DMX mobs are in the same show file or group.
 
 DMX mobs are DMX-only for now. The Lighting Console Output view writes to their assigned DMX channels instead of putting individual mobs into Manual mode.
 
 DMX Wardens retain normal Minecraft Warden behavior and aggression.
 
 DMX Nautiluses retain normal Nautilus swimming, taming, riding, saddle, armor, and breeding behavior. They are marked persistent so an unattended show Nautilus does not despawn.
+
+DMX Creakings are standalone and do not require a Creaking Heart. They retain vanilla freezing and player aggression, but are normally damageable because they are not heart-bound.
+
+DMX Axolotls retain normal swimming, land movement, variants, combat, and bucket interaction. A normal Axolotl bucket releases a vanilla Axolotl, so use the DMX spawn egg or summon command when DMX identity must be preserved.
 
 ## DMX Block Display summon
 

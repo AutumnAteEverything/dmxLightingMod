@@ -6,6 +6,8 @@
   "item.dmxlighting.dmx_enderman_spawn_egg": "DMX Enderman Spawn Egg",
   "item.dmxlighting.dmx_warden_spawn_egg": "DMX Warden Spawn Egg",
   "item.dmxlighting.dmx_nautilus_spawn_egg": "DMX Nautilus Spawn Egg",
+  "item.dmxlighting.dmx_creaking_spawn_egg": "DMX Creaking Spawn Egg",
+  "item.dmxlighting.dmx_axolotl_spawn_egg": "DMX Axolotl Spawn Egg",
   "item.dmxlighting.generic_60_bpm": "generic60bpm disc",
   "item.dmxlighting.generic_70_bpm": "generic70bpm disc",
   "item.dmxlighting.generic_80_bpm": "generic80bpm disc",
@@ -28,5 +30,7 @@
   "entity.dmxlighting.dmx_enderman": "dmxEnderman",
   "entity.dmxlighting.dmx_warden": "dmxWarden",
   "entity.dmxlighting.dmx_nautilus": "dmxNautilus",
+  "entity.dmxlighting.dmx_creaking": "dmxCreaking",
+  "entity.dmxlighting.dmx_axolotl": "dmxAxolotl",
   "entity.dmxlighting.dmx_block_display": "DMX Block Display"
 }

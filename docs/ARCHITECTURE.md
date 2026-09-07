@@ -39,7 +39,7 @@ The server owns saved fixture configuration and authoritative output. Client scr
 | Fixture types | `DmxFixtureProfileRegistry`, `RgbParProfile`, `StaticSpotProfile` | Selects supported visual fixture models and compatibility aliases |
 | Pixel block | `DmxPixelBlock`, `DmxPixelBlockEntity` | RGB/dimmer/strobe surface, five skins, and DMX skin selection |
 | Block display | `DmxBlockDisplayEntity`, `DmxBlockDisplayRegistry` | Transformable, summonable pixel surfaces with entity persistence and console discovery |
-| DMX mobs | `DmxParrotEntity`, `DmxEndermanEntity`, `DmxWardenEntity`, `DmxNautilusEntity`, `DmxMobFixtureRegistry` | Moving RGB/dimmer fixtures, persistence, loaded-entity discovery, and automatic-show output |
+| DMX mobs | `DmxParrotEntity`, `DmxEndermanEntity`, `DmxWardenEntity`, `DmxNautilusEntity`, `DmxCreakingEntity`, `DmxAxolotlEntity`, `DmxMobFixtureRegistry` | Moving RGB/dimmer fixtures, persistence, loaded-entity discovery, and automatic-show output |
 | Console | `LightingConsole`, `LightingConsoleScreen`, console payload handlers | Browser summaries, patch analysis, and targeted output |
 | Beams/light | `FixtureBeamDirection`, `FixtureBeamSettings`, `FixtureBeamLightManager`, client renderers | Beam geometry, orientation, sampling, and light behavior |
 | Commands | `DmxCommand`, `DmxSendCommand`, `DmxBulkAddressCommand`, `DmxControlCommand` | Raw output, fixture setup, diagnostics, and bulk patching |

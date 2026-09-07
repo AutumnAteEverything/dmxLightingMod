@@ -1,7 +1,9 @@
 package dmx.lighting.client;
 
 import dmx.lighting.ConsoleFixtureOutputPayload;
+import dmx.lighting.DmxAxolotlProfile;
 import dmx.lighting.DmxBlockDisplayProfile;
+import dmx.lighting.DmxCreakingProfile;
 import dmx.lighting.DmxEndermanProfile;
 import dmx.lighting.DmxFixtureProfile;
 import dmx.lighting.DmxFixtureProfileRegistry;
@@ -1720,6 +1722,12 @@ public class LightingConsoleScreen extends Screen {
                 )
                 || DmxNautilusProfile.ID.equals(
                         fixtureType
+                )
+                || DmxCreakingProfile.ID.equals(
+                        fixtureType
+                )
+                || DmxAxolotlProfile.ID.equals(
+                        fixtureType
                 );
     }
 
@@ -2382,6 +2390,24 @@ public class LightingConsoleScreen extends Screen {
                     new DmxNautilusScreen(
                             selectedEntry
                     )
+            );
+            return;
+        }
+
+        if (DmxCreakingProfile.ID.equals(
+                selectedEntry.fixtureType()
+        )) {
+            Minecraft.getInstance().setScreen(
+                    new DmxCreakingScreen(selectedEntry)
+            );
+            return;
+        }
+
+        if (DmxAxolotlProfile.ID.equals(
+                selectedEntry.fixtureType()
+        )) {
+            Minecraft.getInstance().setScreen(
+                    new DmxAxolotlScreen(selectedEntry)
             );
             return;
         }

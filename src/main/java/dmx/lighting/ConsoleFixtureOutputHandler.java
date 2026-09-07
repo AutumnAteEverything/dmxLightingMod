@@ -215,6 +215,28 @@ public final class ConsoleFixtureOutputHandler {
             return;
         }
 
+        DmxCreakingEntity targetedCreaking =
+                DmxMobFixtureRegistry.getCreakingByEntityId(
+                        level.dimension(),
+                        payload.targetEntityId()
+                );
+
+        if (targetedCreaking != null && !targetedCreaking.isRemoved()) {
+            applyPayloadToCreaking(targetedCreaking, payload);
+            return;
+        }
+
+        DmxAxolotlEntity targetedAxolotl =
+                DmxMobFixtureRegistry.getAxolotlByEntityId(
+                        level.dimension(),
+                        payload.targetEntityId()
+                );
+
+        if (targetedAxolotl != null && !targetedAxolotl.isRemoved()) {
+            applyPayloadToAxolotl(targetedAxolotl, payload);
+            return;
+        }
+
         DmxFixtureBlockEntity fixture =
                 DmxFixtureRegistry.getFixture(
                         level.dimension(),
@@ -272,6 +294,22 @@ public final class ConsoleFixtureOutputHandler {
 
         applyPayloadToNautilus(
                 nautilus,
+                payload
+        );
+
+        applyPayloadToCreaking(
+                DmxMobFixtureRegistry.getCreakingAt(
+                        level.dimension(),
+                        position
+                ),
+                payload
+        );
+
+        applyPayloadToAxolotl(
+                DmxMobFixtureRegistry.getAxolotlAt(
+                        level.dimension(),
+                        position
+                ),
                 payload
         );
 
@@ -432,6 +470,40 @@ public final class ConsoleFixtureOutputHandler {
             }
         }
 
+        if (group == null || group.isUngrouped()) {
+            DmxCreakingEntity sourceCreaking =
+                    DmxMobFixtureRegistry.getCreakingByEntityId(
+                            level.dimension(),
+                            payload.targetEntityId()
+                    );
+            if (sourceCreaking == null) {
+                sourceCreaking = DmxMobFixtureRegistry.getCreakingAt(
+                        level.dimension(),
+                        sourcePosition
+                );
+            }
+            if (sourceCreaking != null && !sourceCreaking.isUngrouped()) {
+                group = sourceCreaking.getFixtureGroup();
+            }
+        }
+
+        if (group == null || group.isUngrouped()) {
+            DmxAxolotlEntity sourceAxolotl =
+                    DmxMobFixtureRegistry.getAxolotlByEntityId(
+                            level.dimension(),
+                            payload.targetEntityId()
+                    );
+            if (sourceAxolotl == null) {
+                sourceAxolotl = DmxMobFixtureRegistry.getAxolotlAt(
+                        level.dimension(),
+                        sourcePosition
+                );
+            }
+            if (sourceAxolotl != null && !sourceAxolotl.isUngrouped()) {
+                group = sourceAxolotl.getFixtureGroup();
+            }
+        }
+
         if (group == null
                 || group.isUngrouped()) {
 
@@ -504,6 +576,16 @@ public final class ConsoleFixtureOutputHandler {
                 payload
         );
 
+        applyPayloadToCreakings(
+                DmxMobFixtureRegistry.getCreakingsInGroup(level.dimension(), group),
+                payload
+        );
+
+        applyPayloadToAxolotls(
+                DmxMobFixtureRegistry.getAxolotlsInGroup(level.dimension(), group),
+                payload
+        );
+
         applyPayloadToBlockDisplays(
                 DmxBlockDisplayRegistry.getDisplaysInGroup(
                         level.dimension(),
@@ -564,6 +646,16 @@ public final class ConsoleFixtureOutputHandler {
                 DmxMobFixtureRegistry.getNautilusesInDimension(
                         level.dimension()
                 ),
+                payload
+        );
+
+        applyPayloadToCreakings(
+                DmxMobFixtureRegistry.getCreakingsInDimension(level.dimension()),
+                payload
+        );
+
+        applyPayloadToAxolotls(
+                DmxMobFixtureRegistry.getAxolotlsInDimension(level.dimension()),
                 payload
         );
 
@@ -718,6 +810,30 @@ public final class ConsoleFixtureOutputHandler {
                     nautilus,
                     payload
             );
+        }
+    }
+
+    private static void applyPayloadToCreakings(
+            List<DmxCreakingEntity> creakings,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (creakings == null || payload == null) {
+            return;
+        }
+        for (DmxCreakingEntity creaking : new ArrayList<>(creakings)) {
+            applyPayloadToCreaking(creaking, payload);
+        }
+    }
+
+    private static void applyPayloadToAxolotls(
+            List<DmxAxolotlEntity> axolotls,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (axolotls == null || payload == null) {
+            return;
+        }
+        for (DmxAxolotlEntity axolotl : new ArrayList<>(axolotls)) {
+            applyPayloadToAxolotl(axolotl, payload);
         }
     }
 
@@ -1083,6 +1199,24 @@ public final class ConsoleFixtureOutputHandler {
         nautilus.applyConsoleDmxOutput(
                 payload
         );
+    }
+
+    private static void applyPayloadToCreaking(
+            DmxCreakingEntity creaking,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (creaking != null && !creaking.isRemoved() && payload != null) {
+            creaking.applyConsoleDmxOutput(payload);
+        }
+    }
+
+    private static void applyPayloadToAxolotl(
+            DmxAxolotlEntity axolotl,
+            ConsoleFixtureOutputPayload payload
+    ) {
+        if (axolotl != null && !axolotl.isRemoved() && payload != null) {
+            axolotl.applyConsoleDmxOutput(payload);
+        }
     }
 
     private static void applyPayloadToBlockDisplay(

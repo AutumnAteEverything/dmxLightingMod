@@ -147,6 +147,14 @@ public final class DmxFixtureProfileRegistry {
         );
 
         register(
+                DmxCreakingProfile.INSTANCE
+        );
+
+        register(
+                DmxAxolotlProfile.INSTANCE
+        );
+
+        register(
                 DmxBlockDisplayProfile.INSTANCE
         );
 

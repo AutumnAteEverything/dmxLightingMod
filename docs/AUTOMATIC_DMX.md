@@ -4,7 +4,7 @@ Automatic DMX turns a playing jukebox into a simple synchronized light show. It 
 
 ## What it controls
 
-While a record is playing, every loaded DMX fixture, DMX Block, DMX Block Display, DMX Parrot, DMX Enderman, DMX Warden, and DMX Nautilus in the same dimension follows the record's beat.
+While a record is playing, every loaded DMX fixture, DMX Block, DMX Block Display, DMX Parrot, DMX Enderman, DMX Warden, DMX Nautilus, DMX Creaking, and DMX Axolotl in the same dimension follows the record's beat.
 
 - All DMX fixtures and mobs receive saturated color changes every two beats.
 - Brightness pulses on every beat, with a stronger pulse at the start of each four-beat show phrase.

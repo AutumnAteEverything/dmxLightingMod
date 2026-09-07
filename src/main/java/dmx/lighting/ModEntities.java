@@ -8,9 +8,11 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.animal.nautilus.Nautilus;
 import net.minecraft.world.entity.animal.parrot.Parrot;
 import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.creaking.Creaking;
 import net.minecraft.world.entity.monster.warden.Warden;
 
 /**
@@ -48,6 +50,18 @@ public final class ModEntities {
                     DmxLighting.id(
                             "dmx_nautilus"
                     )
+            );
+
+    public static final ResourceKey<EntityType<?>> DMX_CREAKING_KEY =
+            ResourceKey.create(
+                    Registries.ENTITY_TYPE,
+                    DmxLighting.id("dmx_creaking")
+            );
+
+    public static final ResourceKey<EntityType<?>> DMX_AXOLOTL_KEY =
+            ResourceKey.create(
+                    Registries.ENTITY_TYPE,
+                    DmxLighting.id("dmx_axolotl")
             );
 
     public static final ResourceKey<EntityType<?>>
@@ -161,6 +175,36 @@ public final class ModEntities {
                             )
             );
 
+    public static final EntityType<DmxCreakingEntity> DMX_CREAKING =
+            Registry.register(
+                    BuiltInRegistries.ENTITY_TYPE,
+                    DMX_CREAKING_KEY,
+                    EntityType.Builder
+                            .of(
+                                    DmxCreakingEntity::new,
+                                    MobCategory.MONSTER
+                            )
+                            .sized(0.9F, 2.7F)
+                            .clientTrackingRange(8)
+                            .updateInterval(3)
+                            .build(DMX_CREAKING_KEY)
+            );
+
+    public static final EntityType<DmxAxolotlEntity> DMX_AXOLOTL =
+            Registry.register(
+                    BuiltInRegistries.ENTITY_TYPE,
+                    DMX_AXOLOTL_KEY,
+                    EntityType.Builder
+                            .of(
+                                    DmxAxolotlEntity::new,
+                                    MobCategory.AXOLOTLS
+                            )
+                            .sized(0.75F, 0.42F)
+                            .clientTrackingRange(10)
+                            .updateInterval(3)
+                            .build(DMX_AXOLOTL_KEY)
+            );
+
     public static final EntityType<DmxBlockDisplayEntity>
     DMX_BLOCK_DISPLAY =
             Registry.register(
@@ -209,6 +253,16 @@ public final class ModEntities {
         FabricDefaultAttributeRegistry.register(
                 DMX_NAUTILUS,
                 Nautilus.createAttributes()
+        );
+
+        FabricDefaultAttributeRegistry.register(
+                DMX_CREAKING,
+                Creaking.createAttributes()
+        );
+
+        FabricDefaultAttributeRegistry.register(
+                DMX_AXOLOTL,
+                Axolotl.createAttributes()
         );
 
         DmxLighting.LOGGER.info(

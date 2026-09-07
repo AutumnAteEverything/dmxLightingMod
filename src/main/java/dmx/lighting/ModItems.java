@@ -81,6 +81,22 @@ public final class ModItems {
                             )
             );
 
+    public static final SpawnEggItem DMX_CREAKING_SPAWN_EGG =
+            register(
+                    "dmx_creaking_spawn_egg",
+                    SpawnEggItem::new,
+                    new Item.Properties()
+                            .spawnEgg(ModEntities.DMX_CREAKING)
+            );
+
+    public static final SpawnEggItem DMX_AXOLOTL_SPAWN_EGG =
+            register(
+                    "dmx_axolotl_spawn_egg",
+                    SpawnEggItem::new,
+                    new Item.Properties()
+                            .spawnEgg(ModEntities.DMX_AXOLOTL)
+            );
+
     public static final Item GENERIC_60_BPM =
             registerGenericDisc(
                     "generic_60_bpm",
@@ -249,6 +265,18 @@ public final class ModItems {
                 output -> output.accept(
                         DMX_NAUTILUS_SPAWN_EGG
                 )
+        );
+
+        CreativeModeTabEvents.modifyOutputEvent(
+                TOOLS_AND_UTILITIES_TAB
+        ).register(
+                output -> output.accept(DMX_CREAKING_SPAWN_EGG)
+        );
+
+        CreativeModeTabEvents.modifyOutputEvent(
+                TOOLS_AND_UTILITIES_TAB
+        ).register(
+                output -> output.accept(DMX_AXOLOTL_SPAWN_EGG)
         );
 
         DmxLighting.LOGGER.info(

@@ -673,6 +673,153 @@ public record FixtureBrowserEntry(
         );
     }
 
+    /** Creates a browser entry from one loaded DMX Creaking. */
+    public static FixtureBrowserEntry fromDmxCreaking(
+            DmxCreakingEntity creaking
+    ) {
+        Objects.requireNonNull(
+                creaking,
+                "creaking"
+        );
+
+        FixtureParameterMap map =
+                creaking.getParameterMap();
+
+        int[] assignedChannels =
+                new int[] {
+                        map.getRedChannel(),
+                        map.getGreenChannel(),
+                        map.getBlueChannel(),
+                        map.getWhiteChannel(),
+                        map.getAmberChannel(),
+                        map.getDimmerChannel(),
+                        map.getPanChannel(),
+                        map.getTiltChannel(),
+                        map.getBeamWidthChannel(),
+                        map.getBeamLengthChannel(),
+                        map.getStrobeChannel()
+                };
+
+        FixtureOutput output =
+                creaking.getCurrentOutput();
+
+        return new FixtureBrowserEntry(
+                creaking.blockPosition(),
+                creaking.getConsoleName(),
+                creaking.getGroupDisplayName(),
+                DmxCreakingProfile.ID,
+                creaking.getUniverse(),
+                assignedChannels,
+                creaking.getControlMode()
+                        .getSerializedName(),
+                creaking.getOutputPackedRgb(),
+                creaking.getMinecraftLightLevel(),
+
+                output.getRed(),
+                output.getGreen(),
+                output.getBlue(),
+                output.getWhite(),
+                output.getAmber(),
+                output.getDimmer(),
+
+                output.getPan(),
+                output.getTilt(),
+
+                output.getBeamWidth(),
+                output.getBeamLength(),
+
+                output.getStrobe(),
+
+                TARGET_MOB,
+                creaking.getId(),
+
+                map.getRedChannel(),
+                map.getGreenChannel(),
+                map.getBlueChannel(),
+                map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                DmxPixelBlockEntity.MIN_SKIN,
+                FixtureParameterMap.UNASSIGNED,
+
+                creaking.isColorInterpolationEnabled(),
+                creaking.getColorInterpolationTimeSeconds()
+        );
+    }
+
+    /** Creates a browser entry from one loaded DMX Axolotl. */
+    public static FixtureBrowserEntry fromDmxAxolotl(
+            DmxAxolotlEntity axolotl
+    ) {
+        Objects.requireNonNull(
+                axolotl,
+                "axolotl"
+        );
+
+        FixtureParameterMap map =
+                axolotl.getParameterMap();
+
+        int[] assignedChannels =
+                new int[] {
+                        map.getRedChannel(),
+                        map.getGreenChannel(),
+                        map.getBlueChannel(),
+                        map.getWhiteChannel(),
+                        map.getAmberChannel(),
+                        map.getDimmerChannel(),
+                        map.getPanChannel(),
+                        map.getTiltChannel(),
+                        map.getBeamWidthChannel(),
+                        map.getBeamLengthChannel(),
+                        map.getStrobeChannel()
+                };
+
+        FixtureOutput output =
+                axolotl.getCurrentOutput();
+
+        return new FixtureBrowserEntry(
+                axolotl.blockPosition(),
+                axolotl.getConsoleName(),
+                axolotl.getGroupDisplayName(),
+                DmxAxolotlProfile.ID,
+                axolotl.getUniverse(),
+                assignedChannels,
+                axolotl.getControlMode()
+                        .getSerializedName(),
+                axolotl.getOutputPackedRgb(),
+                axolotl.getMinecraftLightLevel(),
+
+                output.getRed(),
+                output.getGreen(),
+                output.getBlue(),
+                output.getWhite(),
+                output.getAmber(),
+                output.getDimmer(),
+
+                output.getPan(),
+                output.getTilt(),
+
+                output.getBeamWidth(),
+                output.getBeamLength(),
+
+                output.getStrobe(),
+
+                TARGET_MOB,
+                axolotl.getId(),
+
+                map.getRedChannel(),
+                map.getGreenChannel(),
+                map.getBlueChannel(),
+                map.getDimmerChannel(),
+                map.getStrobeChannel(),
+                DmxPixelBlockEntity.MIN_SKIN,
+                FixtureParameterMap.UNASSIGNED,
+
+                axolotl.isColorInterpolationEnabled(),
+                axolotl.getColorInterpolationTimeSeconds()
+        );
+    }
+
+
     /** Creates a browser entry from one loaded DMX Block Display. */
     public static FixtureBrowserEntry fromDmxBlockDisplay(
             DmxBlockDisplayEntity display
