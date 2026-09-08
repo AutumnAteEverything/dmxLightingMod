@@ -1,6 +1,7 @@
 package dmx.lighting.mixin;
 
 import dmx.lighting.AutomaticDmxShowManager;
+import dmx.lighting.DmxBlockDisplayRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
@@ -29,6 +30,12 @@ public abstract class JukeboxBlockEntityMixin {
                 position,
                 jukebox
         );
+
+        if (!level.isClientSide()) {
+            DmxBlockDisplayRegistry.refreshInDimension(
+                    level.dimension()
+            );
+        }
     }
 
     @Inject(
@@ -45,5 +52,13 @@ public abstract class JukeboxBlockEntityMixin {
                 jukebox.getLevel(),
                 jukebox.getBlockPos()
         );
+
+        Level level = jukebox.getLevel();
+
+        if (level != null && !level.isClientSide()) {
+            DmxBlockDisplayRegistry.refreshInDimension(
+                    level.dimension()
+            );
+        }
     }
 }

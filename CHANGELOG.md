@@ -27,6 +27,11 @@ All notable changes to dmxLighting are documented here. This project follows a s
 - `/dmxsend` accepts any valid number of consecutive DMX values instead of a fixed four-value footprint.
 - Generic BPM disc item names now end in `disc` so they appear in searches for music discs.
 
+### Fixed
+
+- Restored inventory icons for the DMX Creaking and DMX Axolotl spawn eggs.
+- DMX Block Displays now refresh directly from jukebox playback and return to their underlying DMX color when playback stops.
+
 ## [1.0.0] - Unreleased
 
 ### Added

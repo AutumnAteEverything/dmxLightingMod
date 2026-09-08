@@ -161,6 +161,14 @@ public final class DmxBlockDisplayRegistry {
         }
     }
 
+    public static void refreshInDimension(ResourceKey<Level> dimension) {
+        for (DmxBlockDisplayEntity display :
+                getDisplaysInDimension(dimension)) {
+
+            display.refreshFromDmx();
+        }
+    }
+
     private static boolean isUsable(DmxBlockDisplayEntity display) {
         return display != null
                 && !display.isRemoved()
