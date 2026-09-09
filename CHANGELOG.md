@@ -31,6 +31,7 @@ All notable changes to dmxLighting are documented here. This project follows a s
 
 - Restored inventory icons for the DMX Creaking and DMX Axolotl spawn eggs.
 - DMX Block Displays now refresh directly from jukebox playback and return to their underlying DMX color when playback stops.
+- DMX Block Displays now render their emissive color base beneath the selected skin overlay, making direct DMX and automatic-show colors visible.
 
 ## [1.0.0] - Unreleased
 

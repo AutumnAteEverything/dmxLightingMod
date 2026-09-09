@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "dmxlighting-gametest",
+  "version": "1.0.0",
+  "name": "dmxLighting Game Tests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "dmx.lighting.gametest.DmxBlockDisplayClientGameTest"
+    ]
+  }
+}

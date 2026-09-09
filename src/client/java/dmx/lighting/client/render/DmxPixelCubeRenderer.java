@@ -11,8 +11,11 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 
-/** Shared full-bright cube geometry for DMX Blocks and displays. */
+/** Full-bright DMX Block geometry for display entities. */
 final class DmxPixelCubeRenderer {
+
+    private static final Identifier BASE_TEXTURE =
+            DmxLighting.id("textures/block/dmx_pixel_block.png");
 
     private static final Identifier[] TEXTURES = {
             DmxLighting.id("textures/block/dmx_pixel_block1.png"),
@@ -48,47 +51,67 @@ final class DmxPixelCubeRenderer {
 
         queue.submitCustomGeometry(
                 matrices,
+                RenderTypes.entityTranslucentEmissive(BASE_TEXTURE),
+                (pose, vertices) -> submitCube(
+                        pose,
+                        vertices,
+                        color,
+                        0.0F,
+                        1.0F
+                )
+        );
+
+        queue.submitCustomGeometry(
+                matrices,
                 RenderTypes.entityTranslucentEmissive(
                         TEXTURES[safeSkin - 1]
                 ),
-                (pose, vertices) -> submitCube(pose, vertices, color)
+                (pose, vertices) -> submitCube(
+                        pose,
+                        vertices,
+                        color,
+                        MIN,
+                        MAX
+                )
         );
     }
 
     private static void submitCube(
             PoseStack.Pose pose,
             VertexConsumer vertices,
-            int color
+            int color,
+            float min,
+            float max
     ) {
-        addVertex(pose, vertices, MIN, MAX, MIN, 0, 0, color, 0, 0, -1);
-        addVertex(pose, vertices, MIN, MIN, MIN, 0, 1, color, 0, 0, -1);
-        addVertex(pose, vertices, MAX, MIN, MIN, 1, 1, color, 0, 0, -1);
-        addVertex(pose, vertices, MAX, MAX, MIN, 1, 0, color, 0, 0, -1);
+        addVertex(pose, vertices, min, max, min, 0, 0, color, 0, 0, -1);
+        addVertex(pose, vertices, min, min, min, 0, 1, color, 0, 0, -1);
+        addVertex(pose, vertices, max, min, min, 1, 1, color, 0, 0, -1);
+        addVertex(pose, vertices, max, max, min, 1, 0, color, 0, 0, -1);
 
-        addVertex(pose, vertices, MAX, MAX, MAX, 0, 0, color, 0, 0, 1);
-        addVertex(pose, vertices, MAX, MIN, MAX, 0, 1, color, 0, 0, 1);
-        addVertex(pose, vertices, MIN, MIN, MAX, 1, 1, color, 0, 0, 1);
-        addVertex(pose, vertices, MIN, MAX, MAX, 1, 0, color, 0, 0, 1);
+        addVertex(pose, vertices, max, max, max, 0, 0, color, 0, 0, 1);
+        addVertex(pose, vertices, max, min, max, 0, 1, color, 0, 0, 1);
+        addVertex(pose, vertices, min, min, max, 1, 1, color, 0, 0, 1);
+        addVertex(pose, vertices, min, max, max, 1, 0, color, 0, 0, 1);
 
-        addVertex(pose, vertices, MIN, MAX, MAX, 0, 0, color, -1, 0, 0);
-        addVertex(pose, vertices, MIN, MIN, MAX, 0, 1, color, -1, 0, 0);
-        addVertex(pose, vertices, MIN, MIN, MIN, 1, 1, color, -1, 0, 0);
-        addVertex(pose, vertices, MIN, MAX, MIN, 1, 0, color, -1, 0, 0);
+        addVertex(pose, vertices, min, max, max, 0, 0, color, -1, 0, 0);
+        addVertex(pose, vertices, min, min, max, 0, 1, color, -1, 0, 0);
+        addVertex(pose, vertices, min, min, min, 1, 1, color, -1, 0, 0);
+        addVertex(pose, vertices, min, max, min, 1, 0, color, -1, 0, 0);
 
-        addVertex(pose, vertices, MAX, MAX, MIN, 0, 0, color, 1, 0, 0);
-        addVertex(pose, vertices, MAX, MIN, MIN, 0, 1, color, 1, 0, 0);
-        addVertex(pose, vertices, MAX, MIN, MAX, 1, 1, color, 1, 0, 0);
-        addVertex(pose, vertices, MAX, MAX, MAX, 1, 0, color, 1, 0, 0);
+        addVertex(pose, vertices, max, max, min, 0, 0, color, 1, 0, 0);
+        addVertex(pose, vertices, max, min, min, 0, 1, color, 1, 0, 0);
+        addVertex(pose, vertices, max, min, max, 1, 1, color, 1, 0, 0);
+        addVertex(pose, vertices, max, max, max, 1, 0, color, 1, 0, 0);
 
-        addVertex(pose, vertices, MIN, MAX, MIN, 0, 0, color, 0, 1, 0);
-        addVertex(pose, vertices, MAX, MAX, MIN, 1, 0, color, 0, 1, 0);
-        addVertex(pose, vertices, MAX, MAX, MAX, 1, 1, color, 0, 1, 0);
-        addVertex(pose, vertices, MIN, MAX, MAX, 0, 1, color, 0, 1, 0);
+        addVertex(pose, vertices, min, max, min, 0, 0, color, 0, 1, 0);
+        addVertex(pose, vertices, max, max, min, 1, 0, color, 0, 1, 0);
+        addVertex(pose, vertices, max, max, max, 1, 1, color, 0, 1, 0);
+        addVertex(pose, vertices, min, max, max, 0, 1, color, 0, 1, 0);
 
-        addVertex(pose, vertices, MIN, MIN, MAX, 0, 0, color, 0, -1, 0);
-        addVertex(pose, vertices, MAX, MIN, MAX, 1, 0, color, 0, -1, 0);
-        addVertex(pose, vertices, MAX, MIN, MIN, 1, 1, color, 0, -1, 0);
-        addVertex(pose, vertices, MIN, MIN, MIN, 0, 1, color, 0, -1, 0);
+        addVertex(pose, vertices, min, min, max, 0, 0, color, 0, -1, 0);
+        addVertex(pose, vertices, max, min, max, 1, 0, color, 0, -1, 0);
+        addVertex(pose, vertices, max, min, min, 1, 1, color, 0, -1, 0);
+        addVertex(pose, vertices, min, min, min, 0, 1, color, 0, -1, 0);
     }
 
     private static void addVertex(
