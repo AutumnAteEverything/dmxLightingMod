@@ -9,6 +9,7 @@ While a record is playing, every loaded DMX fixture, DMX Block, DMX Block Displa
 - All DMX fixtures and mobs receive saturated color changes every two beats.
 - Brightness pulses on every beat, with a stronger pulse at the start of each four-beat show phrase.
 - Fixture blocks receive smooth pan and tilt sweeps.
+- Each DMX Block and DMX Block Display independently changes skin on one randomly selected beat per four-beat phrase.
 - DMX Blocks, DMX Block Displays, and DMX mobs keep their normal physical behavior and use only the color and brightness part of the show.
 
 If more than one jukebox is playing, each fixture or mob follows the nearest active jukebox in its dimension.
@@ -23,11 +24,13 @@ If more than one jukebox is playing, each fixture or mob follows the nearest act
 
 Each pulse changes the show on that beat. The mod measures the interval between received pulses to smooth fixture movement, but it does not invent beats after the commands stop. Three seconds after the last pulse, the show times out and all fixtures and mobs return to their underlying output. Use `/dmxPulse stop` to end it immediately or `/dmxPulse status` to inspect its pulse count, estimated BPM, and timeout.
 
+Random DMX Block skin changes are jukebox-only. `/dmxPulse` leaves block and display skins under their normal configured or DMX-channel control.
+
 A command-pulse show takes temporary priority over a jukebox show in the same dimension. If the jukebox is still playing when command pulses time out, its show resumes. Command pulses also work while jukebox Automatic DMX is turned off with `/automaticdmx off`.
 
 ## DMX safety
 
-Automatic DMX is a temporary output layer. It does not write into the in-game DMX universes and does not replace a fixture's saved DMX or manual values. Commands, console output, and external automation can continue changing DMX while a record is playing. When playback stops, those underlying values become visible again.
+Automatic DMX is a temporary output layer. It does not write into the in-game DMX universes and does not replace a fixture's saved DMX or manual values. Jukebox skin changes likewise do not replace the saved skin or skin-channel assignment. Commands, console output, and external automation can continue changing DMX while a record is playing. When playback stops, those underlying values and skins become visible again.
 
 ## Testing
 

@@ -14,7 +14,7 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Manual and DMX operating modes, with optional visible color fades.
 - Optional pan/tilt interpolation with a user-defined movement time.
 - Optional RGB color fade time for fixtures, DMX Blocks, and DMX mobs.
-- Automatic jukebox shows with beat-synchronized color, dimmer, and fixture movement.
+- Automatic jukebox shows with beat-synchronized color, dimmer, fixture movement, and DMX Block skin changes.
 - `/dmxPulse` instant-party shows driven one beat at a time by commands.
 - Nine generic music discs from 60 to 140 BPM for resource-pack music.
 - Mount orientation controls separate from live pan/tilt offsets.

@@ -528,6 +528,19 @@ public final class DmxBlockDisplayEntity extends Display {
                     ) * MAX_SKIN / 256;
         }
 
+        Integer showSkin =
+                AutomaticDmxShowManager.createSkinOverride(
+                        level(),
+                        blockPosition(),
+                        getUUID().getMostSignificantBits()
+                                ^ getUUID().getLeastSignificantBits(),
+                        renderedSkin
+                );
+
+        if (showSkin != null) {
+            renderedSkin = showSkin;
+        }
+
         getEntityData().set(
                 DATA_RENDERED_SKIN,
                 Math.clamp(renderedSkin, MIN_SKIN, MAX_SKIN)

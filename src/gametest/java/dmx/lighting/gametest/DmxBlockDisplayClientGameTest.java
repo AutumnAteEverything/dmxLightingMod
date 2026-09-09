@@ -1,6 +1,9 @@
 package dmx.lighting.gametest;
 
+import dmx.lighting.AutomaticDmxShowManager;
 import dmx.lighting.DmxBlockDisplayEntity;
+import dmx.lighting.DmxPixelBlockEntity;
+import dmx.lighting.ModBlocks;
 
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
@@ -108,9 +111,14 @@ public final class DmxBlockDisplayClientGameTest
             singleplayer.getServer().runCommand(
                     "dmxsend 1 11 0 0 0 0 0"
             );
+            BlockPos pixelBlockPosition = new BlockPos(4, -59, 0);
+            BlockPos jukeboxPosition = new BlockPos(2, -59, 0);
             singleplayer.getServer().runOnServer(server -> {
                 ServerLevel level = server.overworld();
-                BlockPos jukeboxPosition = new BlockPos(2, -59, 0);
+                level.setBlockAndUpdate(
+                        pixelBlockPosition,
+                        ModBlocks.DMX_PIXEL_BLOCK.defaultBlockState()
+                );
                 level.setBlockAndUpdate(
                         jukeboxPosition,
                         Blocks.JUKEBOX.defaultBlockState()
@@ -136,6 +144,98 @@ public final class DmxBlockDisplayClientGameTest
             if (jukeboxPackedRgb == 0) {
                 throw new AssertionError(
                         "Jukebox show did not light the DMX Block Display."
+                );
+            }
+
+            int previousDisplaySkin = context.computeOnClient(
+                    client -> findDisplay(client.level).getRenderedSkin()
+            );
+            int previousBlockSkin = context.computeOnClient(
+                    client -> findPixelBlock(
+                            client.level,
+                            pixelBlockPosition
+                    ).getRenderedSkin()
+            );
+            boolean displaySkinChanged = false;
+            boolean blockSkinChanged = false;
+
+            for (int sample = 0; sample < 10; sample++) {
+                context.waitTicks(12);
+
+                int displaySkin = context.computeOnClient(
+                        client -> findDisplay(
+                                client.level
+                        ).getRenderedSkin()
+                );
+                int blockSkin = context.computeOnClient(
+                        client -> findPixelBlock(
+                                client.level,
+                                pixelBlockPosition
+                        ).getRenderedSkin()
+                );
+
+                displaySkinChanged |= displaySkin != previousDisplaySkin;
+                blockSkinChanged |= blockSkin != previousBlockSkin;
+                previousDisplaySkin = displaySkin;
+                previousBlockSkin = blockSkin;
+            }
+
+            if (!displaySkinChanged || !blockSkinChanged) {
+                throw new AssertionError(
+                        "Jukebox beats did not change both DMX skins."
+                );
+            }
+
+            singleplayer.getServer().runOnServer(server ->
+                    AutomaticDmxShowManager.triggerCommandPulse(
+                            server.overworld()
+                    )
+            );
+            context.waitTicks(2);
+
+            int pulseDisplaySkin = context.computeOnClient(
+                    client -> findDisplay(client.level).getRenderedSkin()
+            );
+            int pulseBlockSkin = context.computeOnClient(
+                    client -> findPixelBlock(
+                            client.level,
+                            pixelBlockPosition
+                    ).getRenderedSkin()
+            );
+
+            if (pulseDisplaySkin != 3 || pulseBlockSkin != 1) {
+                throw new AssertionError(
+                        "Command pulses unexpectedly changed DMX skins."
+                );
+            }
+
+            singleplayer.getServer().runOnServer(server ->
+                    AutomaticDmxShowManager.stopCommandPulse(
+                            server.overworld()
+                    )
+            );
+
+            singleplayer.getServer().runOnServer(server ->
+                    server.overworld().removeBlock(
+                            jukeboxPosition,
+                            false
+                    )
+            );
+            context.waitTicks(5);
+
+            int restoredDisplaySkin = context.computeOnClient(
+                    client -> findDisplay(client.level).getRenderedSkin()
+            );
+            int restoredBlockSkin = context.computeOnClient(
+                    client -> findPixelBlock(
+                            client.level,
+                            pixelBlockPosition
+                    ).getRenderedSkin()
+            );
+
+            if (restoredDisplaySkin != 3 || restoredBlockSkin != 1) {
+                throw new AssertionError(
+                        "DMX skins were not restored after the disc stopped."
                 );
             }
         }
@@ -247,5 +347,19 @@ public final class DmxBlockDisplayClientGameTest
         }
 
         throw new AssertionError("DMX Block Display did not reach the client.");
+    }
+
+    private static DmxPixelBlockEntity findPixelBlock(
+            ClientLevel level,
+            BlockPos position
+    ) {
+        if (level != null
+                && level.getBlockEntity(position)
+                instanceof DmxPixelBlockEntity pixelBlock) {
+
+            return pixelBlock;
+        }
+
+        throw new AssertionError("DMX Block did not reach the client.");
     }
 }

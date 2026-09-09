@@ -49,6 +49,12 @@ public final class AutomaticDmxShowManager {
     private static final int COMMAND_PULSE_PALETTE_SEED =
             "dmxlighting:command_pulse".hashCode();
 
+    private static final int BEATS_PER_SKIN_CHANGE_WINDOW =
+            4;
+
+    private static final long SKIN_RANDOM_SALT =
+            0x5EED5A17C0FFEE1L;
+
     private static final DiscBeatProfile CUSTOM_DISC_FALLBACK =
             new DiscBeatProfile(
                     120.0D,
@@ -270,6 +276,123 @@ public final class AutomaticDmxShowManager {
                 base,
                 allowMovement
         );
+    }
+
+    /**
+     * Returns a temporary jukebox-show skin, or null when the fixture
+     * should use its configured or DMX-controlled skin.
+     */
+    public static synchronized Integer createSkinOverride(
+            Level level,
+            BlockPos fixturePosition,
+            long fixtureSeed,
+            int underlyingSkin
+    ) {
+        if (level == null
+                || level.isClientSide()
+                || !enabled) {
+
+            return null;
+        }
+
+        if (findActiveCommandPulse(level) != null) {
+            return null;
+        }
+
+        ActiveJukebox jukebox =
+                findNearestActiveJukebox(
+                        level,
+                        fixturePosition
+                );
+
+        if (jukebox == null) {
+            return null;
+        }
+
+        long beatIndex =
+                (long) Math.floor(
+                        getBeatPosition(jukebox)
+                );
+
+        if (beatIndex < 0L) {
+            return null;
+        }
+
+        long windowIndex =
+                Math.floorDiv(
+                        beatIndex,
+                        BEATS_PER_SKIN_CHANGE_WINDOW
+                );
+
+        int beatInWindow =
+                Math.floorMod(
+                        beatIndex,
+                        BEATS_PER_SKIN_CHANGE_WINDOW
+                );
+
+        long randomSeed =
+                skinRandomSeed(
+                        jukebox,
+                        fixturePosition,
+                        fixtureSeed
+                );
+
+        int changeBeat =
+                Math.floorMod(
+                        mix64(
+                                randomSeed
+                                        + windowIndex
+                                        * 0x9E3779B97F4A7C15L
+                        ),
+                        BEATS_PER_SKIN_CHANGE_WINDOW
+                );
+
+        long activeWindow =
+                beatInWindow >= changeBeat
+                        ? windowIndex
+                        : windowIndex - 1L;
+
+        if (activeWindow < 0L) {
+            return null;
+        }
+
+        int safeUnderlying =
+                Math.clamp(
+                        underlyingSkin,
+                        DmxPixelBlockEntity.MIN_SKIN,
+                        DmxPixelBlockEntity.MAX_SKIN
+                );
+
+        int availableAlternatives =
+                DmxPixelBlockEntity.MAX_SKIN
+                        - DmxPixelBlockEntity.MIN_SKIN;
+
+        int direction =
+                (mix64(randomSeed ^ SKIN_RANDOM_SALT) & 1L) == 0L
+                        ? 1
+                        : availableAlternatives - 1;
+
+        int relativeSkin =
+                1 + Math.floorMod(
+                        Math.floorMod(
+                                mix64(randomSeed),
+                                availableAlternatives
+                        ) + activeWindow * direction,
+                        availableAlternatives
+                );
+
+        int skinCount =
+                DmxPixelBlockEntity.MAX_SKIN
+                        - DmxPixelBlockEntity.MIN_SKIN
+                        + 1;
+
+        return DmxPixelBlockEntity.MIN_SKIN
+                + Math.floorMod(
+                        safeUnderlying
+                                - DmxPixelBlockEntity.MIN_SKIN
+                                + relativeSkin,
+                        skinCount
+                );
     }
 
     public static synchronized void triggerCommandPulse(
@@ -510,6 +633,17 @@ public final class AutomaticDmxShowManager {
             FixtureOutput base,
             boolean allowMovement
     ) {
+        return buildBeatShowOutput(
+                getBeatPosition(jukebox),
+                jukebox.discItemId().hashCode(),
+                base,
+                allowMovement
+        );
+    }
+
+    private static double getBeatPosition(
+            ActiveJukebox jukebox
+    ) {
         DiscBeatProfile profile =
                 jukebox.profile();
 
@@ -526,16 +660,8 @@ public final class AutomaticDmxShowManager {
                         - profile.offsetSeconds()
                         * 20.0D;
 
-        double beatPosition =
-                adjustedTicks
-                        / ticksPerBeat;
-
-        return buildBeatShowOutput(
-                beatPosition,
-                jukebox.discItemId().hashCode(),
-                base,
-                allowMovement
-        );
+        return adjustedTicks
+                / ticksPerBeat;
     }
 
     private static FixtureOutput buildCommandPulseOutput(
@@ -780,6 +906,43 @@ public final class AutomaticDmxShowManager {
                 first.getZ() - second.getZ();
 
         return x * x + y * y + z * z;
+    }
+
+    private static long skinRandomSeed(
+            ActiveJukebox jukebox,
+            BlockPos fixturePosition,
+            long fixtureSeed
+    ) {
+        BlockPos safePosition =
+                fixturePosition == null
+                        ? BlockPos.ZERO
+                        : fixturePosition;
+
+        long positionSeed =
+                safePosition.getX() * 3129871L
+                        ^ safePosition.getY() * 42317861L
+                        ^ safePosition.getZ() * 116129781L;
+
+        long jukeboxSeed =
+                jukebox.position().getX() * 73428767L
+                        ^ jukebox.position().getY() * 912931L
+                        ^ jukebox.position().getZ() * 438289L;
+
+        return mix64(
+                SKIN_RANDOM_SALT
+                        ^ fixtureSeed
+                        ^ positionSeed
+                        ^ jukeboxSeed
+                        ^ jukebox.discItemId().hashCode()
+        );
+    }
+
+    private static long mix64(long value) {
+        value ^= value >>> 33;
+        value *= 0xFF51AFD7ED558CCDL;
+        value ^= value >>> 33;
+        value *= 0xC4CEB9FE1A85EC53L;
+        return value ^ value >>> 33;
     }
 
     private static Map.Entry<String, DiscBeatProfile> profile(

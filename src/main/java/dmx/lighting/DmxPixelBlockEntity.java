@@ -177,6 +177,18 @@ public final class DmxPixelBlockEntity
                             / 256;
         }
 
+        Integer showSkin =
+                AutomaticDmxShowManager.createSkinOverride(
+                        level,
+                        worldPosition,
+                        0L,
+                        targetSkin
+                );
+
+        if (showSkin != null) {
+            targetSkin = showSkin;
+        }
+
         setRenderedSkin(
                 targetSkin
         );
