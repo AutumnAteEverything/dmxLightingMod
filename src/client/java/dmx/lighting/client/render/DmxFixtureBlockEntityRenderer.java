@@ -5,7 +5,10 @@ import com.mojang.math.Axis;
 
 import dmx.lighting.DmxFixtureBlockEntity;
 import dmx.lighting.DmxFixtureProfile;
+import dmx.lighting.DmxDiscoBallBlockEntity;
+import dmx.lighting.DmxDiscoBallProfile;
 import dmx.lighting.client.DmxFixtureRenderState;
+import dmx.lighting.client.render.fixture.DiscoBallFixtureRenderer;
 import dmx.lighting.client.render.fixture.ParFixtureRenderer;
 import dmx.lighting.client.render.fixture.SpotlightFixtureRenderer;
 
@@ -78,6 +81,8 @@ public final class DmxFixtureBlockEntityRenderer
 
     private final SpotlightFixtureRenderer spotlightFixtureRenderer;
 
+    private final DiscoBallFixtureRenderer discoBallFixtureRenderer;
+
     /*
      * -----------------------------------------------------------------
      * Construction
@@ -99,6 +104,9 @@ public final class DmxFixtureBlockEntityRenderer
                 new SpotlightFixtureRenderer(
                         context
                 );
+
+        this.discoBallFixtureRenderer =
+                new DiscoBallFixtureRenderer();
     }
 
     /*
@@ -300,6 +308,13 @@ public final class DmxFixtureBlockEntityRenderer
                 fixture.getMountTiltDegrees()
         );
 
+        if (fixture instanceof DmxDiscoBallBlockEntity discoBall) {
+            state.setDiscoRotationDegrees(
+                    discoBall.getSpinRotationDegrees(tickProgress)
+            );
+            state.setDiscoBaseOnTop(discoBall.isBaseOnTop());
+        }
+
         /*
          * -------------------------------------------------------------
          * Final resolved movement
@@ -353,7 +368,13 @@ public final class DmxFixtureBlockEntityRenderer
          *
          * Every other profile currently falls back to PAR.
          */
-        if (SPOTLIGHT_PROFILE_ID.equals(
+        if (DmxDiscoBallProfile.ID.equals(profileId)) {
+            discoBallFixtureRenderer.submit(
+                    state,
+                    matrices,
+                    queue
+            );
+        } else if (SPOTLIGHT_PROFILE_ID.equals(
                 profileId
         )) {
             spotlightFixtureRenderer.submit(

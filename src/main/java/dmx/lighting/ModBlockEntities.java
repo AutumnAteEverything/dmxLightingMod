@@ -30,6 +30,14 @@ public final class ModBlockEntities {
                     ModBlocks.DMX_PIXEL_BLOCK
             );
 
+    public static final BlockEntityType<DmxDiscoBallBlockEntity>
+            DMX_DISCO_BALL_BLOCK_ENTITY =
+            register(
+                    "dmx_disco_ball",
+                    DmxDiscoBallBlockEntity::new,
+                    ModBlocks.DMX_DISCO_BALL
+            );
+
     private ModBlockEntities() {
     }
 

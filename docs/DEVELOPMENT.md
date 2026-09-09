@@ -54,7 +54,7 @@ Suggested smoke test:
 6. Verify immediate movement with Smooth off and gradual movement with Smooth on.
 7. Test every Lighting Console tab and Fixture, Group, and All output targets.
 8. Confirm the DMX Block is full-bright in darkness and emits no block light.
-9. Test all five skins manually and through their DMX value ranges.
+9. Test all sixteen skins manually and through their DMX value ranges.
 10. Enable the template resource pack and verify all replacement textures.
 
 ## Source layout

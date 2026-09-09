@@ -56,6 +56,18 @@ public final class ModBlocks {
                     DmxLighting.id("dmx_pixel_block")
             );
 
+    public static final ResourceKey<Block> DMX_DISCO_BALL_KEY =
+            ResourceKey.create(
+                    Registries.BLOCK,
+                    DmxLighting.id("dmx_disco_ball")
+            );
+
+    public static final ResourceKey<Item> DMX_DISCO_BALL_ITEM_KEY =
+            ResourceKey.create(
+                    Registries.ITEM,
+                    DmxLighting.id("dmx_disco_ball")
+            );
+
     public static final Block DMX_BLOCK = registerBlock(
             DMX_BLOCK_KEY,
             DMX_BLOCK_ITEM_KEY,
@@ -85,6 +97,19 @@ public final class ModBlocks {
                     .lightLevel(
                             state -> 0
                     )
+                    .emissiveRendering(
+                            (state, level, position) -> true
+                    )
+    );
+
+    public static final Block DMX_DISCO_BALL = registerBlock(
+            DMX_DISCO_BALL_KEY,
+            DMX_DISCO_BALL_ITEM_KEY,
+            DmxDiscoBallBlock::new,
+            BlockBehaviour.Properties.of()
+                    .strength(1.5F)
+                    .sound(SoundType.METAL)
+                    .lightLevel(state -> 0)
                     .emissiveRendering(
                             (state, level, position) -> true
                     )
@@ -134,6 +159,7 @@ public final class ModBlocks {
                 output -> {
                     output.accept(DMX_BLOCK);
                     output.accept(DMX_PIXEL_BLOCK);
+                    output.accept(DMX_DISCO_BALL);
                 }
         );
 
@@ -154,7 +180,8 @@ public final class ModBlocks {
                     ).getBlock();
 
                     if (stateBlock != DMX_BLOCK
-                            && stateBlock != DMX_PIXEL_BLOCK) {
+                            && stateBlock != DMX_PIXEL_BLOCK
+                            && stateBlock != DMX_DISCO_BALL) {
 
                         return InteractionResult.PASS;
                     }

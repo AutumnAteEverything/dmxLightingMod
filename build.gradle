@@ -96,8 +96,18 @@ tasks.register('genericMusicResourcePack', Zip) {
 	exclude '**/.DS_Store'
 }
 
+tasks.register('dmxLightingResourcePack', Zip) {
+	group = 'build'
+	description = 'Packages the editable dmxLighting texture resource pack.'
+	from('resourcePack/dmxlighting-resource-pack-template')
+	archiveFileName = "dmxlighting-resource-pack-template-mc${project.minecraft_version}-v${project.mod_version}.zip"
+	destinationDirectory = layout.buildDirectory.dir('distributions')
+	exclude '**/.DS_Store'
+}
+
 tasks.named('assemble') {
 	dependsOn tasks.named('genericMusicResourcePack')
+	dependsOn tasks.named('dmxLightingResourcePack')
 }
 
 // configure the maven publication

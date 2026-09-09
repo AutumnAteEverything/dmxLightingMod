@@ -6,9 +6,12 @@ All notable changes to dmxLighting are documented here. This project follows a s
 
 ### Added
 
+- DMX Disco Ball fixture with a cubic mirrored body, five colored beams, stationary top/bottom mounting, initial-angle control, Dimmer, and bipolar Spin Rate with 128 stopped.
+- DMX Block skins 6-16 for placed blocks and Block Displays, including the new resource-pack slots and exact sixteen-way DMX selection ranges.
+
 - DMX Creaking mob with standalone spawning, vanilla movement/aggression, RGB/dimmer patching, console editing, color fades, emissive rendering, and automatic-show support.
 - DMX Axolotl mob with vanilla aquatic behavior and variants, RGB/dimmer patching, console editing, color fades, emissive rendering, and automatic-show support.
-- Summonable DMX Block Display entities with console editing and output, RGB, dimmer, strobe, five skins, optional DMX skin selection, color fades, automatic-show support, and the full vanilla display transformation system including negative scale.
+- Summonable DMX Block Display entities with console editing and output, RGB, dimmer, strobe, sixteen skins, optional DMX skin selection, color fades, automatic-show support, and the full vanilla display transformation system including negative scale.
 
 - Automatic DMX shows triggered by music discs playing in jukeboxes.
 - Beat-synchronized color and dimmer output for fixtures, DMX Blocks, and DMX mobs.

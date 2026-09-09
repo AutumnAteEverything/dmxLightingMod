@@ -116,6 +116,11 @@ public final class DmxFixtureRenderState
     private float mountTiltDegrees =
             0.0F;
 
+    private float discoRotationDegrees =
+            0.0F;
+
+    private boolean discoBaseOnTop;
+
     /*
      * -----------------------------------------------------------------
      * Resolved orientation
@@ -640,6 +645,24 @@ public final class DmxFixtureRenderState
         setMountTiltDegrees(
                 tiltDegrees
         );
+    }
+
+    public float getDiscoRotationDegrees() {
+        return discoRotationDegrees;
+    }
+
+    public void setDiscoRotationDegrees(float discoRotationDegrees) {
+        this.discoRotationDegrees = normalizeDegrees(
+                discoRotationDegrees
+        );
+    }
+
+    public boolean isDiscoBaseOnTop() {
+        return discoBaseOnTop;
+    }
+
+    public void setDiscoBaseOnTop(boolean discoBaseOnTop) {
+        this.discoBaseOnTop = discoBaseOnTop;
     }
 
     /**

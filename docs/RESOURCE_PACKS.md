@@ -8,10 +8,7 @@ dmxLighting's appearance and generic music-disc audio can be changed with a norm
 | --- | --- |
 | `assets/dmxlighting/textures/block/dmx_pixel_block.png` | Base baked model for the DMX Block |
 | `assets/dmxlighting/textures/block/dmx_pixel_block1.png` | DMX Block Skin 1 emissive overlay |
-| `assets/dmxlighting/textures/block/dmx_pixel_block2.png` | DMX Block Skin 2 emissive overlay |
-| `assets/dmxlighting/textures/block/dmx_pixel_block3.png` | DMX Block Skin 3 emissive overlay |
-| `assets/dmxlighting/textures/block/dmx_pixel_block4.png` | DMX Block Skin 4 emissive overlay |
-| `assets/dmxlighting/textures/block/dmx_pixel_block5.png` | DMX Block Skin 5 emissive overlay |
+| `assets/dmxlighting/textures/block/dmx_pixel_block2.png` through `dmx_pixel_block16.png` | DMX Block Skins 2-16 emissive overlays |
 | `assets/dmxlighting/textures/entity/dmx_fixture.png` | Fixture body texture |
 | `assets/dmxlighting/textures/entity/dmx_fixture_lens.png` | PAR lens texture |
 | `assets/dmxlighting/textures/entity/dmx_fixture_spotlight_lens.png` | Spotlight lens texture |
@@ -45,9 +42,8 @@ My dmxLighting Pack/
             │   ├── dmx_pixel_block.png
             │   ├── dmx_pixel_block1.png
             │   ├── dmx_pixel_block2.png
-            │   ├── dmx_pixel_block3.png
-            │   ├── dmx_pixel_block4.png
-            │   └── dmx_pixel_block5.png
+            │   ├── ...
+            │   └── dmx_pixel_block16.png
             ├── entity/
             │   ├── dmx_fixture.png
             │   ├── dmx_fixture_lens.png
@@ -84,3 +80,5 @@ The generic discs have a one-hour playback ceiling because the server cannot ins
 4. Load a world containing dmxLighting blocks and inspect every fixture profile and skin.
 
 Resource packs do not change BPM profiles, channel mappings, saved fixture data, commands, or control behavior.
+
+Skin 16 currently duplicates the bundled Skin 15 artwork as a temporary placeholder. Resource packs can replace `dmx_pixel_block16.png` independently now, and a distinct default can be added without another code change.

@@ -21,7 +21,12 @@ public final class DmxPixelBlockEntity
             1;
 
     public static final int MAX_SKIN =
-            5;
+            16;
+
+    public static final int SKIN_COUNT =
+            MAX_SKIN
+                    - MIN_SKIN
+                    + 1;
 
     private static final String SKIN_KEY =
             "pixel_skin";
@@ -173,7 +178,7 @@ public final class DmxPixelBlockEntity
             targetSkin =
                     MIN_SKIN
                             + dmxValue
-                            * MAX_SKIN
+                            * SKIN_COUNT
                             / 256;
         }
 

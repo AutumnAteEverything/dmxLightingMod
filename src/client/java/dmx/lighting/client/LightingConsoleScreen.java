@@ -4,6 +4,7 @@ import dmx.lighting.ConsoleFixtureOutputPayload;
 import dmx.lighting.DmxAxolotlProfile;
 import dmx.lighting.DmxBlockDisplayProfile;
 import dmx.lighting.DmxCreakingProfile;
+import dmx.lighting.DmxDiscoBallProfile;
 import dmx.lighting.DmxEndermanProfile;
 import dmx.lighting.DmxFixtureProfile;
 import dmx.lighting.DmxFixtureProfileRegistry;
@@ -936,7 +937,7 @@ public class LightingConsoleScreen extends Screen {
                                 + OUTPUT_SLIDER_SPACING
                                 * 6,
                         sliderWidth,
-                        "Pan Offset",
+                        "Pan / Spin Rate",
                         outputPan,
                         ConsoleFixtureOutputPayload.APPLY_PAN
                 );
@@ -1392,6 +1393,14 @@ public class LightingConsoleScreen extends Screen {
                                 outputTarget
                         );
 
+        boolean dmxDiscoBallTarget =
+                visible
+                        && isSelectedDmxDiscoBall()
+                        && ConsoleFixtureOutputPayload.TARGET_FIXTURE
+                        .equals(
+                                outputTarget
+                        );
+
         boolean compactDmxEntityTarget =
                 dmxMobFixtureTarget
                         || dmxBlockDisplayTarget;
@@ -1413,29 +1422,31 @@ public class LightingConsoleScreen extends Screen {
 
         setWidgetVisible(
                 outputRedSlider,
-                visible
+                visible && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
                 outputGreenSlider,
-                visible
+                visible && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
                 outputBlueSlider,
-                visible
+                visible && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
                 outputWhiteSlider,
                 visible
                         && !compactDmxEntityTarget
+                        && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
                 outputAmberSlider,
                 visible
                         && !compactDmxEntityTarget
+                        && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
@@ -1453,24 +1464,28 @@ public class LightingConsoleScreen extends Screen {
                 outputTiltSlider,
                 visible
                         && !compactDmxEntityTarget
+                        && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
                 outputBeamWidthSlider,
                 visible
                         && !compactDmxEntityTarget
+                        && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
                 outputBeamLengthSlider,
                 visible
                         && !compactDmxEntityTarget
+                        && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
                 outputStrobeSlider,
                 visible
                         && !dmxMobFixtureTarget
+                        && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
@@ -1481,7 +1496,7 @@ public class LightingConsoleScreen extends Screen {
         if (outputApplyButton != null) {
             outputApplyButton.setMessage(
                     Component.literal(
-                            compactDmxEntityTarget
+                            compactDmxEntityTarget || dmxDiscoBallTarget
                                     ? "Apply DMX Output"
                                     : "Apply All Output"
                     )
@@ -1675,6 +1690,14 @@ public class LightingConsoleScreen extends Screen {
     }
 
     private int getApplyAllMaskForCurrentTarget() {
+        if (isSelectedDmxDiscoBall()
+                && ConsoleFixtureOutputPayload.TARGET_FIXTURE.equals(
+                outputTarget
+        )) {
+            return ConsoleFixtureOutputPayload.APPLY_DIMMER
+                    | ConsoleFixtureOutputPayload.APPLY_PAN;
+        }
+
         if (isSelectedDmxBlockDisplay()
                 && ConsoleFixtureOutputPayload.TARGET_FIXTURE.equals(
                         outputTarget
@@ -1735,6 +1758,14 @@ public class LightingConsoleScreen extends Screen {
         FixtureBrowserEntry selected = getSelectedBrowserEntry();
         return selected != null
                 && DmxBlockDisplayProfile.ID.equals(
+                        selected.fixtureType()
+                );
+    }
+
+    private boolean isSelectedDmxDiscoBall() {
+        FixtureBrowserEntry selected = getSelectedBrowserEntry();
+        return selected != null
+                && DmxDiscoBallProfile.ID.equals(
                         selected.fixtureType()
                 );
     }
@@ -2417,6 +2448,15 @@ public class LightingConsoleScreen extends Screen {
         )) {
             Minecraft.getInstance().setScreen(
                     new DmxBlockDisplayScreen(selectedEntry)
+            );
+            return;
+        }
+
+        if (DmxDiscoBallProfile.ID.equals(
+                selectedEntry.fixtureType()
+        )) {
+            Minecraft.getInstance().setScreen(
+                    new DmxDiscoBallScreen(selectedEntry.position())
             );
             return;
         }

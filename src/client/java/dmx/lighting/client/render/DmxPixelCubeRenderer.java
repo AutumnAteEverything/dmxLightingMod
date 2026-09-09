@@ -22,7 +22,18 @@ final class DmxPixelCubeRenderer {
             DmxLighting.id("textures/block/dmx_pixel_block2.png"),
             DmxLighting.id("textures/block/dmx_pixel_block3.png"),
             DmxLighting.id("textures/block/dmx_pixel_block4.png"),
-            DmxLighting.id("textures/block/dmx_pixel_block5.png")
+            DmxLighting.id("textures/block/dmx_pixel_block5.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block6.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block7.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block8.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block9.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block10.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block11.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block12.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block13.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block14.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block15.png"),
+            DmxLighting.id("textures/block/dmx_pixel_block16.png")
     };
 
     private static final int FULL_BRIGHT = 0x00F000F0;

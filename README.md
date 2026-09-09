@@ -19,10 +19,11 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Nine generic music discs from 60 to 140 BPM for resource-pack music.
 - Mount orientation controls separate from live pan/tilt offsets.
 - Colored lenses, visible fixture beams, and Minecraft light output.
-- Full-cube **DMX Block** with RGB, dimmer, strobe, and five selectable skins.
+- Full-cube **DMX Block** with RGB, dimmer, strobe, and sixteen selectable skins.
 - Optional DMX channel for selecting the DMX Block skin.
 - Emissive DMX Block surfaces that remain visible in darkness while emitting no Minecraft block light.
 - Summonable **DMX Block Displays** with the same emissive skins and DMX controls, plus vanilla display transformations including negative scale.
+- Cubic **DMX Disco Ball** with a stationary top/bottom mount, five colored beams, initial-angle control, and bipolar spin speed.
 - **DMX Parrot**, **DMX Enderman**, **DMX Warden**, **DMX Nautilus**, **DMX Creaking**, and **DMX Axolotl** mobs with RGB/dimmer patching, color fades, and emissive DMX color rendering.
 - Handheld, right-docked **Lighting Console** with Fixtures, Groups, Universes, Patch, and Output views.
 - Live output to one fixture, one group, or all loaded fixtures.
@@ -76,7 +77,16 @@ For a DMX Block patched to channels 101-105 as red, green, blue, dimmer, and ski
 /dmxsend 1 101 255 0 0 255 128
 ```
 
-That makes the block bright red and selects skin 3.
+That makes the block bright red and selects skin 9.
+
+Place and test a DMX Disco Ball using its default Dimmer and Spin Rate channels:
+
+```mcfunction
+/setblock ~ ~ ~ dmxlighting:dmx_disco_ball
+/dmxsend 1 1 255 128
+```
+
+Change the final value to `0` for maximum reverse spin or `255` for maximum forward spin.
 
 Summon a transformable DMX Block Display with RGB, dimmer, and strobe on channels 101-105:
 
@@ -91,8 +101,9 @@ It appears in the Lighting Console and supports Minecraft's normal display-entit
 | Name | Registry ID | Creative tab | Purpose |
 | --- | --- | --- | --- |
 | DMX Fixture | `dmxlighting:dmx_block` | Functional Blocks | Configurable PAR/Spotlight fixture with movement, beam, and light controls |
-| DMX Block | `dmxlighting:dmx_pixel_block` | Functional Blocks | Emissive RGB surface with dimmer, strobe, and five skins; emits no world light |
+| DMX Block | `dmxlighting:dmx_pixel_block` | Functional Blocks | Emissive RGB surface with dimmer, strobe, and sixteen skins; emits no world light |
 | DMX Block Display | `dmxlighting:dmx_block_display` | Summon command | Transformable emissive DMX Block visual with console registration and no world light |
+| DMX Disco Ball | `dmxlighting:dmx_disco_ball` | Functional Blocks | Cubic five-beam effect with Dimmer and bipolar Spin Rate controls |
 | Lighting Console | `dmxlighting:lighting_console` | Tools & Utilities | Portable browser, patch view, and live control surface |
 | DMX Parrot Spawn Egg | `dmxlighting:dmx_parrot_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable parrot mob that appears in the console |
 | DMX Enderman Spawn Egg | `dmxlighting:dmx_enderman_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Enderman mob that appears in the console |
@@ -107,6 +118,7 @@ See the detailed guides:
 - [Getting started](docs/GETTING_STARTED.md)
 - [DMX Fixtures](docs/FIXTURES.md)
 - [DMX Blocks](docs/DMX_BLOCK.md)
+- [DMX Disco Ball](docs/DISCO_BALL.md)
 - [Lighting Console](docs/LIGHTING_CONSOLE.md)
 - [Automatic DMX and jukebox shows](docs/AUTOMATIC_DMX.md)
 - [Commands](docs/COMMANDS.md)

@@ -37,6 +37,19 @@ Command-pulse shows remain available when `/automaticdmx off` has disabled jukeb
 
 ## Raw DMX output
 
+### DMX Disco Ball quick test
+
+The DMX Disco Ball defaults to Dimmer on channel 1 and bipolar Spin Rate on channel 2:
+
+```mcfunction
+/setblock ~ ~ ~ dmxlighting:dmx_disco_ball
+/dmxsend 1 1 255 128
+/dmxsend 1 1 255 255
+/dmxsend 1 1 255 0
+```
+
+Spin Rate `128` is stopped, lower values spin in reverse, and higher values spin forward. Use the fixture's editor to change channels, initial angle, or top/bottom mounting.
+
 ### `/dmx`
 
 Sets one channel in the in-game universe.

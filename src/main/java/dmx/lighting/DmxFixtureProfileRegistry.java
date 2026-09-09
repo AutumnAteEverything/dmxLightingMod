@@ -158,6 +158,10 @@ public final class DmxFixtureProfileRegistry {
                 DmxBlockDisplayProfile.INSTANCE
         );
 
+        register(
+                DmxDiscoBallProfile.INSTANCE
+        );
+
         initialized =
                 true;
     }

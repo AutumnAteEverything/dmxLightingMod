@@ -13,7 +13,7 @@ Right-click the block to set:
 - manual RGB, dimmer, and strobe values;
 - optional visible color fade time;
 - control mode;
-- one of five visual skins;
+- one of sixteen visual skins;
 - an optional skin-selection DMX channel.
 
 Blank channel fields are unassigned.
@@ -30,14 +30,13 @@ Strobe value 0 disables the effect. Higher values increase the visible flashing 
 
 ## Skins
 
-The manual selector cycles through Skin 1 to Skin 5. The corresponding resource locations are:
+The manual selector cycles through Skin 1 to Skin 16. The corresponding resource locations are:
 
 ```text
 assets/dmxlighting/textures/block/dmx_pixel_block1.png
 assets/dmxlighting/textures/block/dmx_pixel_block2.png
-assets/dmxlighting/textures/block/dmx_pixel_block3.png
-assets/dmxlighting/textures/block/dmx_pixel_block4.png
-assets/dmxlighting/textures/block/dmx_pixel_block5.png
+...
+assets/dmxlighting/textures/block/dmx_pixel_block16.png
 ```
 
 `dmx_pixel_block.png` remains the base baked-block texture. See [Resource packs and textures](RESOURCE_PACKS.md) for customization.
@@ -50,11 +49,22 @@ When the block is in DMX mode and the Skin DMX Channel is assigned, its value se
 
 | DMX value | Skin |
 | --- | --- |
-| 0-51 | Skin 1 |
-| 52-102 | Skin 2 |
-| 103-153 | Skin 3 |
-| 154-204 | Skin 4 |
-| 205-255 | Skin 5 |
+| 0-15 | Skin 1 |
+| 16-31 | Skin 2 |
+| 32-47 | Skin 3 |
+| 48-63 | Skin 4 |
+| 64-79 | Skin 5 |
+| 80-95 | Skin 6 |
+| 96-111 | Skin 7 |
+| 112-127 | Skin 8 |
+| 128-143 | Skin 9 |
+| 144-159 | Skin 10 |
+| 160-175 | Skin 11 |
+| 176-191 | Skin 12 |
+| 192-207 | Skin 13 |
+| 208-223 | Skin 14 |
+| 224-239 | Skin 15 |
+| 240-255 | Skin 16 |
 
 The selected manual skin remains stored. It is used when the skin channel is unassigned or when the block is in Manual mode.
 
@@ -73,10 +83,10 @@ Patch universe 1 as follows:
 Then send:
 
 ```mcfunction
-/dmxsend 1 101 0 160 255 255 210
+/dmxsend 1 101 0 160 255 255 255
 ```
 
-The block displays a bright blue-cyan color using Skin 5.
+The block displays a bright blue-cyan color using Skin 16.
 
 ## DMX Block Displays
 

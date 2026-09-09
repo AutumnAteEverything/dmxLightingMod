@@ -525,7 +525,7 @@ public final class DmxBlockDisplayEntity extends Display {
                     + DmxUniverseManager.getChannel(
                             universe,
                             skinDmxChannel
-                    ) * MAX_SKIN / 256;
+                    ) * DmxPixelBlockEntity.SKIN_COUNT / 256;
         }
 
         Integer showSkin =

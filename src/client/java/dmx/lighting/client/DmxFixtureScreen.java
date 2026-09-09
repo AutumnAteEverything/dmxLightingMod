@@ -508,6 +508,9 @@ public class DmxFixtureScreen extends Screen {
                                         && !"dmx_block_display".equals(
                                                 profile.id()
                                         )
+                                        && !"dmx_disco_ball".equals(
+                                                profile.id()
+                                        )
                         )
                         .collect(
                                 Collectors.toUnmodifiableList()

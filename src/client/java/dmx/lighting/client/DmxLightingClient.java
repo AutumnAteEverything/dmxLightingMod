@@ -71,6 +71,11 @@ public class DmxLightingClient implements ClientModInitializer {
                 ModBlockEntities.DMX_PIXEL_BLOCK_ENTITY,
                 DmxPixelBlockEntityRenderer::new
         );
+
+        BlockEntityRenderers.register(
+                ModBlockEntities.DMX_DISCO_BALL_BLOCK_ENTITY,
+                DmxFixtureBlockEntityRenderer::new
+        );
     }
 
     private static void registerEntityRenderers() {
@@ -132,7 +137,11 @@ public class DmxLightingClient implements ClientModInitializer {
                             ModBlocks.DMX_BLOCK
                     );
 
-                    if (!isPixelBlock && !isFixtureBlock) {
+                    boolean isDiscoBall = state.is(
+                            ModBlocks.DMX_DISCO_BALL
+                    );
+
+                    if (!isPixelBlock && !isFixtureBlock && !isDiscoBall) {
                         return InteractionResult.PASS;
                     }
 
@@ -147,6 +156,11 @@ public class DmxLightingClient implements ClientModInitializer {
                                             new DmxPixelBlockScreen(
                                                     position
                                             )
+                                    );
+                        } else if (isDiscoBall) {
+                            Minecraft.getInstance()
+                                    .setScreenAndShow(
+                                            new DmxDiscoBallScreen(position)
                                     );
                         } else {
                             Minecraft.getInstance()
