@@ -49,9 +49,11 @@ final class DmxPixelCubeRenderer {
         );
         int color = 0xFF000000 | packedRgb;
 
+        // Cutout surfaces write depth, keeping the expanded skin above the
+        // colored base even when Minecraft batches the two textures.
         queue.submitCustomGeometry(
                 matrices,
-                RenderTypes.entityTranslucentEmissive(BASE_TEXTURE),
+                RenderTypes.entityCutout(BASE_TEXTURE),
                 (pose, vertices) -> submitCube(
                         pose,
                         vertices,
@@ -63,7 +65,7 @@ final class DmxPixelCubeRenderer {
 
         queue.submitCustomGeometry(
                 matrices,
-                RenderTypes.entityTranslucentEmissive(
+                RenderTypes.entityCutout(
                         TEXTURES[safeSkin - 1]
                 ),
                 (pose, vertices) -> submitCube(

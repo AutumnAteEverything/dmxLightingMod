@@ -74,6 +74,30 @@ public final class DmxBlockDisplayClientGameTest
             assertVisibleColor(redScreenshot, 0);
 
             singleplayer.getServer().runCommand(
+                    "data merge entity "
+                            + "@e[type=dmxlighting:dmx_block_display,"
+                            + "sort=nearest,limit=1] "
+                            + "{dmx_display_skin:3,"
+                            + "dmx_display_skin_channel:0}"
+            );
+            context.waitTicks(5);
+
+            int renderedSkin = context.computeOnClient(
+                    client -> findDisplay(client.level).getRenderedSkin()
+            );
+
+            if (renderedSkin != 3) {
+                throw new AssertionError(
+                        "Expected client display skin 3 but received "
+                                + renderedSkin
+                );
+            }
+
+            Path skinScreenshot =
+                    context.takeScreenshot("dmx-block-display-skin-3");
+            assertSkinChanged(redScreenshot, skinScreenshot);
+
+            singleplayer.getServer().runCommand(
                     "dmxsend 1 11 0 0 255 255 0"
             );
             context.waitTicks(5);
@@ -121,22 +145,7 @@ public final class DmxBlockDisplayClientGameTest
             Path screenshot,
             int dominantChannel
     ) {
-        BufferedImage image;
-
-        try {
-            image = ImageIO.read(screenshot.toFile());
-        } catch (IOException exception) {
-            throw new AssertionError(
-                    "Could not read rendered DMX screenshot.",
-                    exception
-            );
-        }
-
-        if (image == null) {
-            throw new AssertionError(
-                    "Rendered DMX screenshot was not a readable image."
-            );
-        }
+        BufferedImage image = readScreenshot(screenshot);
 
         int matchingPixels = 0;
 
@@ -166,6 +175,66 @@ public final class DmxBlockDisplayClientGameTest
                     "DMX Block Display color was not visibly rendered."
             );
         }
+    }
+
+    private static void assertSkinChanged(
+            Path originalScreenshot,
+            Path skinScreenshot
+    ) {
+        BufferedImage original = readScreenshot(originalScreenshot);
+        BufferedImage changed = readScreenshot(skinScreenshot);
+
+        if (original.getWidth() != changed.getWidth()
+                || original.getHeight() != changed.getHeight()) {
+
+            throw new AssertionError(
+                    "DMX skin screenshots had different dimensions."
+            );
+        }
+
+        int changedPixels = 0;
+
+        for (int y = 0; y < original.getHeight(); y++) {
+            for (int x = 0; x < original.getWidth(); x++) {
+                int before = original.getRGB(x, y);
+                int after = changed.getRGB(x, y);
+                int difference = Math.abs((before >> 16 & 0xFF)
+                        - (after >> 16 & 0xFF))
+                        + Math.abs((before >> 8 & 0xFF)
+                        - (after >> 8 & 0xFF))
+                        + Math.abs((before & 0xFF)
+                        - (after & 0xFF));
+
+                if (difference >= 48) {
+                    changedPixels++;
+                }
+            }
+        }
+
+        if (changedPixels < 100) {
+            throw new AssertionError(
+                    "Changing the DMX Block Display skin was not visible."
+            );
+        }
+    }
+
+    private static BufferedImage readScreenshot(Path screenshot) {
+        try {
+            BufferedImage image = ImageIO.read(screenshot.toFile());
+
+            if (image != null) {
+                return image;
+            }
+        } catch (IOException exception) {
+            throw new AssertionError(
+                    "Could not read rendered DMX screenshot.",
+                    exception
+            );
+        }
+
+        throw new AssertionError(
+                "Rendered DMX screenshot was not a readable image."
+        );
     }
 
     private static DmxBlockDisplayEntity findDisplay(ClientLevel level) {
