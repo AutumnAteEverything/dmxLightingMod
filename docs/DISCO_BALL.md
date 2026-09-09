@@ -1,6 +1,6 @@
 # DMX Disco Ball
 
-The DMX Disco Ball is a cubic, two-channel fixture. Its mount remains stationary while the mirrored cube and five narrow beams rotate together. The beams use fixed red, magenta, cyan, green, and yellow colors.
+The DMX Disco Ball is a cubic, two-channel fixture. Its mount remains stationary while the mirrored cube and seventeen narrow beams rotate together. Eight beams form a horizontal ring, eight more angle outward between them toward the open side of the mount, and one points straight away from the mount. The beams cycle through a fixed rainbow palette.
 
 ## Controls
 
@@ -27,6 +27,8 @@ The default patch is Universe 1, Dimmer 1, and Spin Rate 2.
 | 255 | Maximum forward |
 
 Changing the initial angle resets the cube to that position. The top/bottom selection moves only the stationary base and stem; the beam pointing through the mount is omitted.
+
+During Automatic DMX playback, the ball uses a slower movement wave than ordinary fixtures. It spins in each direction for about 24 beats before easing through stop and reversing.
 
 ## Quick test
 

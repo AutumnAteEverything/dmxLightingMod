@@ -9,7 +9,7 @@ import dmx.lighting.client.DmxFixtureRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 
-/** Renders a stationary mount, rotating mirror cube, and five beams. */
+/** Renders a stationary mount, rotating mirror cube, and 17 beams. */
 public final class DiscoBallFixtureRenderer {
 
     private static final float BODY_MIN = 0.27F;
@@ -19,13 +19,22 @@ public final class DiscoBallFixtureRenderer {
     private static final float BEAM_LENGTH = 7.0F;
     private static final float BEAM_START_HALF_WIDTH = 0.025F;
     private static final float BEAM_END_HALF_WIDTH = 0.075F;
+    private static final int BEAMS_PER_RING = 8;
+    private static final float RING_STEP_DEGREES =
+            360.0F / BEAMS_PER_RING;
+    private static final float DIAGONAL_OFFSET_DEGREES =
+            RING_STEP_DEGREES / 2.0F;
+    private static final float DIAGONAL_TILT_DEGREES = 42.0F;
 
     private static final int[] BEAM_COLORS = {
             0xFF3B30,
-            0xFF2BD6,
-            0x28D7FF,
+            0xFF9F0A,
+            0xFFE84A,
             0x4CFF64,
-            0xFFE84A
+            0x28D7FF,
+            0x3478FF,
+            0xAF52DE,
+            0xFF2BD6
     };
 
     public void submit(
@@ -170,15 +179,39 @@ public final class DiscoBallFixtureRenderer {
             return;
         }
 
-        submitBeam(state, matrices, queue, BEAM_COLORS[0], 0.0F, 0.0F);
-        submitBeam(state, matrices, queue, BEAM_COLORS[1], 180.0F, 0.0F);
-        submitBeam(state, matrices, queue, BEAM_COLORS[2], 90.0F, 0.0F);
-        submitBeam(state, matrices, queue, BEAM_COLORS[3], -90.0F, 0.0F);
+        for (int beam = 0; beam < BEAMS_PER_RING; beam++) {
+            submitBeam(
+                    state,
+                    matrices,
+                    queue,
+                    BEAM_COLORS[beam],
+                    beam * RING_STEP_DEGREES,
+                    0.0F
+            );
+        }
+
+        float openSideTilt =
+                state.isDiscoBaseOnTop()
+                        ? -DIAGONAL_TILT_DEGREES
+                        : DIAGONAL_TILT_DEGREES;
+
+        for (int beam = 0; beam < BEAMS_PER_RING; beam++) {
+            submitBeam(
+                    state,
+                    matrices,
+                    queue,
+                    BEAM_COLORS[(beam + 3) % BEAM_COLORS.length],
+                    DIAGONAL_OFFSET_DEGREES
+                            + beam * RING_STEP_DEGREES,
+                    openSideTilt
+            );
+        }
+
         submitBeam(
                 state,
                 matrices,
                 queue,
-                BEAM_COLORS[4],
+                BEAM_COLORS[2],
                 0.0F,
                 state.isDiscoBaseOnTop() ? -90.0F : 90.0F
         );

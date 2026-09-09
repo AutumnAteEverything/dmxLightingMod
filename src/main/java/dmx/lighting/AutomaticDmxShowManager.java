@@ -52,6 +52,12 @@ public final class AutomaticDmxShowManager {
     private static final int BEATS_PER_SKIN_CHANGE_WINDOW =
             4;
 
+    private static final double FIXTURE_MOVEMENT_HALF_CYCLE_BEATS =
+            4.0D;
+
+    private static final double DISCO_SPIN_HALF_CYCLE_BEATS =
+            24.0D;
+
     private static final long SKIN_RANDOM_SALT =
             0x5EED5A17C0FFEE1L;
 
@@ -232,6 +238,36 @@ public final class AutomaticDmxShowManager {
             FixtureOutput underlyingOutput,
             boolean allowMovement
     ) {
+        return createOutput(
+                level,
+                fixturePosition,
+                underlyingOutput,
+                allowMovement
+                        ? MovementStyle.FIXTURE
+                        : MovementStyle.STATIC
+        );
+    }
+
+    /** Uses a slower bipolar movement wave for disco-ball spin. */
+    public static synchronized FixtureOutput createDiscoBallOutput(
+            Level level,
+            BlockPos fixturePosition,
+            FixtureOutput underlyingOutput
+    ) {
+        return createOutput(
+                level,
+                fixturePosition,
+                underlyingOutput,
+                MovementStyle.DISCO_BALL
+        );
+    }
+
+    private static FixtureOutput createOutput(
+            Level level,
+            BlockPos fixturePosition,
+            FixtureOutput underlyingOutput,
+            MovementStyle movementStyle
+    ) {
         if (level == null
                 || level.isClientSide()) {
 
@@ -253,7 +289,7 @@ public final class AutomaticDmxShowManager {
                     commandPulse,
                     level.getGameTime(),
                     base,
-                    allowMovement
+                    movementStyle
             );
         }
 
@@ -274,7 +310,7 @@ public final class AutomaticDmxShowManager {
         return buildShowOutput(
                 jukebox,
                 base,
-                allowMovement
+                movementStyle
         );
     }
 
@@ -631,13 +667,13 @@ public final class AutomaticDmxShowManager {
     private static FixtureOutput buildShowOutput(
             ActiveJukebox jukebox,
             FixtureOutput base,
-            boolean allowMovement
+            MovementStyle movementStyle
     ) {
         return buildBeatShowOutput(
                 getBeatPosition(jukebox),
                 jukebox.discItemId().hashCode(),
                 base,
-                allowMovement
+                movementStyle
         );
     }
 
@@ -668,7 +704,7 @@ public final class AutomaticDmxShowManager {
             ActiveCommandPulse pulse,
             long currentGameTime,
             FixtureOutput base,
-            boolean allowMovement
+            MovementStyle movementStyle
     ) {
         double elapsedTicks =
                 Math.max(
@@ -693,7 +729,7 @@ public final class AutomaticDmxShowManager {
                 beatPosition,
                 COMMAND_PULSE_PALETTE_SEED,
                 base,
-                allowMovement
+                movementStyle
         );
     }
 
@@ -701,7 +737,7 @@ public final class AutomaticDmxShowManager {
             double beatPosition,
             int paletteSeed,
             FixtureOutput base,
-            boolean allowMovement
+            MovementStyle movementStyle
     ) {
 
         long beatIndex =
@@ -761,11 +797,16 @@ public final class AutomaticDmxShowManager {
         int tilt =
                 base.getTilt();
 
-        if (allowMovement) {
+        if (movementStyle != MovementStyle.STATIC) {
+            double halfCycleBeats =
+                    movementStyle == MovementStyle.DISCO_BALL
+                            ? DISCO_SPIN_HALF_CYCLE_BEATS
+                            : FIXTURE_MOVEMENT_HALF_CYCLE_BEATS;
+
             double movementPhase =
                     beatPosition
                             * Math.PI
-                            / 4.0D;
+                            / halfCycleBeats;
 
             pan =
                     clampDmx(
@@ -778,18 +819,20 @@ public final class AutomaticDmxShowManager {
                             )
                     );
 
-            tilt =
-                    clampDmx(
-                            (int) Math.round(
-                                    128.0D
-                                            + 56.0D
-                                            * Math.sin(
-                                                    movementPhase
-                                                            * 2.0D
-                                                            + Math.PI / 2.0D
-                                            )
-                            )
-                    );
+            if (movementStyle == MovementStyle.FIXTURE) {
+                tilt =
+                        clampDmx(
+                                (int) Math.round(
+                                        128.0D
+                                                + 56.0D
+                                                * Math.sin(
+                                                        movementPhase
+                                                                * 2.0D
+                                                                + Math.PI / 2.0D
+                                                )
+                                )
+                        );
+            }
         }
 
         FixtureOutput output =
@@ -988,6 +1031,12 @@ public final class AutomaticDmxShowManager {
             double offsetSeconds,
             boolean steadyBeat
     ) {
+    }
+
+    private enum MovementStyle {
+        STATIC,
+        FIXTURE,
+        DISCO_BALL
     }
 
     private record ActiveJukebox(

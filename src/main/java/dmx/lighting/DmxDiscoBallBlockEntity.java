@@ -71,6 +71,17 @@ public final class DmxDiscoBallBlockEntity
         getIdentity().setFixtureProfile(DmxDiscoBallProfile.ID);
     }
 
+    @Override
+    protected FixtureOutput createAutomaticDmxOutput(
+            FixtureOutput underlyingOutput
+    ) {
+        return AutomaticDmxShowManager.createDiscoBallOutput(
+                level,
+                worldPosition,
+                underlyingOutput
+        );
+    }
+
     /** Returns a useful white intensity swatch for the console row. */
     @Override
     public int getOutputPackedRgb() {

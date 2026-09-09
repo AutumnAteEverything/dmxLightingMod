@@ -38,7 +38,7 @@ The server owns saved fixture configuration and authoritative output. Client scr
 | Identity/grouping | `FixtureIdentity`, `FixtureGroupName`, `DmxFixtureRegistry` | Names, groups, profiles, and loaded-fixture discovery |
 | Fixture types | `DmxFixtureProfileRegistry`, `RgbParProfile`, `StaticSpotProfile` | Selects supported visual fixture models and compatibility aliases |
 | Pixel block | `DmxPixelBlock`, `DmxPixelBlockEntity` | RGB/dimmer/strobe surface, sixteen skins, and DMX skin selection |
-| Disco ball | `DmxDiscoBallBlock`, `DmxDiscoBallBlockEntity` | Two-channel dimmer and bipolar spin fixture with a custom five-beam renderer |
+| Disco ball | `DmxDiscoBallBlock`, `DmxDiscoBallBlockEntity` | Two-channel dimmer and bipolar spin fixture with a custom seventeen-beam renderer |
 | Block display | `DmxBlockDisplayEntity`, `DmxBlockDisplayRegistry` | Transformable, summonable pixel surfaces with entity persistence and console discovery |
 | DMX mobs | `DmxParrotEntity`, `DmxEndermanEntity`, `DmxWardenEntity`, `DmxNautilusEntity`, `DmxCreakingEntity`, `DmxAxolotlEntity`, `DmxMobFixtureRegistry` | Moving RGB/dimmer fixtures, persistence, loaded-entity discovery, and automatic-show output |
 | Console | `LightingConsole`, `LightingConsoleScreen`, console payload handlers | Browser summaries, patch analysis, and targeted output |

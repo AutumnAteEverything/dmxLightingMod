@@ -1279,11 +1279,8 @@ public class DmxFixtureBlockEntity extends BlockEntity {
 
     private void refreshAutomaticDmxOutput() {
         FixtureOutput showOutput =
-                AutomaticDmxShowManager.createOutput(
-                        level,
-                        worldPosition,
-                        fixtureState.copyActiveOutput(),
-                        !(this instanceof DmxPixelBlockEntity)
+                createAutomaticDmxOutput(
+                        fixtureState.copyActiveOutput()
                 );
 
         boolean showActive =
@@ -1308,6 +1305,17 @@ public class DmxFixtureBlockEntity extends BlockEntity {
         }
 
         setChanged();
+    }
+
+    protected FixtureOutput createAutomaticDmxOutput(
+            FixtureOutput underlyingOutput
+    ) {
+        return AutomaticDmxShowManager.createOutput(
+                level,
+                worldPosition,
+                underlyingOutput,
+                !(this instanceof DmxPixelBlockEntity)
+        );
     }
 
     public FixtureOutput readParameterMappedDmxOutput() {

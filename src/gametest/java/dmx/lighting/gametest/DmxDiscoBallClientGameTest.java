@@ -2,7 +2,9 @@ package dmx.lighting.gametest;
 
 import dmx.lighting.DmxDiscoBallBlockEntity;
 import dmx.lighting.DmxPixelBlockEntity;
+import dmx.lighting.AutomaticDmxShowManager;
 import dmx.lighting.FixtureParameterMap;
+import dmx.lighting.FixtureOutput;
 import dmx.lighting.ModBlocks;
 
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -40,6 +42,7 @@ public final class DmxDiscoBallClientGameTest
 
             singleplayer.getServer().runOnServer(server -> {
                 ServerLevel level = server.overworld();
+                assertAutomaticSpinTiming(level);
                 level.setBlockAndUpdate(
                         discoPosition,
                         ModBlocks.DMX_DISCO_BALL.defaultBlockState()
@@ -155,6 +158,53 @@ public final class DmxDiscoBallClientGameTest
             if (!baseOnTop) {
                 throw new AssertionError("Top mount did not sync.");
             }
+        }
+    }
+
+    private static void assertAutomaticSpinTiming(ServerLevel level) {
+        AutomaticDmxShowManager.stopCommandPulse(level);
+        AutomaticDmxShowManager.triggerCommandPulse(level);
+        AutomaticDmxShowManager.triggerCommandPulse(level);
+
+        int firstDirection = AutomaticDmxShowManager
+                .createDiscoBallOutput(
+                        level,
+                        BlockPos.ZERO,
+                        FixtureOutput.BLACKOUT
+                )
+                .getPan();
+
+        for (int pulse = 2; pulse < 24; pulse++) {
+            AutomaticDmxShowManager.triggerCommandPulse(level);
+        }
+
+        int sameDirection = AutomaticDmxShowManager
+                .createDiscoBallOutput(
+                        level,
+                        BlockPos.ZERO,
+                        FixtureOutput.BLACKOUT
+                )
+                .getPan();
+
+        AutomaticDmxShowManager.triggerCommandPulse(level);
+        AutomaticDmxShowManager.triggerCommandPulse(level);
+
+        int reversedDirection = AutomaticDmxShowManager
+                .createDiscoBallOutput(
+                        level,
+                        BlockPos.ZERO,
+                        FixtureOutput.BLACKOUT
+                )
+                .getPan();
+
+        AutomaticDmxShowManager.stopCommandPulse(level);
+
+        if (firstDirection <= 128
+                || sameDirection <= 128
+                || reversedDirection >= 128) {
+            throw new AssertionError(
+                    "Automatic disco spin did not keep its direction for 24 beats."
+            );
         }
     }
 
