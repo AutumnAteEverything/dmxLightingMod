@@ -19,8 +19,8 @@ folder around the files when repackaging it.
 - `textures/block/dmx_pixel_block1.png` through
   `dmx_pixel_block16.png` are the sixteen selectable placed-block skins.
 
-Skin 16 currently repeats Skin 15 as a placeholder and can be replaced with a
-distinct image while keeping its filename.
+The supplied white design is included as Skin 16. The base-named
+`dmx_pixel_block.png` remains the inventory icon and base block texture.
 
 The selectable skins are drawn as full-bright surfaces and multiplied by the
 block's current DMX color and dimmer value. White pixels reproduce the DMX

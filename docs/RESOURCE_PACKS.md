@@ -81,4 +81,4 @@ The generic discs have a one-hour playback ceiling because the server cannot ins
 
 Resource packs do not change BPM profiles, channel mappings, saved fixture data, commands, or control behavior.
 
-Skin 16 currently duplicates the bundled Skin 15 artwork as a temporary placeholder. Resource packs can replace `dmx_pixel_block16.png` independently now, and a distinct default can be added without another code change.
+The supplied white artwork is bundled as selectable Skin 16 at `dmx_pixel_block16.png`. The base-named `dmx_pixel_block.png` remains the inventory and baked-block texture.

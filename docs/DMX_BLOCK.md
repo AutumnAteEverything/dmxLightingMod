@@ -39,7 +39,7 @@ assets/dmxlighting/textures/block/dmx_pixel_block2.png
 assets/dmxlighting/textures/block/dmx_pixel_block16.png
 ```
 
-`dmx_pixel_block.png` remains the base baked-block texture. See [Resource packs and textures](RESOURCE_PACKS.md) for customization.
+The supplied white design is Skin 16. `dmx_pixel_block.png` remains the base baked-block texture. See [Resource packs and textures](RESOURCE_PACKS.md) for customization.
 
 During a jukebox Automatic DMX show, each DMX Block and DMX Block Display independently changes to a temporary skin on one randomly selected beat in every four-beat phrase. Ejecting the disc immediately restores the configured or DMX-controlled skin. Command-driven `/dmxPulse` shows do not change skins.
 
