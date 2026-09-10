@@ -44,6 +44,7 @@ public final class DmxDiscoBallClientGameTest
 
             singleplayer.getServer().runOnServer(server -> {
                 ServerLevel level = server.overworld();
+                assertAutomaticFixtureMovementStartsAtBase(level);
                 assertAutomaticSpinTiming(level);
                 buildProjectionWall(level);
                 level.setBlockAndUpdate(
@@ -193,6 +194,59 @@ public final class DmxDiscoBallClientGameTest
             if (!baseOnTop) {
                 throw new AssertionError("Top mount did not sync.");
             }
+        }
+    }
+
+    private static void assertAutomaticFixtureMovementStartsAtBase(
+            ServerLevel level
+    ) {
+        FixtureOutput base = new FixtureOutput(
+                0,
+                0,
+                0,
+                0,
+                0,
+                255,
+                64,
+                80,
+                0,
+                0,
+                0
+        );
+
+        AutomaticDmxShowManager.stopCommandPulse(level);
+        AutomaticDmxShowManager.triggerCommandPulse(level);
+
+        FixtureOutput initial = AutomaticDmxShowManager.createOutput(
+                level,
+                BlockPos.ZERO,
+                base,
+                true
+        );
+
+        if (initial == null
+                || initial.getPan() != base.getPan()
+                || initial.getTilt() != base.getTilt()) {
+            throw new AssertionError(
+                    "Automatic fixture movement did not start at its base position."
+            );
+        }
+
+        AutomaticDmxShowManager.triggerCommandPulse(level);
+        FixtureOutput moving = AutomaticDmxShowManager.createOutput(
+                level,
+                BlockPos.ZERO,
+                base,
+                true
+        );
+        AutomaticDmxShowManager.stopCommandPulse(level);
+
+        if (moving == null
+                || moving.getPan() <= base.getPan()
+                || moving.getTilt() <= base.getTilt()) {
+            throw new AssertionError(
+                    "Automatic fixture movement did not sweep from its base position."
+            );
         }
     }
 

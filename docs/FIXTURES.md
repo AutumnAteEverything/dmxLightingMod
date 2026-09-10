@@ -57,6 +57,8 @@ Mount Pan and Mount Tilt describe how the fixture was installed. Pan Offset and 
 
 For live pan and tilt, DMX value 128 represents zero offset. Values below and above 128 move in opposite directions.
 
+During jukebox and `/dmxPulse` shows, Automatic DMX starts each ordinary fixture at its current underlying pan and tilt values and sweeps relative to them. This preserves the fixture's pre-show aim instead of forcing every fixture to begin at the same live offset.
+
 ### Pan/tilt interpolation
 
 The **Smooth** control enables optional pan/tilt interpolation. The adjacent time field specifies how long, from 0.05 to 60 seconds, a move should take. With smoothing off, pan and tilt jump immediately to their new values.

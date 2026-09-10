@@ -8,7 +8,7 @@ While a record is playing, every loaded DMX fixture, DMX Block, DMX Block Displa
 
 - All DMX fixtures and mobs receive saturated color changes every two beats.
 - Brightness pulses on every beat, with a stronger pulse at the start of each four-beat show phrase.
-- Fixture blocks receive smooth pan and tilt sweeps.
+- Fixture blocks receive smooth pan and tilt sweeps that begin from their underlying pre-show pan and tilt positions.
 - Each DMX Block and DMX Block Display independently changes skin on one randomly selected beat per four-beat phrase.
 - DMX Blocks, DMX Block Displays, and DMX mobs keep their normal physical behavior and use only the color and brightness part of the show.
 
@@ -31,6 +31,8 @@ A command-pulse show takes temporary priority over a jukebox show in the same di
 ## DMX safety
 
 Automatic DMX is a temporary output layer. It does not write into the in-game DMX universes and does not replace a fixture's saved DMX or manual values. Jukebox skin changes likewise do not replace the saved skin or skin-channel assignment. Commands, console output, and external automation can continue changing DMX while a record is playing. When playback stops, those underlying values and skins become visible again.
+
+Fixture movement is also relative to the underlying output. When a jukebox or `/dmxPulse` show begins at its first beat, each ordinary fixture starts from its existing pan and tilt rather than jumping to a shared center position. The temporary sweep is added to those starting values and kept within the standard 0-255 DMX range.
 
 ## Testing
 

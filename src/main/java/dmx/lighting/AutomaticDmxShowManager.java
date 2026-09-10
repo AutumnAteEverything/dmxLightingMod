@@ -797,17 +797,10 @@ public final class AutomaticDmxShowManager {
         int tilt =
                 base.getTilt();
 
-        if (movementStyle != MovementStyle.STATIC) {
-            double halfCycleBeats =
-                    movementStyle == MovementStyle.DISCO_BALL
-                            ? DISCO_SPIN_HALF_CYCLE_BEATS
-                            : FIXTURE_MOVEMENT_HALF_CYCLE_BEATS;
-
-            double movementPhase =
-                    beatPosition
-                            * Math.PI
-                            / halfCycleBeats;
-
+        if (movementStyle == MovementStyle.DISCO_BALL) {
+            double movementPhase = beatPosition
+                    * Math.PI
+                    / DISCO_SPIN_HALF_CYCLE_BEATS;
             pan =
                     clampDmx(
                             (int) Math.round(
@@ -818,21 +811,19 @@ public final class AutomaticDmxShowManager {
                                             )
                             )
                     );
+        } else if (movementStyle == MovementStyle.FIXTURE) {
+            double movementPhase = beatPosition
+                    * Math.PI
+                    / FIXTURE_MOVEMENT_HALF_CYCLE_BEATS;
 
-            if (movementStyle == MovementStyle.FIXTURE) {
-                tilt =
-                        clampDmx(
-                                (int) Math.round(
-                                        128.0D
-                                                + 56.0D
-                                                * Math.sin(
-                                                        movementPhase
-                                                                * 2.0D
-                                                                + Math.PI / 2.0D
-                                                )
-                                )
-                        );
-            }
+            pan = applyMovementOffset(
+                    base.getPan(),
+                    96.0D * Math.sin(movementPhase)
+            );
+            tilt = applyMovementOffset(
+                    base.getTilt(),
+                    56.0D * Math.sin(movementPhase * 2.0D)
+            );
         }
 
         FixtureOutput output =
@@ -1023,6 +1014,15 @@ public final class AutomaticDmxShowManager {
                 value,
                 FixtureOutput.MIN_VALUE,
                 FixtureOutput.MAX_VALUE
+        );
+    }
+
+    private static int applyMovementOffset(
+            int initialValue,
+            double offset
+    ) {
+        return clampDmx(
+                (int) Math.round(initialValue + offset)
         );
     }
 
