@@ -232,20 +232,52 @@ public final class DmxDiscoBallClientGameTest
             );
         }
 
+        BlockPos secondFixturePosition = new BlockPos(11, 4, -7);
+        FixtureOutput secondInitial = AutomaticDmxShowManager.createOutput(
+                level,
+                secondFixturePosition,
+                base,
+                true
+        );
+
+        if (secondInitial == null
+                || secondInitial.getPan() != base.getPan()
+                || secondInitial.getTilt() != base.getTilt()) {
+            throw new AssertionError(
+                    "Independent movement did not preserve the second fixture start."
+            );
+        }
+
         AutomaticDmxShowManager.triggerCommandPulse(level);
-        FixtureOutput moving = AutomaticDmxShowManager.createOutput(
+        FixtureOutput firstMoving = AutomaticDmxShowManager.createOutput(
                 level,
                 BlockPos.ZERO,
                 base,
                 true
         );
+        FixtureOutput secondMoving = AutomaticDmxShowManager.createOutput(
+                level,
+                secondFixturePosition,
+                base,
+                true
+        );
         AutomaticDmxShowManager.stopCommandPulse(level);
 
-        if (moving == null
-                || moving.getPan() <= base.getPan()
-                || moving.getTilt() <= base.getTilt()) {
+        if (firstMoving == null
+                || secondMoving == null
+                || firstMoving.getPan() == base.getPan()
+                        && firstMoving.getTilt() == base.getTilt()
+                || secondMoving.getPan() == base.getPan()
+                        && secondMoving.getTilt() == base.getTilt()) {
             throw new AssertionError(
                     "Automatic fixture movement did not sweep from its base position."
+            );
+        }
+
+        if (firstMoving.getPan() == secondMoving.getPan()
+                && firstMoving.getTilt() == secondMoving.getTilt()) {
+            throw new AssertionError(
+                    "Separate fixtures received identical movement phases."
             );
         }
     }

@@ -55,6 +55,12 @@ public final class AutomaticDmxShowManager {
     private static final double FIXTURE_MOVEMENT_HALF_CYCLE_BEATS =
             4.0D;
 
+    private static final long FIXTURE_PAN_PHASE_SALT =
+            0x50414E5F50484153L;
+
+    private static final long FIXTURE_TILT_PHASE_SALT =
+            0x54494C5450484153L;
+
     private static final double DISCO_SPIN_HALF_CYCLE_BEATS =
             24.0D;
 
@@ -288,6 +294,7 @@ public final class AutomaticDmxShowManager {
             return buildCommandPulseOutput(
                     commandPulse,
                     level.getGameTime(),
+                    fixturePosition,
                     base,
                     movementStyle
             );
@@ -309,6 +316,7 @@ public final class AutomaticDmxShowManager {
 
         return buildShowOutput(
                 jukebox,
+                fixturePosition,
                 base,
                 movementStyle
         );
@@ -666,12 +674,14 @@ public final class AutomaticDmxShowManager {
 
     private static FixtureOutput buildShowOutput(
             ActiveJukebox jukebox,
+            BlockPos fixturePosition,
             FixtureOutput base,
             MovementStyle movementStyle
     ) {
         return buildBeatShowOutput(
                 getBeatPosition(jukebox),
                 jukebox.discItemId().hashCode(),
+                fixturePosition,
                 base,
                 movementStyle
         );
@@ -703,6 +713,7 @@ public final class AutomaticDmxShowManager {
     private static FixtureOutput buildCommandPulseOutput(
             ActiveCommandPulse pulse,
             long currentGameTime,
+            BlockPos fixturePosition,
             FixtureOutput base,
             MovementStyle movementStyle
     ) {
@@ -728,6 +739,7 @@ public final class AutomaticDmxShowManager {
         return buildBeatShowOutput(
                 beatPosition,
                 COMMAND_PULSE_PALETTE_SEED,
+                fixturePosition,
                 base,
                 movementStyle
         );
@@ -736,6 +748,7 @@ public final class AutomaticDmxShowManager {
     private static FixtureOutput buildBeatShowOutput(
             double beatPosition,
             int paletteSeed,
+            BlockPos fixturePosition,
             FixtureOutput base,
             MovementStyle movementStyle
     ) {
@@ -815,14 +828,27 @@ public final class AutomaticDmxShowManager {
             double movementPhase = beatPosition
                     * Math.PI
                     / FIXTURE_MOVEMENT_HALF_CYCLE_BEATS;
+            double movementBlend = getMovementStartBlend(beatPosition);
+            double panPhase = getFixtureMovementPhase(
+                    fixturePosition,
+                    FIXTURE_PAN_PHASE_SALT
+            );
+            double tiltPhase = getFixtureMovementPhase(
+                    fixturePosition,
+                    FIXTURE_TILT_PHASE_SALT
+            );
 
             pan = applyMovementOffset(
                     base.getPan(),
-                    96.0D * Math.sin(movementPhase)
+                    96.0D
+                            * movementBlend
+                            * Math.sin(movementPhase + panPhase)
             );
             tilt = applyMovementOffset(
                     base.getTilt(),
-                    56.0D * Math.sin(movementPhase * 2.0D)
+                    56.0D
+                            * movementBlend
+                            * Math.sin(movementPhase * 2.0D + tiltPhase)
             );
         }
 
@@ -1024,6 +1050,28 @@ public final class AutomaticDmxShowManager {
         return clampDmx(
                 (int) Math.round(initialValue + offset)
         );
+    }
+
+    private static double getMovementStartBlend(double beatPosition) {
+        double progress = Math.clamp(beatPosition, 0.0D, 1.0D);
+        return progress * progress * (3.0D - 2.0D * progress);
+    }
+
+    private static double getFixtureMovementPhase(
+            BlockPos fixturePosition,
+            long salt
+    ) {
+        BlockPos position = fixturePosition == null
+                ? BlockPos.ZERO
+                : fixturePosition;
+        long positionSeed = position.getX() * 3129871L
+                ^ position.getY() * 42317861L
+                ^ position.getZ() * 116129781L;
+        long phaseStep = Math.floorMod(
+                mix64(positionSeed ^ salt),
+                3600L
+        );
+        return phaseStep * Math.PI * 2.0D / 3600.0D;
     }
 
     private record DiscBeatProfile(

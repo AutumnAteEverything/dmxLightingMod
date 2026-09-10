@@ -27,7 +27,7 @@ All notable changes to dmxLighting are documented here. This project follows a s
 
 ### Changed
 
-- Automatic DMX pan and tilt movement now begins from each ordinary fixture's underlying pre-show position and sweeps relative to it.
+- Automatic DMX pan and tilt movement now begins from each ordinary fixture's underlying pre-show position, eases in over the first beat, and uses stable position-based phases so fixtures move independently.
 - Disco Ball Beam mode now uses a dark charcoal checkerboard body while Dots mode retains the bright silver mirrored checkerboard.
 - Disco Ball beam mode no longer has a straight vertical beam and adds four shallower angled beams; Automatic DMX spin reversals remain approximately 24 beats apart.
 - `/dmxsend` accepts any valid number of consecutive DMX values instead of a fixed four-value footprint.
