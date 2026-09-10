@@ -79,14 +79,14 @@ For a DMX Block patched to channels 101-105 as red, green, blue, dimmer, and ski
 
 That makes the block bright red and selects skin 9.
 
-Place and test a DMX Disco Ball using its default Dimmer and Spin Rate channels:
+Place and test a DMX Disco Ball using its default Dimmer, Spin Rate, and Effect Mode channels:
 
 ```mcfunction
 /setblock ~ ~ ~ dmxlighting:dmx_disco_ball
-/dmxsend 1 1 255 128
+/dmxsend 1 1 255 128 0
 ```
 
-Change the final value to `0` for maximum reverse spin or `255` for maximum forward spin.
+The second value controls spin (`0` reverse, `128` stopped, `255` forward). The final value selects Beams at `0-127` or Dots at `128-255`.
 
 Summon a transformable DMX Block Display with RGB, dimmer, and strobe on channels 101-105:
 
@@ -103,7 +103,7 @@ It appears in the Lighting Console and supports Minecraft's normal display-entit
 | DMX Fixture | `dmxlighting:dmx_block` | Functional Blocks | Configurable PAR/Spotlight fixture with movement, beam, and light controls |
 | DMX Block | `dmxlighting:dmx_pixel_block` | Functional Blocks | Emissive RGB surface with dimmer, strobe, and sixteen skins; emits no world light |
 | DMX Block Display | `dmxlighting:dmx_block_display` | Summon command | Transformable emissive DMX Block visual with console registration and no world light |
-| DMX Disco Ball | `dmxlighting:dmx_disco_ball` | Functional Blocks | Cubic five-beam effect with Dimmer and bipolar Spin Rate controls |
+| DMX Disco Ball | `dmxlighting:dmx_disco_ball` | Functional Blocks | Cubic twenty-beam or projected-dot effect with Dimmer, bipolar Spin Rate, and Effect Mode controls |
 | Lighting Console | `dmxlighting:lighting_console` | Tools & Utilities | Portable browser, patch view, and live control surface |
 | DMX Parrot Spawn Egg | `dmxlighting:dmx_parrot_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable parrot mob that appears in the console |
 | DMX Enderman Spawn Egg | `dmxlighting:dmx_enderman_spawn_egg` | Tools & Utilities | Spawns a DMX-addressable Enderman mob that appears in the console |

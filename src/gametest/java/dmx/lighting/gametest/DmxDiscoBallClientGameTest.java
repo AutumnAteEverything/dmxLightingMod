@@ -62,6 +62,7 @@ public final class DmxDiscoBallClientGameTest
                 FixtureParameterMap map = disco.getParameterMap();
                 map.setDimmerChannel(11);
                 map.setPanChannel(12);
+                map.setStrobeChannel(13);
                 disco.setInstallation(45.0F, false);
 
                 DmxPixelBlockEntity pixel = findPixel(
@@ -72,7 +73,7 @@ public final class DmxDiscoBallClientGameTest
             });
 
             singleplayer.getServer().runCommand(
-                    "dmxsend 1 11 255 128"
+                    "dmxsend 1 11 255 128 0"
             );
             singleplayer.getServer().runCommand(
                     "dmxsend 1 20 255"
@@ -123,9 +124,8 @@ public final class DmxDiscoBallClientGameTest
             Path screenshot = context.takeScreenshot("dmx-disco-ball");
             assertPrismaticBeams(screenshot);
 
-            singleplayer.getServer().runOnServer(server ->
-                    findDisco(server.overworld(), discoPosition)
-                            .setEffectMode(DmxDiscoBallEffectMode.DOTS)
+            singleplayer.getServer().runCommand(
+                    "dmxsend 1 13 255"
             );
             context.waitTicks(5);
 
@@ -135,14 +135,19 @@ public final class DmxDiscoBallClientGameTest
                         discoPosition
                 );
                 return new int[] {
-                        disco.getEffectMode()
+                        disco.getResolvedEffectMode()
                                 == DmxDiscoBallEffectMode.DOTS ? 1 : 0,
-                        disco.getActiveDimmer()
+                        disco.getActiveDimmer(),
+                        disco.getDmxStrobe()
                 };
             });
 
-            if (dotsState[0] != 1 || dotsState[1] != 255) {
-                throw new AssertionError("Projected-dot mode did not sync.");
+            if (dotsState[0] != 1
+                    || dotsState[1] != 255
+                    || dotsState[2] != 255) {
+                throw new AssertionError(
+                        "DMX effect channel did not select projected dots."
+                );
             }
 
             Path dotsScreenshot = context.takeScreenshot(

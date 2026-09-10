@@ -39,16 +39,17 @@ Command-pulse shows remain available when `/automaticdmx off` has disabled jukeb
 
 ### DMX Disco Ball quick test
 
-The DMX Disco Ball defaults to Dimmer on channel 1 and bipolar Spin Rate on channel 2:
+The DMX Disco Ball defaults to Dimmer on channel 1, bipolar Spin Rate on channel 2, and Effect Mode on channel 3:
 
 ```mcfunction
 /setblock ~ ~ ~ dmxlighting:dmx_disco_ball
-/dmxsend 1 1 255 128
-/dmxsend 1 1 255 255
-/dmxsend 1 1 255 0
+/dmxsend 1 1 255 128 0
+/dmxsend 1 1 255 255 0
+/dmxsend 1 1 255 0 0
+/dmx 1 3 255
 ```
 
-Spin Rate `128` is stopped, lower values spin in reverse, and higher values spin forward. Use the fixture's editor to change channels, initial angle, or top/bottom mounting.
+Spin Rate `128` is stopped, lower values spin in reverse, and higher values spin forward. Effect Mode values `0-127` select Beams and `128-255` select Dots. Use the fixture's editor to change channels, initial angle, or top/bottom mounting.
 
 ### `/dmx`
 

@@ -49,7 +49,7 @@ public class DmxValueSlider extends AbstractSliderButton {
      * -----------------------------------------------------------------
      */
 
-    private final String label;
+    private String label;
 
     private final IntConsumer changeListener;
 
@@ -125,6 +125,12 @@ public class DmxValueSlider extends AbstractSliderButton {
                                 * 255.0D
                 )
         );
+    }
+
+    /** Changes the displayed label without firing the value listener. */
+    public void setLabel(String label) {
+        this.label = label == null ? "" : label;
+        updateMessage();
     }
 
     /**

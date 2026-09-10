@@ -6,7 +6,7 @@ All notable changes to dmxLighting are documented here. This project follows a s
 
 ### Added
 
-- DMX Disco Ball fixture with a cubic mirrored body, twenty colored beams, a surface-projected Dots mode, stationary top/bottom mounting, initial-angle control, Dimmer, and bipolar Spin Rate with 128 stopped.
+- DMX Disco Ball fixture with a cubic mirrored body, twenty colored beams, a surface-projected Dots mode, stationary top/bottom mounting, initial-angle control, Dimmer, bipolar Spin Rate with 128 stopped, and a third DMX channel for effect selection.
 - DMX Block skins 6-16 for placed blocks and Block Displays, including the new resource-pack slots and exact sixteen-way DMX selection ranges.
 
 - DMX Creaking mob with standalone spawning, vanilla movement/aggression, RGB/dimmer patching, console editing, color fades, emissive rendering, and automatic-show support.

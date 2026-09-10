@@ -1,6 +1,6 @@
 package dmx.lighting;
 
-/** Two-channel profile for the cubic DMX Disco Ball. */
+/** Three-channel profile for the cubic DMX Disco Ball. */
 public final class DmxDiscoBallProfile
         extends AbstractFixtureProfile {
 
@@ -21,12 +21,12 @@ public final class DmxDiscoBallProfile
                         true,
                         false,
                         false,
-                        false,
+                        true,
                         false,
                         false
                 ),
                 new FixtureChannelLayout(
-                        2,
+                        3,
                         0,
                         -1,
                         -1,
@@ -35,7 +35,7 @@ public final class DmxDiscoBallProfile
                         1,
                         -1,
                         -1,
-                        -1,
+                        2,
                         -1
                 )
         );

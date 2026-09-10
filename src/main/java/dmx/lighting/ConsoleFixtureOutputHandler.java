@@ -1112,6 +1112,15 @@ public final class ConsoleFixtureOutputHandler {
                             payload.strobe()
                     );
 
+            if (fixture instanceof DmxDiscoBallBlockEntity discoBall) {
+                DmxDiscoBallEffectMode mode =
+                        DmxDiscoBallEffectMode.fromDmxValue(value);
+                if (discoBall.getEffectMode() != mode) {
+                    discoBall.setEffectMode(mode);
+                    changed = true;
+                }
+            }
+
             if (manualOutput.getStrobe()
                     != value) {
 

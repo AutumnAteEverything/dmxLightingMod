@@ -1405,6 +1405,12 @@ public class LightingConsoleScreen extends Screen {
                 dmxMobFixtureTarget
                         || dmxBlockDisplayTarget;
 
+        if (outputStrobeSlider != null) {
+            outputStrobeSlider.setLabel(
+                    dmxDiscoBallTarget ? "Effect Mode" : "Strobe"
+            );
+        }
+
         setWidgetVisible(
                 outputFixtureTargetButton,
                 visible
@@ -1485,7 +1491,6 @@ public class LightingConsoleScreen extends Screen {
                 outputStrobeSlider,
                 visible
                         && !dmxMobFixtureTarget
-                        && !dmxDiscoBallTarget
         );
 
         setWidgetVisible(
@@ -1695,7 +1700,8 @@ public class LightingConsoleScreen extends Screen {
                 outputTarget
         )) {
             return ConsoleFixtureOutputPayload.APPLY_DIMMER
-                    | ConsoleFixtureOutputPayload.APPLY_PAN;
+                    | ConsoleFixtureOutputPayload.APPLY_PAN
+                    | ConsoleFixtureOutputPayload.APPLY_STROBE;
         }
 
         if (isSelectedDmxBlockDisplay()

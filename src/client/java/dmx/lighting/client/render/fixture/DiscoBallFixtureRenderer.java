@@ -71,9 +71,11 @@ public final class DiscoBallFixtureRenderer {
             DmxDiscoBallBlockEntity fixture,
             DmxFixtureRenderState state
     ) {
-        state.setDiscoEffectMode(fixture.getEffectMode());
+        DmxDiscoBallEffectMode effectMode =
+                fixture.getResolvedEffectMode();
+        state.setDiscoEffectMode(effectMode);
 
-        if (fixture.getEffectMode() != DmxDiscoBallEffectMode.DOTS
+        if (effectMode != DmxDiscoBallEffectMode.DOTS
                 || state.getDimmer() <= 0
                 || fixture.getLevel() == null) {
             state.clearDiscoSpots();

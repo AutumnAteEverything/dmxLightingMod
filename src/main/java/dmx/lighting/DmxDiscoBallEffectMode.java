@@ -15,6 +15,10 @@ public enum DmxDiscoBallEffectMode {
         return serializedName;
     }
 
+    public static DmxDiscoBallEffectMode fromDmxValue(int value) {
+        return value >= 128 ? DOTS : BEAMS;
+    }
+
     public static DmxDiscoBallEffectMode fromSerializedName(
             String serializedName
     ) {

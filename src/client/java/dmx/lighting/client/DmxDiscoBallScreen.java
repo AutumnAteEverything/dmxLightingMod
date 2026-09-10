@@ -26,11 +26,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-/** Focused two-channel editor for a DMX Disco Ball. */
+/** Focused three-channel editor for a DMX Disco Ball. */
 public final class DmxDiscoBallScreen extends Screen {
 
     private static final int FIELD_HEIGHT = 20;
-    private static final int ROW_SPACING = 24;
+    private static final int ROW_SPACING = 22;
 
     private final BlockPos fixturePosition;
 
@@ -39,6 +39,7 @@ public final class DmxDiscoBallScreen extends Screen {
     private EditBox groupField;
     private EditBox dimmerChannelField;
     private EditBox spinChannelField;
+    private EditBox effectChannelField;
 
     private DmxValueSlider manualDimmerSlider;
     private DmxValueSlider manualSpinSlider;
@@ -67,7 +68,7 @@ public final class DmxDiscoBallScreen extends Screen {
         int left = width / 2 - 220;
         int right = width / 2 + 20;
         int fieldX = left + 76;
-        int top = 42;
+        int top = 34;
 
         if (fixture != null) {
             baseOnTop = fixture.isBaseOnTop();
@@ -117,11 +118,19 @@ public final class DmxDiscoBallScreen extends Screen {
                         : fixture.getParameterMap().getPanChannel(),
                 "Spin rate DMX channel"
         );
+        effectChannelField = createChannelField(
+                fieldX,
+                top + ROW_SPACING * 5,
+                fixture == null
+                        ? 3
+                        : fixture.getParameterMap().getStrobeChannel(),
+                "Effect mode DMX channel"
+        );
 
         initialAngleSlider = addRenderableWidget(
                 new DmxAngleSlider(
                         left,
-                        top + ROW_SPACING * 5 + 6,
+                        top + ROW_SPACING * 6 + 6,
                         220,
                         FIELD_HEIGHT,
                         "Initial angle",
@@ -142,7 +151,7 @@ public final class DmxDiscoBallScreen extends Screen {
                         }
                 ).bounds(
                         left,
-                        top + ROW_SPACING * 6 + 6,
+                        top + ROW_SPACING * 7 + 6,
                         220,
                         FIELD_HEIGHT
                 ).build()
@@ -219,7 +228,7 @@ public final class DmxDiscoBallScreen extends Screen {
                 ).build()
         );
 
-        int bottom = Math.max(top + ROW_SPACING * 6 + 6, height - 48);
+        int bottom = Math.max(top + ROW_SPACING * 7 + 6, height - 48);
         addRenderableWidget(
                 Button.builder(
                         Component.literal("Save"),
@@ -323,6 +332,7 @@ public final class DmxDiscoBallScreen extends Screen {
         Integer universe = parseInteger(universeField.getValue());
         Integer dimmerChannel = parseChannel(dimmerChannelField);
         Integer spinChannel = parseChannel(spinChannelField);
+        Integer effectChannel = parseChannel(effectChannelField);
 
         if (universe == null
                 || universe < DmxFixtureBlockEntity.MIN_UNIVERSE
@@ -331,7 +341,9 @@ public final class DmxDiscoBallScreen extends Screen {
             return false;
         }
 
-        if (dimmerChannel == null || spinChannel == null) {
+        if (dimmerChannel == null
+                || spinChannel == null
+                || effectChannel == null) {
             setError("Channels must be blank or 1-512.");
             return false;
         }
@@ -374,7 +386,7 @@ public final class DmxDiscoBallScreen extends Screen {
                         FixtureParameterMap.UNASSIGNED,
                         FixtureParameterMap.UNASSIGNED,
                         FixtureParameterMap.UNASSIGNED,
-                        FixtureParameterMap.UNASSIGNED
+                        effectChannel
                 )
         );
         ClientPlayNetworking.send(
@@ -403,7 +415,7 @@ public final class DmxDiscoBallScreen extends Screen {
                         128,
                         0,
                         0,
-                        0
+                        effectMode == DmxDiscoBallEffectMode.DOTS ? 255 : 0
                 )
         );
         ClientPlayNetworking.send(
@@ -468,7 +480,7 @@ public final class DmxDiscoBallScreen extends Screen {
 
         int centerX = width / 2;
         int left = centerX - 220;
-        int top = 42;
+        int top = 34;
 
         graphics.centeredText(font, title, centerX, 18, 0xFFFFFFFF);
 
@@ -477,7 +489,8 @@ public final class DmxDiscoBallScreen extends Screen {
                 "Universe",
                 "Group",
                 "Dimmer",
-                "Spin Rate"
+                "Spin Rate",
+                "Effect Mode"
         };
 
         for (int index = 0; index < labels.length; index++) {

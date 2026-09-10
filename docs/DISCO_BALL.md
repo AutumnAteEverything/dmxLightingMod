@@ -1,6 +1,6 @@
 # DMX Disco Ball
 
-The DMX Disco Ball is a cubic, two-channel fixture with two selectable visual effects. Its mount remains stationary while the mirrored cube and its projection pattern rotate together.
+The DMX Disco Ball is a cubic, three-channel fixture with two selectable visual effects. Its mount remains stationary while the mirrored cube and its projection pattern rotate together.
 
 **Beams** draws twenty narrow rainbow beams: eight form a horizontal ring, eight form a steeper staggered ring toward the open side of the mount, and four form a shallower ring. There is no straight vertical beam.
 
@@ -13,15 +13,23 @@ Right-click the block, or select **Edit** from its Lighting Console row, to set:
 - name, group, and universe;
 - Dimmer channel;
 - Spin Rate channel;
+- Effect Mode channel;
 - initial rotation angle;
 - base position at the top or bottom;
 - Beams or Dots effect mode;
 - DMX or Manual mode;
 - manual dimmer and spin values.
 
-The default patch is Universe 1, Dimmer 1, and Spin Rate 2.
+The default patch is Universe 1, Dimmer 1, Spin Rate 2, and Effect Mode 3.
 
-Effect mode is a saved fixture setting rather than a third DMX channel. Both modes use the same Dimmer and Spin Rate controls.
+## Effect mapping
+
+| DMX value | Projection |
+| --- | --- |
+| 0-127 | Beams |
+| 128-255 | Dots |
+
+The Beams and Dots buttons store the fallback used in Manual mode or when the Effect Mode channel is blank. In DMX mode, an assigned Effect Mode channel takes control. Existing balls from an earlier build keep their saved selection until you assign this channel.
 
 ## Spin mapping
 
@@ -48,19 +56,25 @@ Place a ball at your feet:
 Full brightness, stopped:
 
 ```mcfunction
-/dmxsend 1 1 255 128
+/dmxsend 1 1 255 128 0
 ```
 
 Full brightness, maximum forward spin:
 
 ```mcfunction
-/dmxsend 1 1 255 255
+/dmxsend 1 1 255 255 0
 ```
 
 Full brightness, maximum reverse spin:
 
 ```mcfunction
-/dmxsend 1 1 255 0
+/dmxsend 1 1 255 0 0
+```
+
+Switch to Dots while preserving brightness and spin:
+
+```mcfunction
+/dmx 1 3 255
 ```
 
 Blackout while preserving the current spin-rate value:

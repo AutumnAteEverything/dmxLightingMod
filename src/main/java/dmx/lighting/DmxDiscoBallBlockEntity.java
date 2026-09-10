@@ -40,7 +40,7 @@ public final class DmxDiscoBallBlockEntity
                 FixtureParameterMap.UNASSIGNED,
                 FixtureParameterMap.UNASSIGNED,
                 1,
-                FixtureParameterMap.UNASSIGNED,
+                3,
                 2,
                 FixtureParameterMap.UNASSIGNED,
                 FixtureParameterMap.UNASSIGNED,
@@ -112,6 +112,18 @@ public final class DmxDiscoBallBlockEntity
     }
 
     public DmxDiscoBallEffectMode getEffectMode() {
+        return effectMode;
+    }
+
+    /** Resolves the patched DMX effect channel or the saved fallback mode. */
+    public DmxDiscoBallEffectMode getResolvedEffectMode() {
+        if (getControlMode() == FixtureControlMode.DMX
+                && FixtureParameterMap.isAssigned(
+                        getParameterMap().getStrobeChannel()
+                )) {
+            return DmxDiscoBallEffectMode.fromDmxValue(getDmxStrobe());
+        }
+
         return effectMode;
     }
 
