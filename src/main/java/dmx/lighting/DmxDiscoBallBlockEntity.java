@@ -2,6 +2,8 @@ package dmx.lighting;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /** DMX state and smooth bipolar rotation for a Disco Ball block. */
 public final class DmxDiscoBallBlockEntity
@@ -16,6 +18,9 @@ public final class DmxDiscoBallBlockEntity
     private float displayedSpinDegrees;
     private float sampledInitialDegrees =
             Float.NaN;
+
+    private DmxDiscoBallEffectMode effectMode =
+            DmxDiscoBallEffectMode.BEAMS;
 
     public DmxDiscoBallBlockEntity(
             BlockPos blockPos,
@@ -106,6 +111,24 @@ public final class DmxDiscoBallBlockEntity
         );
     }
 
+    public DmxDiscoBallEffectMode getEffectMode() {
+        return effectMode;
+    }
+
+    public void setEffectMode(DmxDiscoBallEffectMode effectMode) {
+        DmxDiscoBallEffectMode safeMode =
+                effectMode == null
+                        ? DmxDiscoBallEffectMode.BEAMS
+                        : effectMode;
+
+        if (this.effectMode == safeMode) {
+            return;
+        }
+
+        this.effectMode = safeMode;
+        setChanged();
+    }
+
     /**
      * Integrates rotation on the client without changing world state.
      * DMX 128 is stopped, 0 is maximum reverse, and 255 is maximum
@@ -155,6 +178,26 @@ public final class DmxDiscoBallBlockEntity
                 : (spin - 128) / 127.0F;
 
         return normalized * MAX_DEGREES_PER_SECOND;
+    }
+
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putString(
+                "disco_effect_mode",
+                effectMode.getSerializedName()
+        );
+    }
+
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        effectMode = DmxDiscoBallEffectMode.fromSerializedName(
+                input.getStringOr(
+                        "disco_effect_mode",
+                        DmxDiscoBallEffectMode.BEAMS.getSerializedName()
+                )
+        );
     }
 
     private static float normalizeDegrees(float degrees) {

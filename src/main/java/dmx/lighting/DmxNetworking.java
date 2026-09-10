@@ -33,6 +33,9 @@ import java.util.Locale;
  * UpdateFixtureMountOrientationPayload
  *     Stores physical installation pan and tilt.
  *
+ * UpdateDmxDiscoBallEffectPayload
+ *     Selects Beams or projected Dots for a DMX Disco Ball.
+ *
  * UpdateFixturePanTiltInterpolationPayload
  *     Stores optional Pan/Tilt smoothing and its transition time.
  *
@@ -135,6 +138,11 @@ public final class DmxNetworking {
         PayloadTypeRegistry.serverboundPlay().register(
                 UpdateFixtureMountOrientationPayload.TYPE,
                 UpdateFixtureMountOrientationPayload.STREAM_CODEC
+        );
+
+        PayloadTypeRegistry.serverboundPlay().register(
+                UpdateDmxDiscoBallEffectPayload.TYPE,
+                UpdateDmxDiscoBallEffectPayload.STREAM_CODEC
         );
 
         PayloadTypeRegistry.serverboundPlay().register(
@@ -285,6 +293,17 @@ public final class DmxNetworking {
                 (payload, context) ->
                         context.server().execute(
                                 () -> handleMountOrientationUpdate(
+                                        context.player(),
+                                        payload
+                                )
+                        )
+        );
+
+        ServerPlayNetworking.registerGlobalReceiver(
+                UpdateDmxDiscoBallEffectPayload.TYPE,
+                (payload, context) ->
+                        context.server().execute(
+                                () -> handleDiscoBallEffectUpdate(
                                         context.player(),
                                         payload
                                 )
@@ -760,6 +779,27 @@ public final class DmxNetworking {
         fixture.setMountOrientation(
                 payload.panDegrees(),
                 payload.tiltDegrees()
+        );
+    }
+
+    private static void handleDiscoBallEffectUpdate(
+            ServerPlayer player,
+            UpdateDmxDiscoBallEffectPayload payload
+    ) {
+        DmxFixtureBlockEntity fixture =
+                getFixture(
+                        player,
+                        payload.position()
+                );
+
+        if (!(fixture instanceof DmxDiscoBallBlockEntity discoBall)) {
+            return;
+        }
+
+        discoBall.setEffectMode(
+                payload.dotsMode()
+                        ? DmxDiscoBallEffectMode.DOTS
+                        : DmxDiscoBallEffectMode.BEAMS
         );
     }
 

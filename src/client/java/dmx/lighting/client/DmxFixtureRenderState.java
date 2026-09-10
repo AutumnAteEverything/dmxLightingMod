@@ -1,8 +1,12 @@
 package dmx.lighting.client;
 
+import dmx.lighting.DmxDiscoBallEffectMode;
 import dmx.lighting.FixtureBeamSettings;
 
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.core.Direction;
+
+import java.util.List;
 
 /**
  * Per-frame rendering snapshot for one DMX fixture.
@@ -120,6 +124,12 @@ public final class DmxFixtureRenderState
             0.0F;
 
     private boolean discoBaseOnTop;
+
+    private DmxDiscoBallEffectMode discoEffectMode =
+            DmxDiscoBallEffectMode.BEAMS;
+
+    private List<DiscoSpot> discoSpots =
+            List.of();
 
     /*
      * -----------------------------------------------------------------
@@ -663,6 +673,43 @@ public final class DmxFixtureRenderState
 
     public void setDiscoBaseOnTop(boolean discoBaseOnTop) {
         this.discoBaseOnTop = discoBaseOnTop;
+    }
+
+    public DmxDiscoBallEffectMode getDiscoEffectMode() {
+        return discoEffectMode;
+    }
+
+    public void setDiscoEffectMode(
+            DmxDiscoBallEffectMode discoEffectMode
+    ) {
+        this.discoEffectMode =
+                discoEffectMode == null
+                        ? DmxDiscoBallEffectMode.BEAMS
+                        : discoEffectMode;
+    }
+
+    public List<DiscoSpot> getDiscoSpots() {
+        return discoSpots;
+    }
+
+    public void setDiscoSpots(List<DiscoSpot> discoSpots) {
+        this.discoSpots =
+                discoSpots == null
+                        ? List.of()
+                        : List.copyOf(discoSpots);
+    }
+
+    public void clearDiscoSpots() {
+        discoSpots = List.of();
+    }
+
+    public record DiscoSpot(
+            float x,
+            float y,
+            float z,
+            Direction face,
+            int packedRgb
+    ) {
     }
 
     /**

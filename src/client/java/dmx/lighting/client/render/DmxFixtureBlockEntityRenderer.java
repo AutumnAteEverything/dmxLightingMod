@@ -83,6 +83,8 @@ public final class DmxFixtureBlockEntityRenderer
 
     private final DiscoBallFixtureRenderer discoBallFixtureRenderer;
 
+    private final boolean renderOffScreen;
+
     /*
      * -----------------------------------------------------------------
      * Construction
@@ -92,8 +94,17 @@ public final class DmxFixtureBlockEntityRenderer
     public DmxFixtureBlockEntityRenderer(
             BlockEntityRendererProvider.Context context
     ) {
+        this(context, false);
+    }
+
+    public DmxFixtureBlockEntityRenderer(
+            BlockEntityRendererProvider.Context context,
+            boolean renderOffScreen
+    ) {
         this.font =
                 context.font();
+
+        this.renderOffScreen = renderOffScreen;
 
         this.parFixtureRenderer =
                 new ParFixtureRenderer(
@@ -107,6 +118,11 @@ public final class DmxFixtureBlockEntityRenderer
 
         this.discoBallFixtureRenderer =
                 new DiscoBallFixtureRenderer();
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen() {
+        return renderOffScreen;
     }
 
     /*
@@ -313,6 +329,12 @@ public final class DmxFixtureBlockEntityRenderer
                     discoBall.getSpinRotationDegrees(tickProgress)
             );
             state.setDiscoBaseOnTop(discoBall.isBaseOnTop());
+            discoBallFixtureRenderer.extractRenderState(
+                    discoBall,
+                    state
+            );
+        } else {
+            state.clearDiscoSpots();
         }
 
         /*

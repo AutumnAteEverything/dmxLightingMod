@@ -1,6 +1,7 @@
 package dmx.lighting.gametest;
 
 import dmx.lighting.DmxDiscoBallBlockEntity;
+import dmx.lighting.DmxDiscoBallEffectMode;
 import dmx.lighting.DmxPixelBlockEntity;
 import dmx.lighting.AutomaticDmxShowManager;
 import dmx.lighting.FixtureParameterMap;
@@ -14,6 +15,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -43,6 +45,7 @@ public final class DmxDiscoBallClientGameTest
             singleplayer.getServer().runOnServer(server -> {
                 ServerLevel level = server.overworld();
                 assertAutomaticSpinTiming(level);
+                buildProjectionWall(level);
                 level.setBlockAndUpdate(
                         discoPosition,
                         ModBlocks.DMX_DISCO_BALL.defaultBlockState()
@@ -119,6 +122,33 @@ public final class DmxDiscoBallClientGameTest
             singleplayer.getClientLevel().waitForChunksRender();
             Path screenshot = context.takeScreenshot("dmx-disco-ball");
             assertPrismaticBeams(screenshot);
+
+            singleplayer.getServer().runOnServer(server ->
+                    findDisco(server.overworld(), discoPosition)
+                            .setEffectMode(DmxDiscoBallEffectMode.DOTS)
+            );
+            context.waitTicks(5);
+
+            int[] dotsState = context.computeOnClient(client -> {
+                DmxDiscoBallBlockEntity disco = findDisco(
+                        client.level,
+                        discoPosition
+                );
+                return new int[] {
+                        disco.getEffectMode()
+                                == DmxDiscoBallEffectMode.DOTS ? 1 : 0,
+                        disco.getActiveDimmer()
+                };
+            });
+
+            if (dotsState[0] != 1 || dotsState[1] != 255) {
+                throw new AssertionError("Projected-dot mode did not sync.");
+            }
+
+            Path dotsScreenshot = context.takeScreenshot(
+                    "dmx-disco-ball-dots"
+            );
+            assertScatteredDots(dotsScreenshot);
 
             singleplayer.getServer().runCommand(
                     "dmxsend 1 12 255"
@@ -208,6 +238,17 @@ public final class DmxDiscoBallClientGameTest
         }
     }
 
+    private static void buildProjectionWall(ServerLevel level) {
+        for (int x = -6; x <= 6; x++) {
+            for (int y = -60; y <= -50; y++) {
+                level.setBlockAndUpdate(
+                        new BlockPos(x, y, 5),
+                        Blocks.WHITE_CONCRETE.defaultBlockState()
+                );
+            }
+        }
+    }
+
     private static float angularDifference(float first, float second) {
         float difference = Math.abs(first - second) % 360.0F;
         return Math.min(difference, 360.0F - difference);
@@ -243,6 +284,61 @@ public final class DmxDiscoBallClientGameTest
 
         if (saturatedPixels < 30) {
             throw new AssertionError("Disco ball beams were not visible.");
+        }
+    }
+
+    private static void assertScatteredDots(Path screenshot) {
+        BufferedImage image;
+        try {
+            image = ImageIO.read(screenshot.toFile());
+        } catch (IOException exception) {
+            throw new AssertionError(
+                    "Could not read disco-dot screenshot.",
+                    exception
+            );
+        }
+
+        if (image == null) {
+            throw new AssertionError("Disco-dot screenshot was unreadable.");
+        }
+
+        int saturatedPixels = 0;
+        int cellSize = 40;
+        boolean[][] occupied = new boolean[
+                (image.getHeight() + cellSize - 1) / cellSize
+        ][
+                (image.getWidth() + cellSize - 1) / cellSize
+        ];
+
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) {
+                int color = image.getRGB(x, y);
+                int red = color >> 16 & 0xFF;
+                int green = color >> 8 & 0xFF;
+                int blue = color & 0xFF;
+                int maximum = Math.max(red, Math.max(green, blue));
+                int minimum = Math.min(red, Math.min(green, blue));
+
+                if (maximum >= 120 && maximum - minimum >= 65) {
+                    saturatedPixels++;
+                    occupied[y / cellSize][x / cellSize] = true;
+                }
+            }
+        }
+
+        int occupiedCells = 0;
+        for (boolean[] row : occupied) {
+            for (boolean cell : row) {
+                if (cell) {
+                    occupiedCells++;
+                }
+            }
+        }
+
+        if (saturatedPixels < 30 || occupiedCells < 6) {
+            throw new AssertionError(
+                    "Projected disco dots were not visible and scattered."
+            );
         }
     }
 

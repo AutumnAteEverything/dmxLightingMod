@@ -4,12 +4,26 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
+import dmx.lighting.DmxDiscoBallBlockEntity;
+import dmx.lighting.DmxDiscoBallEffectMode;
 import dmx.lighting.client.DmxFixtureRenderState;
 
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
-/** Renders a stationary mount, rotating mirror cube, and 17 beams. */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+
+/** Renders a stationary mount with beam and projected-dot effects. */
 public final class DiscoBallFixtureRenderer {
 
     private static final float BODY_MIN = 0.27F;
@@ -25,6 +39,19 @@ public final class DiscoBallFixtureRenderer {
     private static final float DIAGONAL_OFFSET_DEGREES =
             RING_STEP_DEGREES / 2.0F;
     private static final float DIAGONAL_TILT_DEGREES = 42.0F;
+    private static final int SHALLOW_BEAM_COUNT = 4;
+    private static final float SHALLOW_BEAM_STEP_DEGREES =
+            360.0F / SHALLOW_BEAM_COUNT;
+    private static final float SHALLOW_DIAGONAL_TILT_DEGREES = 22.0F;
+
+    private static final int DOT_RAY_COUNT = 64;
+    private static final double DOT_RANGE_BLOCKS = 24.0D;
+    private static final double DOT_RAY_START_BLOCKS = 0.90D;
+    private static final double GOLDEN_ANGLE_RADIANS =
+            Math.PI * (3.0D - Math.sqrt(5.0D));
+    private static final float DOT_HALF_SIZE = 0.075F;
+    private static final float DOT_HALF_THICKNESS = 0.006F;
+    private static final float DOT_SURFACE_OFFSET = 0.010F;
 
     private static final int[] BEAM_COLORS = {
             0xFF3B30,
@@ -36,6 +63,44 @@ public final class DiscoBallFixtureRenderer {
             0xAF52DE,
             0xFF2BD6
     };
+
+    private final Map<DmxDiscoBallBlockEntity, DotCache> dotCaches =
+            new WeakHashMap<>();
+
+    public void extractRenderState(
+            DmxDiscoBallBlockEntity fixture,
+            DmxFixtureRenderState state
+    ) {
+        state.setDiscoEffectMode(fixture.getEffectMode());
+
+        if (fixture.getEffectMode() != DmxDiscoBallEffectMode.DOTS
+                || state.getDimmer() <= 0
+                || fixture.getLevel() == null) {
+            state.clearDiscoSpots();
+            return;
+        }
+
+        Level level = fixture.getLevel();
+        long gameTime = level.getGameTime();
+        DotCache cached = dotCaches.get(fixture);
+
+        if (cached != null && cached.gameTime() == gameTime) {
+            state.setDiscoSpots(cached.spots());
+            return;
+        }
+
+        List<DmxFixtureRenderState.DiscoSpot> spots =
+                projectDots(
+                        fixture,
+                        state.getDiscoRotationDegrees()
+                );
+
+        dotCaches.put(
+                fixture,
+                new DotCache(gameTime, spots)
+        );
+        state.setDiscoSpots(spots);
+    }
 
     public void submit(
             DmxFixtureRenderState state,
@@ -54,8 +119,80 @@ public final class DiscoBallFixtureRenderer {
         matrices.translate(-BODY_CENTER, -BODY_CENTER, -BODY_CENTER);
 
         submitMirrorCube(state, matrices, queue);
-        submitBeams(state, matrices, queue);
+        if (state.getDiscoEffectMode()
+                == DmxDiscoBallEffectMode.BEAMS) {
+            submitBeams(state, matrices, queue);
+        }
         matrices.popPose();
+
+        if (state.getDiscoEffectMode()
+                == DmxDiscoBallEffectMode.DOTS) {
+            submitDots(state, matrices, queue);
+        }
+    }
+
+    private static List<DmxFixtureRenderState.DiscoSpot> projectDots(
+            DmxDiscoBallBlockEntity fixture,
+            float rotationDegrees
+    ) {
+        Level level = fixture.getLevel();
+        if (level == null) {
+            return List.of();
+        }
+
+        Vec3 origin = Vec3.atCenterOf(fixture.getBlockPos());
+        Vec3 blockOrigin = Vec3.atLowerCornerOf(fixture.getBlockPos());
+        double rotationRadians = Math.toRadians(rotationDegrees);
+        List<DmxFixtureRenderState.DiscoSpot> spots =
+                new ArrayList<>(DOT_RAY_COUNT);
+
+        for (int ray = 0; ray < DOT_RAY_COUNT; ray++) {
+            double vertical = 1.0D
+                    - 2.0D * (ray + 0.5D) / DOT_RAY_COUNT;
+            double horizontal = Math.sqrt(
+                    Math.max(0.0D, 1.0D - vertical * vertical)
+            );
+            double azimuth = ray * GOLDEN_ANGLE_RADIANS
+                    + rotationRadians;
+            Vec3 direction = new Vec3(
+                    -Math.sin(azimuth) * horizontal,
+                    vertical,
+                    -Math.cos(azimuth) * horizontal
+            );
+            Vec3 start = origin.add(
+                    direction.scale(DOT_RAY_START_BLOCKS)
+            );
+            Vec3 end = origin.add(
+                    direction.scale(DOT_RANGE_BLOCKS)
+            );
+
+            BlockHitResult hit = level.clip(
+                    new ClipContext(
+                            start,
+                            end,
+                            ClipContext.Block.COLLIDER,
+                            ClipContext.Fluid.NONE,
+                            CollisionContext.empty()
+                    )
+            );
+
+            if (hit.getType() != HitResult.Type.BLOCK) {
+                continue;
+            }
+
+            Vec3 relative = hit.getLocation().subtract(blockOrigin);
+            spots.add(
+                    new DmxFixtureRenderState.DiscoSpot(
+                            (float) relative.x,
+                            (float) relative.y,
+                            (float) relative.z,
+                            hit.getDirection(),
+                            BEAM_COLORS[ray % BEAM_COLORS.length]
+                    )
+            );
+        }
+
+        return List.copyOf(spots);
     }
 
     private static void submitMount(
@@ -207,13 +344,81 @@ public final class DiscoBallFixtureRenderer {
             );
         }
 
-        submitBeam(
-                state,
+        float shallowOpenSideTilt =
+                state.isDiscoBaseOnTop()
+                        ? -SHALLOW_DIAGONAL_TILT_DEGREES
+                        : SHALLOW_DIAGONAL_TILT_DEGREES;
+
+        for (int beam = 0; beam < SHALLOW_BEAM_COUNT; beam++) {
+            submitBeam(
+                    state,
+                    matrices,
+                    queue,
+                    BEAM_COLORS[(beam * 2 + 1) % BEAM_COLORS.length],
+                    beam * SHALLOW_BEAM_STEP_DEGREES,
+                    shallowOpenSideTilt
+            );
+        }
+    }
+
+    private static void submitDots(
+            DmxFixtureRenderState state,
+            PoseStack matrices,
+            SubmitNodeCollector queue
+    ) {
+        if (state.getDimmer() <= 0 || state.getDiscoSpots().isEmpty()) {
+            return;
+        }
+
+        int alpha = Math.max(
+                8,
+                Math.round(255.0F * state.getNormalizedDimmer())
+        );
+
+        queue.submitCustomGeometry(
                 matrices,
-                queue,
-                BEAM_COLORS[2],
-                0.0F,
-                state.isDiscoBaseOnTop() ? -90.0F : 90.0F
+                RenderTypes.debugQuads(),
+                (pose, vertices) -> {
+                    for (DmxFixtureRenderState.DiscoSpot spot
+                            : state.getDiscoSpots()) {
+                        submitDot(pose, vertices, spot, alpha);
+                    }
+                }
+        );
+    }
+
+    private static void submitDot(
+            PoseStack.Pose pose,
+            VertexConsumer vertices,
+            DmxFixtureRenderState.DiscoSpot spot,
+            int alpha
+    ) {
+        Direction face = spot.face();
+        float x = spot.x() + face.getStepX() * DOT_SURFACE_OFFSET;
+        float y = spot.y() + face.getStepY() * DOT_SURFACE_OFFSET;
+        float z = spot.z() + face.getStepZ() * DOT_SURFACE_OFFSET;
+        float halfX = face.getAxis() == Direction.Axis.X
+                ? DOT_HALF_THICKNESS
+                : DOT_HALF_SIZE;
+        float halfY = face.getAxis() == Direction.Axis.Y
+                ? DOT_HALF_THICKNESS
+                : DOT_HALF_SIZE;
+        float halfZ = face.getAxis() == Direction.Axis.Z
+                ? DOT_HALF_THICKNESS
+                : DOT_HALF_SIZE;
+        int color = (alpha << 24)
+                | (spot.packedRgb() & 0x00FFFFFF);
+
+        submitBox(
+                pose,
+                vertices,
+                x - halfX,
+                y - halfY,
+                z - halfZ,
+                x + halfX,
+                y + halfY,
+                z + halfZ,
+                color
         );
     }
 
@@ -341,5 +546,11 @@ public final class DiscoBallFixtureRenderer {
         vertices.addVertex(pose, x2, y2, z2).setColor(color);
         vertices.addVertex(pose, x3, y3, z3).setColor(color);
         vertices.addVertex(pose, x4, y4, z4).setColor(color);
+    }
+
+    private record DotCache(
+            long gameTime,
+            List<DmxFixtureRenderState.DiscoSpot> spots
+    ) {
     }
 }

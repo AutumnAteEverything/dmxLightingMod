@@ -1,6 +1,7 @@
 package dmx.lighting.client;
 
 import dmx.lighting.DmxDiscoBallBlockEntity;
+import dmx.lighting.DmxDiscoBallEffectMode;
 import dmx.lighting.DmxFixtureBlockEntity;
 import dmx.lighting.FixtureControlMode;
 import dmx.lighting.FixtureGroupName;
@@ -12,6 +13,7 @@ import dmx.lighting.UpdateFixtureGroupPayload;
 import dmx.lighting.UpdateFixtureMountOrientationPayload;
 import dmx.lighting.UpdateFixtureParameterMapPayload;
 import dmx.lighting.UpdateFixturePayload;
+import dmx.lighting.UpdateDmxDiscoBallEffectPayload;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 
@@ -44,8 +46,12 @@ public final class DmxDiscoBallScreen extends Screen {
     private Button basePositionButton;
     private Button dmxModeButton;
     private Button manualModeButton;
+    private Button beamsEffectButton;
+    private Button dotsEffectButton;
 
     private boolean baseOnTop;
+    private DmxDiscoBallEffectMode effectMode =
+            DmxDiscoBallEffectMode.BEAMS;
     private String controlMode = FixtureControlMode.DMX.getSerializedName();
     private Component statusMessage = Component.empty();
     private int statusColor = 0xFFFFFFFF;
@@ -65,6 +71,7 @@ public final class DmxDiscoBallScreen extends Screen {
 
         if (fixture != null) {
             baseOnTop = fixture.isBaseOnTop();
+            effectMode = fixture.getEffectMode();
             controlMode = fixture.getControlMode().getSerializedName();
         }
 
@@ -185,6 +192,33 @@ public final class DmxDiscoBallScreen extends Screen {
                 ).build()
         );
 
+        beamsEffectButton = addRenderableWidget(
+                Button.builder(
+                        Component.literal("Beams"),
+                        button -> setEffectMode(
+                                DmxDiscoBallEffectMode.BEAMS
+                        )
+                ).bounds(
+                        right,
+                        top + ROW_SPACING * 5,
+                        105,
+                        FIELD_HEIGHT
+                ).build()
+        );
+        dotsEffectButton = addRenderableWidget(
+                Button.builder(
+                        Component.literal("Dots"),
+                        button -> setEffectMode(
+                                DmxDiscoBallEffectMode.DOTS
+                        )
+                ).bounds(
+                        right + 115,
+                        top + ROW_SPACING * 5,
+                        105,
+                        FIELD_HEIGHT
+                ).build()
+        );
+
         int bottom = Math.max(top + ROW_SPACING * 6 + 6, height - 48);
         addRenderableWidget(
                 Button.builder(
@@ -204,6 +238,7 @@ public final class DmxDiscoBallScreen extends Screen {
         );
 
         updateModeButtons();
+        updateEffectModeButtons();
         setInitialFocus(nameField);
     }
 
@@ -268,6 +303,22 @@ public final class DmxDiscoBallScreen extends Screen {
         );
     }
 
+    private void setEffectMode(DmxDiscoBallEffectMode mode) {
+        effectMode = mode;
+        updateEffectModeButtons();
+    }
+
+    private void updateEffectModeButtons() {
+        if (beamsEffectButton != null) {
+            beamsEffectButton.active =
+                    effectMode != DmxDiscoBallEffectMode.BEAMS;
+        }
+        if (dotsEffectButton != null) {
+            dotsEffectButton.active =
+                    effectMode != DmxDiscoBallEffectMode.DOTS;
+        }
+    }
+
     private boolean saveConfiguration() {
         Integer universe = parseInteger(universeField.getValue());
         Integer dimmerChannel = parseChannel(dimmerChannelField);
@@ -287,6 +338,13 @@ public final class DmxDiscoBallScreen extends Screen {
 
         if (!ClientPlayNetworking.canSend(UpdateFixturePayload.TYPE)) {
             setError("DMX Disco Ball controls are unavailable.");
+            return false;
+        }
+
+        if (!ClientPlayNetworking.canSend(
+                UpdateDmxDiscoBallEffectPayload.TYPE
+        )) {
+            setError("DMX Disco Ball effect controls are unavailable.");
             return false;
         }
 
@@ -324,6 +382,12 @@ public final class DmxDiscoBallScreen extends Screen {
                         fixturePosition,
                         initialAngleSlider.getDegrees(),
                         baseOnTop ? 180.0F : 0.0F
+                )
+        );
+        ClientPlayNetworking.send(
+                new UpdateDmxDiscoBallEffectPayload(
+                        fixturePosition,
+                        effectMode == DmxDiscoBallEffectMode.DOTS
                 )
         );
         ClientPlayNetworking.send(
@@ -432,6 +496,15 @@ public final class DmxDiscoBallScreen extends Screen {
                 "Control mode",
                 centerX + 20,
                 top + ROW_SPACING * 2 + 6,
+                0xFFAAAAAA,
+                false
+        );
+
+        graphics.text(
+                font,
+                "Effect mode",
+                centerX + 20,
+                top + ROW_SPACING * 4 + 6,
                 0xFFAAAAAA,
                 false
         );

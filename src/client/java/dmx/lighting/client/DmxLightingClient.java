@@ -74,7 +74,10 @@ public class DmxLightingClient implements ClientModInitializer {
 
         BlockEntityRenderers.register(
                 ModBlockEntities.DMX_DISCO_BALL_BLOCK_ENTITY,
-                DmxFixtureBlockEntityRenderer::new
+                context -> new DmxFixtureBlockEntityRenderer(
+                        context,
+                        true
+                )
         );
     }
 

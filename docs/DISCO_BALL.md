@@ -1,6 +1,10 @@
 # DMX Disco Ball
 
-The DMX Disco Ball is a cubic, two-channel fixture. Its mount remains stationary while the mirrored cube and seventeen narrow beams rotate together. Eight beams form a horizontal ring, eight more angle outward between them toward the open side of the mount, and one points straight away from the mount. The beams cycle through a fixed rainbow palette.
+The DMX Disco Ball is a cubic, two-channel fixture with two selectable visual effects. Its mount remains stationary while the mirrored cube and its projection pattern rotate together.
+
+**Beams** draws twenty narrow rainbow beams: eight form a horizontal ring, eight form a steeper staggered ring toward the open side of the mount, and four form a shallower ring. There is no straight vertical beam.
+
+**Dots** hides the beam volumes and projects scattered full-bright colored squares onto collidable floors, walls, and ceilings within 24 blocks. The spots follow the spinning mirror pattern but do not emit Minecraft world light.
 
 ## Controls
 
@@ -11,10 +15,13 @@ Right-click the block, or select **Edit** from its Lighting Console row, to set:
 - Spin Rate channel;
 - initial rotation angle;
 - base position at the top or bottom;
+- Beams or Dots effect mode;
 - DMX or Manual mode;
 - manual dimmer and spin values.
 
 The default patch is Universe 1, Dimmer 1, and Spin Rate 2.
+
+Effect mode is a saved fixture setting rather than a third DMX channel. Both modes use the same Dimmer and Spin Rate controls.
 
 ## Spin mapping
 
@@ -26,7 +33,7 @@ The default patch is Universe 1, Dimmer 1, and Spin Rate 2.
 | 129-254 | Forward, speeding up |
 | 255 | Maximum forward |
 
-Changing the initial angle resets the cube to that position. The top/bottom selection moves only the stationary base and stem; the beam pointing through the mount is omitted.
+Changing the initial angle resets the cube to that position. The top/bottom selection moves the stationary base and stem and points the angled beam rings toward the open side of the mount.
 
 During Automatic DMX playback, the ball uses a slower movement wave than ordinary fixtures. It spins in each direction for about 24 beats before easing through stop and reversing.
 
