@@ -23,7 +23,7 @@ dmxLighting is a Fabric mod for building and operating theatrical-style lighting
 - Optional DMX channel for selecting the DMX Block skin.
 - Emissive DMX Block surfaces that remain visible in darkness while emitting no Minecraft block light.
 - Summonable **DMX Block Displays** with the same emissive skins and DMX controls, plus vanilla display transformations including negative scale.
-- Cubic **DMX Disco Ball** with a stationary top/bottom mount, twenty colored beams or projected room dots, initial-angle control, and bipolar spin speed.
+- Cubic **DMX Disco Ball** with mode-specific dark laser and bright mirror checkerboards, a stationary top/bottom mount, twenty colored beams or projected room dots, initial-angle control, and bipolar spin speed.
 - **DMX Parrot**, **DMX Enderman**, **DMX Warden**, **DMX Nautilus**, **DMX Creaking**, and **DMX Axolotl** mobs with RGB/dimmer patching, color fades, and emissive DMX color rendering.
 - Handheld, right-docked **Lighting Console** with Fixtures, Groups, Universes, Patch, and Output views.
 - Live output to one fixture, one group, or all loaded fixtures.

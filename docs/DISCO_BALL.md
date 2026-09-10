@@ -2,9 +2,9 @@
 
 The DMX Disco Ball is a cubic, three-channel fixture with two selectable visual effects. Its mount remains stationary while the mirrored cube and its projection pattern rotate together.
 
-**Beams** draws twenty narrow rainbow beams: eight form a horizontal ring, eight form a steeper staggered ring toward the open side of the mount, and four form a shallower ring. There is no straight vertical beam.
+**Beams** gives the rotating cube a dark charcoal checkerboard like a compact laser effect and draws twenty narrow rainbow beams: eight form a horizontal ring, eight form a steeper staggered ring toward the open side of the mount, and four form a shallower ring. There is no straight vertical beam.
 
-**Dots** hides the beam volumes and projects scattered full-bright colored squares onto collidable floors, walls, and ceilings within 24 blocks. The spots follow the spinning mirror pattern but do not emit Minecraft world light.
+**Dots** uses the bright silver mirror checkerboard, hides the beam volumes, and projects scattered full-bright colored squares onto collidable floors, walls, and ceilings within 24 blocks. The spots follow the spinning mirror pattern but do not emit Minecraft world light.
 
 ## Controls
 

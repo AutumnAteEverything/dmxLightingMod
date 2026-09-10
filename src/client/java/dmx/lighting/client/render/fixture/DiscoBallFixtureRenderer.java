@@ -30,6 +30,12 @@ public final class DiscoBallFixtureRenderer {
     private static final float BODY_MAX = 0.73F;
     private static final float BODY_CENTER = 0.5F;
     private static final int MIRROR_TILES = 4;
+    private static final int DOT_MIRROR_FLOOR = 70;
+    private static final int DOT_MIRROR_BOOST = 150;
+    private static final int DOT_CHECKER_CONTRAST = 32;
+    private static final int BEAM_MIRROR_FLOOR = 18;
+    private static final int BEAM_MIRROR_BOOST = 38;
+    private static final int BEAM_CHECKER_CONTRAST = 22;
     private static final float BEAM_LENGTH = 7.0F;
     private static final float BEAM_START_HALF_WIDTH = 0.025F;
     private static final float BEAM_END_HALF_WIDTH = 0.075F;
@@ -242,8 +248,16 @@ public final class DiscoBallFixtureRenderer {
             PoseStack matrices,
             SubmitNodeCollector queue
     ) {
-        int floor = 70;
-        int boost = Math.round(150.0F * state.getNormalizedDimmer());
+        boolean beamMode = state.getDiscoEffectMode()
+                == DmxDiscoBallEffectMode.BEAMS;
+        int floor = beamMode ? BEAM_MIRROR_FLOOR : DOT_MIRROR_FLOOR;
+        int boost = Math.round(
+                (beamMode ? BEAM_MIRROR_BOOST : DOT_MIRROR_BOOST)
+                        * state.getNormalizedDimmer()
+        );
+        int checkerContrast = beamMode
+                ? BEAM_CHECKER_CONTRAST
+                : DOT_CHECKER_CONTRAST;
 
         queue.submitCustomGeometry(
                 matrices,
@@ -256,12 +270,14 @@ public final class DiscoBallFixtureRenderer {
                             int checker = (row + column) & 1;
                             int brightness = Math.min(
                                     255,
-                                    floor + boost + checker * 32
+                                    floor + boost
+                                            + checker * checkerContrast
                             );
+                            int blueLift = beamMode ? 8 : 10;
                             int color = 0xFF000000
                                     | brightness << 16
                                     | brightness << 8
-                                    | Math.min(255, brightness + 10);
+                                    | Math.min(255, brightness + blueLift);
                             float a = BODY_MIN + column * tile;
                             float b = a + tile;
                             float c = BODY_MIN + row * tile;
